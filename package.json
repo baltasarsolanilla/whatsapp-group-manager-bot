@@ -1,0 +1,33 @@
+{
+  "name": "whatsapp-group-manager-bot",
+  "version": "1.0.0",
+  "description": "WhatsApp Bot for Manijas en Noosa",
+  "homepage": "https://github.com/baltasarsolanilla/whatsapp-group-manager-bot#readme",
+  "bugs": {
+    "url": "https://github.com/baltasarsolanilla/whatsapp-group-manager-bot/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baltasarsolanilla/whatsapp-group-manager-bot.git"
+  },
+  "license": "MIT",
+  "author": "Baltasar Solanilla",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.0",
+    "axios": "^1.11.0",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "prisma": "^6.16.0"
+  }
+}
