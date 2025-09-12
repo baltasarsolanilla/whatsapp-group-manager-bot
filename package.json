@@ -20,7 +20,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@prisma/client": "^6.16.0",
+    "@prisma/client": "^6.16.1",
     "axios": "^1.11.0",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
@@ -28,6 +28,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.10",
-    "prisma": "^6.16.0"
+    "prisma": "^6.16.1"
   }
 }

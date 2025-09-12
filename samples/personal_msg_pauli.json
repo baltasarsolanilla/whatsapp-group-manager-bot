@@ -1,0 +1,31 @@
+{
+  "key": {
+    "remoteJid": "61434219628@s.whatsapp.net",
+    "fromMe": false,
+    "id": "3A70B55C28150C18AC0E",
+    "senderLid": "162349948338361@lid",
+    "senderPn": null,
+    "participant": null,
+    "participantPn": null,
+    "participantLid": null
+  },
+  "pushName": "Paula",
+  "status": "DELIVERY_ACK",
+  "message": {
+    "conversation": "Are you talking to me?",
+    "messageContextInfo": {
+      "deviceListMetadata": {
+        "senderKeyHash": "encrypted_data",
+        "senderChainHash": "encrypted_data",
+        "senderTimestamp": 1757652542
+      },
+      "deviceListMetadataVersion": 2,
+      "messageSecret": "base64_encoded_secret"
+    }
+  },
+  "contextInfo": null,
+  "messageType": "conversation",
+  "messageTimestamp": 1757652542,
+  "instanceId": "40ce673c-0b8a-45d6-92d1-d20a694cdb6f",
+  "source": "ios"
+}

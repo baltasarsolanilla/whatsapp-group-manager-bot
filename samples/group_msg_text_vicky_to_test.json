@@ -1,0 +1,29 @@
+{
+  "key": {
+    "remoteJid": "120363403645737238@g.us",
+    "fromMe": false,
+    "id": "3AF7D885280C3C348A50",
+    "senderLid": null,
+    "senderPn": null,
+    "participant": "275449187958817@lid",
+    "participantPn": "61484735911@s.whatsapp.net",
+    "participantLid": null
+  },
+  "pushName": "Victoria Day",
+  "status": "DELIVERY_ACK",
+  "message": {
+    "senderKeyDistributionMessage": {
+      "groupId": "120363403645737238@g.us",
+      "axolotlSenderKeyDistributionMessage": "encrypted_key_data_uint8array"
+    },
+    "messageContextInfo": {
+      "messageSecret": "encrypted_secret_uint8array"
+    },
+    "conversation": "Jjjjjj"
+  },
+  "contextInfo": null,
+  "messageType": "conversation",
+  "messageTimestamp": 1757653454,
+  "instanceId": "40ce673c-0b8a-45d6-92d1-d20a694cdb6f",
+  "source": "ios"
+}

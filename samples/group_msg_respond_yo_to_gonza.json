@@ -1,0 +1,30 @@
+{
+  "key": {
+    "remoteJid": "120363403554080562@g.us",
+    "fromMe": false,
+    "id": "3AAFDC4B4393A1F3F013",
+    "senderLid": null,
+    "senderPn": null,
+    "participant": "212059715313729@lid",
+    "participantPn": null,
+    "participantLid": null
+  },
+  "pushName": "Baltasar Solanilla",
+  "status": "DELIVERY_ACK",
+  "message": {
+    "conversation": "A veeer"
+  },
+  "contextInfo": {
+    "mentionedJid": [],
+    "groupMentions": [],
+    "stanzaId": "ACA6F69A158973A333920A783A146594",
+    "participant": "243193983561744@lid",
+    "quotedMessage": {
+      "conversation": "Spero q el seguro de viaje sirva jaja"
+    }
+  },
+  "messageType": "conversation",
+  "messageTimestamp": 1757653347,
+  "instanceId": "40ce673c-0b8a-45d6-92d1-d20a694cdb6f",
+  "source": "ios"
+}

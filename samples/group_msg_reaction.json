@@ -1,0 +1,31 @@
+{
+  "key": {
+    "remoteJid": "120363403554080562@g.us",
+    "fromMe": false,
+    "id": "3A7E6A0740D62AE39AF4",
+    "senderLid": null,
+    "senderPn": null,
+    "participant": "267323109830682@lid",
+    "participantPn": "5492615551432@s.whatsapp.net",
+    "participantLid": null
+  },
+  "pushName": "Facu Cano",
+  "status": "DELIVERY_ACK",
+  "message": {
+    "reactionMessage": {
+      "key": {
+        "remoteJid": "120363403554080562@g.us",
+        "fromMe": false,
+        "id": "original-message-id",
+        "participant": "267323109830682@lid"
+      },
+      "text": "❤️",
+      "senderTimestampMs": 1757652290000
+    }
+  },
+  "contextInfo": null,
+  "messageType": "reactionMessage",
+  "messageTimestamp": 1757652290,
+  "instanceId": "40ce673c-0b8a-45d6-92d1-d20a694cdb6f",
+  "source": "ios"
+}

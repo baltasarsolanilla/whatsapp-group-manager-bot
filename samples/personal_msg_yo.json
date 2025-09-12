@@ -1,0 +1,23 @@
+{
+  "key": {
+    "remoteJid": "61476554841@s.whatsapp.net",
+    "fromMe": true,
+    "id": "3A6D224DE1D86D59932C",
+    "senderLid": null,
+    "senderPn": null,
+    "participant": null,
+    "participantPn": null,
+    "participantLid": null
+  },
+  "pushName": "Baltasar Solanilla",
+  "status": "SERVER_ACK",
+  "message": {
+    "conversation": "Iigjcjc"
+  },
+  "contextInfo": null,
+  "messageType": "conversation",
+  "messageTimestamp": 1757652235,
+  "instanceId": "40ce673c-0b8a-45d6-92d1-d20a694cdb6f",
+  "source": "ios",
+  "evolution_api": true
+}
