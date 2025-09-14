@@ -1,6 +1,6 @@
-import { sendMessage } from "../services/evolutionAPI";
-import { saveMessage } from "../database/db";
-import config from "../config";
+import { sendMessage } from "@services/evolutionAPI";
+import { saveMessage } from "@database/db";
+import config from "@config";
 
 export const handleUpdate = (update) => {
   // Save incoming message

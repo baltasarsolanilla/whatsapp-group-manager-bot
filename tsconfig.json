@@ -8,7 +8,15 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": "src",
+    "paths": {
+      "@logic/*": ["logic/*"],
+      "@routes/*": ["routes/*"],
+      "@services/*": ["services/*"],
+      "@database/*": ["database/*"],
+      "@config": ["config"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
