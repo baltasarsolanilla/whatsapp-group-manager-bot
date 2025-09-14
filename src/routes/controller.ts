@@ -1,4 +1,4 @@
-import { handleUpdate } from '../logic/botLogic.js';
+import { handleUpdate } from '../logic/botLogic';
 
 export const controller = (req, res) => {
   const update = req.body;

@@ -12,11 +12,10 @@
   },
   "license": "MIT",
   "author": "Baltasar Solanilla",
-  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -27,7 +26,11 @@
     "pg": "^8.16.3"
   },
   "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.4.0",
     "nodemon": "^3.1.10",
-    "prisma": "^6.16.0"
+    "prisma": "^6.16.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.2"
   }
 }
