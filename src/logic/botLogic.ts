@@ -1,14 +1,7 @@
-import { sendMessage } from "@services/evolutionAPI";
-import { saveMessage } from "@database/db";
-import config from "@config";
+import { saveMessage } from '@database/db';
 
 export const handleUpdate = (update) => {
-  // Save incoming message
-  saveMessage(update);
-  console.log("Handling update from:", update.data.pushName);
-
-  // ! CAREFUL still using my NUMBER!
-  if (false) {
-    sendMessage(config.waGroupTest, "Bonjourrr");
-  }
+	// Save incoming message
+	saveMessage(update);
+	console.log('Handling update from:', update.data.pushName);
 };

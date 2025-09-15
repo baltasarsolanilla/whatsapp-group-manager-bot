@@ -22,6 +22,8 @@
 		"test": "jest --passWithNoTests",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix",
 		"fix-all": "npm run format && npm run lint:fix"
 	},
 	"dependencies": {
