@@ -16,7 +16,8 @@
 			"@routes/*": ["routes/*"],
 			"@services/*": ["services/*"],
 			"@database/*": ["database/*"],
-			"@config": ["config"]
+			"@config": ["config"],
+			"@types/*": ["types/*"]
 		}
 	},
 	"include": ["src"],

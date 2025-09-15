@@ -1,6 +1,6 @@
-const messages: unknown = []; // Temporary in-memory storage
+const messages: string[] = []; // Temporary in-memory storage
 
-export const saveMessage = (msg: unknown) => {
+export const saveMessage = (msg: string) => {
 	messages.push(msg);
 };
 

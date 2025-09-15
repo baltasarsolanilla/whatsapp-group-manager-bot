@@ -1,13 +1,19 @@
-import { handleUpdate } from '@logic/botLogic';
+import { handleMessageUpsert } from '@logic/botLogic';
+import { EVOLUTION_EVENTS } from 'constants/evolution';
+import { Request, Response } from 'express';
+import { type WebhookPayload } from '../types/evolution';
 
-export const controller = (req, res) => {
+export const controller = (
+	// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+	req: Request<{}, {}, WebhookPayload>,
+	res: Response
+) => {
 	const update = req.body;
-	console.log('==========================================');
-	console.log('Event: ', update.event);
-	console.log('Received update:', update);
+	if (update.event === EVOLUTION_EVENTS.MESSAGES_UPSERT) {
+		handleMessageUpsert(update);
+	}
 
-	// Pass the update to the logic layer
-	handleUpdate(update);
+	console.log('ALERT: Unknown event received');
 
 	res.sendStatus(200);
 };
