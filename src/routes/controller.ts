@@ -1,6 +1,6 @@
 import { handlers } from '@logic/handlers';
 import { Request, Response } from 'express';
-import { type WebhookPayload } from '../types/evolution';
+import type { WebhookPayload } from '../types/evolution';
 
 export const controller = <T extends keyof typeof handlers>(
 	// eslint-disable-next-line @typescript-eslint/no-empty-object-type

@@ -1,7 +1,7 @@
 import config from '@config';
+import { handleAxiosError } from '@utils/errorHandler';
 import axios from 'axios';
-import { handleAxiosError } from 'utils/errorHandler';
-import { type SendTextRequest } from '../types/evolution.d';
+import type { SendTextRequest } from '../types/evolution.d';
 
 const BASE_URL = config.evolutionApiUrl;
 const API_KEY = config.evolutionApiKey;

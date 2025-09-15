@@ -1,4 +1,4 @@
-import { type WebhookPayload } from '../types/evolution';
+import type { WebhookPayload } from '../types/evolution';
 import { EVOLUTION_EVENTS } from './../constants/evolution';
 
 export const handleMessageUpsert = (
