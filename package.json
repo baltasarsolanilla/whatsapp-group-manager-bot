@@ -1,44 +1,52 @@
 {
-  "name": "whatsapp-group-manager-bot",
-  "version": "1.0.0",
-  "description": "WhatsApp Bot for Manijas en Noosa",
-  "homepage": "https://github.com/baltasarsolanilla/whatsapp-group-manager-bot#readme",
-  "bugs": {
-    "url": "https://github.com/baltasarsolanilla/whatsapp-group-manager-bot/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/baltasarsolanilla/whatsapp-group-manager-bot.git"
-  },
-  "license": "MIT",
-  "author": "Baltasar Solanilla",
-  "main": "index.js",
-  "scripts": {
-    "dev": "nodemon",
-    "build:ts": "tsc",
-    "build:alias": "tsc-alias",
-    "build": "npm run build:ts && npm run build:alias",
-    "start": "node dist/index.js",
-    "test": "jest --passWithNoTests"
-  },
-  "dependencies": {
-    "@prisma/client": "^6.16.0",
-    "axios": "^1.11.0",
-    "dotenv": "^17.2.2",
-    "express": "^5.1.0",
-    "pg": "^8.16.3"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.3",
-    "@types/jest": "^30.0.0",
-    "@types/node": "^24.4.0",
-    "jest": "^30.1.3",
-    "nodemon": "^3.1.10",
-    "prisma": "^6.16.0",
-    "ts-jest": "^29.4.1",
-    "ts-node-dev": "^2.0.0",
-    "tsc-alias": "^1.8.16",
-    "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.9.2"
-  }
+	"name": "whatsapp-group-manager-bot",
+	"version": "1.0.0",
+	"description": "WhatsApp Bot for Manijas en Noosa",
+	"homepage": "https://github.com/baltasarsolanilla/whatsapp-group-manager-bot#readme",
+	"bugs": {
+		"url": "https://github.com/baltasarsolanilla/whatsapp-group-manager-bot/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/baltasarsolanilla/whatsapp-group-manager-bot.git"
+	},
+	"license": "MIT",
+	"author": "Baltasar Solanilla",
+	"main": "index.js",
+	"scripts": {
+		"dev": "nodemon",
+		"build:ts": "tsc",
+		"build:alias": "tsc-alias",
+		"build": "npm run build:ts && npm run build:alias",
+		"start": "node dist/index.js",
+		"test": "jest --passWithNoTests",
+		"format": "prettier --write .",
+		"format:check": "prettier --check .",
+		"fix-all": "npm run format && npm run lint:fix"
+	},
+	"dependencies": {
+		"@prisma/client": "^6.16.0",
+		"axios": "^1.11.0",
+		"dotenv": "^17.2.2",
+		"express": "^5.1.0",
+		"pg": "^8.16.3"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.35.0",
+		"@types/express": "^5.0.3",
+		"@types/jest": "^30.0.0",
+		"@types/node": "^24.4.0",
+		"eslint": "^9.35.0",
+		"eslint-config-prettier": "^10.1.8",
+		"jest": "^30.1.3",
+		"nodemon": "^3.1.10",
+		"prettier": "^3.6.2",
+		"prisma": "^6.16.0",
+		"ts-jest": "^29.4.1",
+		"ts-node-dev": "^2.0.0",
+		"tsc-alias": "^1.8.16",
+		"tsconfig-paths": "^4.2.0",
+		"typescript": "^5.9.2",
+		"typescript-eslint": "^8.43.0"
+	}
 }

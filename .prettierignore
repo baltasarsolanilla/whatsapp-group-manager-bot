@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+coverage/
+
+# Config files (optional - you might want to format these)
+*.config.ts
+
+# Environment files
+.env*
+
+# Logs
+*.log
+
+# Lock files
+package-lock.json
