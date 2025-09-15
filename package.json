@@ -25,7 +25,8 @@
 		"format:check": "prettier --check .",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
-		"fix-all": "npm run format && npm run lint:fix"
+		"fix-all": "npm run format && npm run lint:fix",
+		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
 		"@prisma/client": "^6.16.0",
