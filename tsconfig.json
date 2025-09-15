@@ -17,7 +17,7 @@
 			"@services/*": ["services/*"],
 			"@database/*": ["database/*"],
 			"@config": ["config"],
-			"@types/*": ["types/*"]
+			"@constants/*": ["constants/*"]
 		}
 	},
 	"include": ["src"],
