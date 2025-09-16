@@ -14,7 +14,7 @@ datasource db {
 model User {
   id         String   @id @default(cuid())
   whatsappId String   @unique @map("whatsapp_user_id")
-  whatsappPh String?  @map("whatsapp_user_ph")
+  whatsappPn String?  @map("whatsapp_user_pn")
   name       String
   createdAt  DateTime @default(now()) @map("created_at")
 
