@@ -39,7 +39,7 @@ export type MessageUpsert = {
 		fromMe: boolean;
 		id: string;
 		participant: string;
-		participantPn: string;
+		participantPn?: string;
 	};
 	pushName: string;
 	messageType: MessageType;
