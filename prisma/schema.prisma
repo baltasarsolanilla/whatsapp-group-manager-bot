@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// CORE ENTITIES
+// ============================================================================
+
+model User {
+  id         String   @id @default(cuid())
+  whatsappId String   @unique @map("whatsapp_user_id")
+  whatsappPn String?  @map("whatsapp_user_pn")
+  name       String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  groupMemberships GroupMembership[]
+  messages         Message[]
+  whitelistEntries Whitelist[]
+  blacklistEntries Blacklist[]
+  removalQueue     RemovalQueue[]
+
+  @@map("users")
+}
+
+model Group {
+  id         String   @id @default(cuid())
+  whatsappId String   @unique @map("whatsapp_group_id")
+  name       String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  groupMemberships GroupMembership[]
+  messages         Message[]
+  whitelistEntries Whitelist[]
+  blacklistEntries Blacklist[]
+  removalQueue     RemovalQueue[]
+
+  @@map("groups")
+}
+
+model GroupMembership {
+  id           String    @id @default(cuid())
+  userId       String    @map("user_id")
+  groupId      String    @map("group_id")
+  joinDate     DateTime  @map("join_date")
+  lastActiveAt DateTime? @map("last_active_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  // Unique constraint to prevent duplicate memberships
+  @@unique([userId, groupId])
+  @@map("group_memberships")
+}
+
+// ============================================================================
+// ACTIVITY TRACKING ENTITIES
+// ============================================================================
+
+model Message {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  groupId     String   @map("group_id")
+  messageType String   @map("message_type")
+  date        DateTime
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([groupId])
+  @@map("messages")
+}
+
+// ============================================================================
+// MEMBER MANAGEMENT ENTITIES
+// ============================================================================
+
+model Whitelist {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  groupId   String   @map("group_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  // Unique constraint to prevent duplicate whitelist entries
+  @@unique([userId, groupId])
+  @@map("whitelist")
+}
+
+model Blacklist {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  groupId   String   @map("group_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  // Unique constraint to prevent duplicate blacklist entries
+  @@unique([userId, groupId])
+  @@map("blacklist")
+}
+
+// ============================================================================
+// PROCESSING QUEUE ENTITIES
+// ============================================================================
+
+enum RemovalStatus {
+  PENDING
+  PROCESSED
+  FAILED
+
+  @@map("removal_status")
+}
+
+model RemovalQueue {
+  id          String        @id @default(cuid())
+  userId      String        @map("user_id")
+  groupId     String        @map("group_id")
+  status      RemovalStatus @default(PENDING)
+  processedAt DateTime?     @map("processed_at")
+  createdAt   DateTime      @default(now()) @map("created_at")
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("removal_queue")
+}
+
+// ============================================================================
+// EVOLUTION API INTEGRATION ENTITIES
+// ============================================================================
+
+model WebhookEvent {
+  id        String   @id @default(cuid())
+  event     String   @map("event_type")
+  instance  String   @map("instance_name")
+  data      Json // Store raw webhook JSON data
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([event])
+  @@index([instance])
+  @@index([createdAt])
+  @@map("webhook_events")
+}

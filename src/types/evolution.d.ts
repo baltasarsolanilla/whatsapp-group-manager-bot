@@ -2,6 +2,7 @@
 import { EVOLUTION_EVENTS } from 'constants/evolution';
 
 export type EvolutionIntegration = 'WHATSAPP-BAILEYS' | 'WHATSAPP-BUSINESS';
+export type MessageType = 'conversation' | 'messageReaction';
 
 // -------------------------------
 // Messaging
@@ -37,19 +38,19 @@ export type MessageUpsert = {
 		remoteJid: string;
 		fromMe: boolean;
 		id: string;
-	};
-	message: {
-		conversation?: string;
-		extendedTextMessage?: {
-			text: string;
-		};
+		participant: string;
+		participantPn?: string;
 	};
 	pushName: string;
-	timestamp: number;
+	messageType: MessageType;
 };
 
 export type EvolutionEvent =
 	(typeof EVOLUTION_EVENTS)[keyof typeof EVOLUTION_EVENTS];
+
+export type EvolutionData = {
+	remoteJid: string;
+};
 
 export type WebhookPayloadMap = {
 	[EVOLUTION_EVENTS.MESSAGES_UPSERT]: MessageUpsert;
