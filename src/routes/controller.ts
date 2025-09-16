@@ -12,7 +12,7 @@ export const controller = <T extends keyof typeof handlers>(
 	const handler = handlers[update.event as T];
 
 	if (handler) {
-		console.warn('UPSERT: ', update);
+		console.log('MESSAGE_UPSERT: ', update);
 		handler(update as WebhookPayload<T>);
 	} else {
 		console.warn('ALERT: Unknown event received', update);
