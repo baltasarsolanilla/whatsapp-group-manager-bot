@@ -67,6 +67,7 @@ model GroupMembership {
 
 model Message {
   id          String   @id @default(cuid())
+  whatsappId  String   @unique @map("whatsapp_message_id")
   userId      String   @map("user_id")
   groupId     String   @map("group_id")
   messageType String   @map("message_type")
