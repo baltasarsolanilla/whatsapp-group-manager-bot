@@ -32,7 +32,10 @@ export const whitelistService = {
 		return await whitelistRepository.remove(user.id, group.id);
 	},
 
-	async list(groupId?: string) {
-		return await whitelistRepository.list(groupId);
+	async list(groupWaId?: string) {
+		const groupId = groupWaId
+			? (await getGroupByWaId(groupWaId))?.id
+			: undefined;
+		return whitelistRepository.list(groupId);
 	},
 };
