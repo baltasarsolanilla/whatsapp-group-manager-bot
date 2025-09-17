@@ -1,5 +1,5 @@
 import { inactiveMembers } from '@database/repositories/groupMembershipRepository';
-import { getGroupByWaId } from '@database/repositories/groupRepository';
+import { groupRepository } from '@database/repositories/groupRepository';
 import {
 	addUserToRemovalQueue,
 	fetchMembers,
@@ -14,7 +14,7 @@ import { evolutionAPI } from '@services/evolutionAPI';
  * @param group The Group object.
  */
 export async function addInactiveMembersToRemovalQueue(groupId: string) {
-	const group = await getGroupByWaId(groupId);
+	const group = await groupRepository.getByWaId(groupId);
 
 	if (!group) {
 		console.warn(
@@ -34,13 +34,17 @@ export async function listInactiveMembers(
 	groupWaId?: string,
 	processStatus?: RemovalStatus
 ) {
-	const groupId = groupWaId ? (await getGroupByWaId(groupWaId))?.id : undefined;
+	const groupId = groupWaId
+		? (await groupRepository.getByWaId(groupWaId))?.id
+		: undefined;
 
 	return fetchMembers(groupId, processStatus);
 }
 
 export async function removeInactiveMembers(groupWaId?: string) {
-	const groupId = groupWaId ? (await getGroupByWaId(groupWaId))?.id : undefined;
+	const groupId = groupWaId
+		? (await groupRepository.getByWaId(groupWaId))?.id
+		: undefined;
 
 	if (groupId && groupWaId) {
 		const removedMemberIds: string[] = [];

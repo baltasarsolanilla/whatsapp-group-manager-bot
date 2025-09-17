@@ -7,17 +7,16 @@ type UpsertGroupType = {
 	name: string;
 };
 
-export async function upsertGroup({
-	whatsappId,
-	name,
-}: UpsertGroupType): Promise<Group> {
-	return prisma.group.upsert({
-		where: { whatsappId },
-		update: { name },
-		create: { whatsappId, name },
-	});
-}
+export const groupRepository = {
+	async upsert({ whatsappId, name }: UpsertGroupType): Promise<Group> {
+		return prisma.group.upsert({
+			where: { whatsappId },
+			update: { name },
+			create: { whatsappId, name },
+		});
+	},
 
-export async function getGroupByWaId(id: string): Promise<Group | null> {
-	return prisma.group.findUnique({ where: { whatsappId: id } });
-}
+	async getByWaId(id: string): Promise<Group | null> {
+		return prisma.group.findUnique({ where: { whatsappId: id } });
+	},
+};
