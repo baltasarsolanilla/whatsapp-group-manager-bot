@@ -17,3 +17,25 @@ export const addUserToRemovalQueue = async ({
 		},
 	});
 };
+
+export const fetchMembers = async (
+	groupId?: string,
+	status?: RemovalStatus
+) => {
+	return prisma.removalQueue.findMany({
+		where: {
+			...(groupId ? { groupId } : {}),
+			...(status ? { status } : {}),
+		},
+	});
+};
+
+export const updateRemovalStatus = async (
+	id: string,
+	status: RemovalStatus
+) => {
+	return prisma.removalQueue.update({
+		where: { id },
+		data: { status },
+	});
+};
