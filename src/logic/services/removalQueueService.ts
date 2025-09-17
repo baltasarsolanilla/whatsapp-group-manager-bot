@@ -1,10 +1,6 @@
 import { inactiveMembers } from '@database/repositories/groupMembershipRepository';
 import { groupRepository } from '@database/repositories/groupRepository';
-import {
-	addUserToRemovalQueue,
-	fetchMembers,
-	updateRemovalStatus,
-} from '@database/repositories/removalQueueRepository';
+import { removalQueueRepository } from '@database/repositories/removalQueueRepository';
 import { extractPhoneNumberFromWhatsappPn } from '@logic/helpers';
 import { RemovalStatus } from '@prisma/client';
 import { evolutionAPI } from '@services/evolutionAPI';
@@ -26,7 +22,7 @@ export async function addInactiveMembersToRemovalQueue(groupId: string) {
 
 	const memberships = await inactiveMembers(group);
 	for (const membership of memberships) {
-		await addUserToRemovalQueue(membership);
+		await removalQueueRepository.addUser(membership);
 	}
 }
 
@@ -38,7 +34,7 @@ export async function listInactiveMembers(
 		? (await groupRepository.getByWaId(groupWaId))?.id
 		: undefined;
 
-	return fetchMembers(groupId, processStatus);
+	return removalQueueRepository.getUsersByGroupId(groupId, processStatus);
 }
 
 export async function removeInactiveMembers(groupWaId?: string) {
@@ -63,12 +59,18 @@ export async function removeInactiveMembers(groupWaId?: string) {
 		try {
 			await evolutionAPI.groupService.removeMembers(participants, groupWaId);
 			for (const entry of firstBatch) {
-				await updateRemovalStatus(entry.id, RemovalStatus.PROCESSED);
+				await removalQueueRepository.updateStatusById(
+					entry.id,
+					RemovalStatus.PROCESSED
+				);
 				removedMemberIds.push(entry.userId);
 			}
 		} catch {
 			for (const entry of firstBatch) {
-				await updateRemovalStatus(entry.id, RemovalStatus.FAILED);
+				await removalQueueRepository.updateStatusById(
+					entry.id,
+					RemovalStatus.FAILED
+				);
 				removedMemberIds.push(entry.userId);
 			}
 		}
