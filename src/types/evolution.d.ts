@@ -1,5 +1,5 @@
 // Starter TypeScript types for Evolution API v2
-import { EVOLUTION_EVENTS } from 'constants/evolution';
+import { EVOLUTION_EVENTS } from '@constants/evolutionConstants';
 
 export type EvolutionIntegration = 'WHATSAPP-BAILEYS' | 'WHATSAPP-BUSINESS';
 export type MessageType = 'conversation' | 'messageReaction';

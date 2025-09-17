@@ -1,4 +1,4 @@
-import { EVOLUTION_EVENTS } from '@constants/evolution';
+import { EVOLUTION_EVENTS } from '@constants/evolutionConstants';
 import { handleMessageUpsert } from '@logic/botLogic';
 import type { WebhookEvent } from '../types/evolution';
 

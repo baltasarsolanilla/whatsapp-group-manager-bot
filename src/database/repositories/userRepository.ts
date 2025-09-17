@@ -23,3 +23,7 @@ export async function upsertUser({
 export async function getUserByWaId(id: string): Promise<User | null> {
 	return prisma.user.findUnique({ where: { whatsappId: id } });
 }
+
+export async function getUserByPn(whatsappPn: string): Promise<User | null> {
+	return prisma.user.findUnique({ where: { whatsappPn } });
+}

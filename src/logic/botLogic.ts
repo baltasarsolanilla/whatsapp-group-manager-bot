@@ -1,5 +1,5 @@
+import { EVOLUTION_EVENTS } from '../constants/evolutionConstants';
 import type { WebhookEvent } from '../types/evolution';
-import { EVOLUTION_EVENTS } from './../constants/evolution';
 import { isGroupMessage } from './helpers';
 import { groupMapper } from './mappers';
 import { ensureGroupMessageUpsert } from './services/messageService';
