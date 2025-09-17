@@ -1,7 +1,7 @@
 import {
 	WHATSAPP_GROUP_SUFFIX,
 	WHATSAPP_PERSONAL_SUFFIX,
-} from '@constants/messages';
+} from '@constants/messagesConstants';
 import type { MessageUpsert } from 'types/evolution';
 import { groupMapper, userMapper } from './mappers';
 
@@ -35,4 +35,16 @@ export const extractGroupFromUpdate = (payload: MessageUpsert) => {
 	}
 
 	return false;
+};
+
+// Format plain phone number to create a whatsappPn
+// e.g. "+61xxxxxxxxx" => "61xxxxxxxxx@s.whatsapp.net"
+export const formatWhatsappId = (phoneNumber: string) => {
+	// Remove leading '+' if it exists
+	const normalized = phoneNumber.startsWith('+')
+		? phoneNumber.slice(1)
+		: phoneNumber;
+
+	// Append the suffix
+	return `${normalized}${WHATSAPP_PERSONAL_SUFFIX}`;
 };

@@ -1,10 +1,12 @@
 import { getGroupByWaId } from '@database/repositories/groupRepository';
 import { getUserByPn } from '@database/repositories/userRepository';
 import { whitelistRepository } from '@database/repositories/whitelistRepository';
+import { formatWhatsappId } from '@logic/helpers';
 
 export const whitelistService = {
 	async add(phoneNumber: string, groupWaId: string) {
-		const user = await getUserByPn(phoneNumber);
+		const whatsappPn = formatWhatsappId(phoneNumber);
+		const user = await getUserByPn(whatsappPn);
 		const group = await getGroupByWaId(groupWaId);
 
 		if (!group || !user) {
@@ -17,7 +19,8 @@ export const whitelistService = {
 	},
 
 	async remove(phoneNumber: string, groupWaId: string) {
-		const user = await getUserByPn(phoneNumber);
+		const whatsappPn = formatWhatsappId(phoneNumber);
+		const user = await getUserByPn(whatsappPn);
 		const group = await getGroupByWaId(groupWaId);
 
 		if (!group || !user) {
