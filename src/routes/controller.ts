@@ -1,4 +1,5 @@
 import { handlers } from '@logic/handlers';
+import { storeWebhookEvent } from '@logic/services/webhookEventService';
 import { Request, Response } from 'express';
 import type { WebhookPayload } from '../types/evolution';
 
@@ -8,6 +9,7 @@ export const controller = <T extends keyof typeof handlers>(
 	res: Response
 ) => {
 	const update = req.body;
+	storeWebhookEvent(update);
 
 	const handler = handlers[update.event as T];
 

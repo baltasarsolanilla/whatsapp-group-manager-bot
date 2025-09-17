@@ -62,6 +62,7 @@ export type WebhookPayload<
 	T extends keyof WebhookPayloadMap = keyof WebhookPayloadMap,
 > = {
 	event: T;
-	instanceId: string;
+	instance: string;
 	data: WebhookPayloadMap[T];
+	date_time: string;
 };
