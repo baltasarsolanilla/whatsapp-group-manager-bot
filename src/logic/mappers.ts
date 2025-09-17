@@ -17,3 +17,13 @@ export const userMapper = {
 export const groupMapper = {
 	id: (payload: MessageUpsert) => payload.key.remoteJid,
 };
+
+// ============================================================================
+// MESSAGE
+// ============================================================================
+
+export const messageMapper = {
+	id: (payload: MessageUpsert) => payload.key.id,
+	type: (payload: MessageUpsert) => payload.messageType,
+	timestamp: (payload: MessageUpsert) => payload.messageTimestamp,
+};
