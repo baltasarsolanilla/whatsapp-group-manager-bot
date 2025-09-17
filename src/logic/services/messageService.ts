@@ -1,13 +1,13 @@
 import { upsertGroupMembership } from '@database/repositories/groupMembershipRepository';
 import { upsertGroup } from '@database/repositories/groupRepository';
 import { addMessage } from '@database/repositories/messageRepository';
-import { upsertUser } from '@database/repositories/userRepository';
+import { userRepository } from '@database/repositories/userRepository';
 import { MessageUpsert } from 'types/evolution';
 import { groupMapper, messageMapper, userMapper } from './../mappers';
 
 export async function ensureGroupMessageUpsert(payload: MessageUpsert) {
 	// 1. Ensure user
-	const user = await upsertUser({
+	const user = await userRepository.upsert({
 		whatsappId: userMapper.id(payload),
 		whatsappPn: userMapper.pn(payload),
 		name: userMapper.name(payload),

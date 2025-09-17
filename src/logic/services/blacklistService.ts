@@ -1,12 +1,12 @@
 import { blacklistRepository } from '@database/repositories/blacklistRepository';
 import { getGroupByWaId } from '@database/repositories/groupRepository';
-import { getUserByPn } from '@database/repositories/userRepository';
+import { userRepository } from '@database/repositories/userRepository';
 import { formatWhatsappId } from '@logic/helpers';
 
 export const blacklistService = {
 	async add(phoneNumber: string, groupWaId: string) {
 		const whatsappPn = formatWhatsappId(phoneNumber);
-		const user = await getUserByPn(whatsappPn);
+		const user = await userRepository.getByPn(whatsappPn);
 		const group = await getGroupByWaId(groupWaId);
 
 		if (!group || !user) {
@@ -20,7 +20,7 @@ export const blacklistService = {
 
 	async remove(phoneNumber: string, groupWaId: string) {
 		const whatsappPn = formatWhatsappId(phoneNumber);
-		const user = await getUserByPn(whatsappPn);
+		const user = await userRepository.getByPn(whatsappPn);
 		const group = await getGroupByWaId(groupWaId);
 
 		if (!group || !user) {

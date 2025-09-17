@@ -1,6 +1,6 @@
 import { upsertGroupMembership } from '@database/repositories/groupMembershipRepository';
 import { upsertGroup } from '@database/repositories/groupRepository';
-import { upsertUser } from '@database/repositories/userRepository';
+import { userRepository } from '@database/repositories/userRepository';
 
 type EnsureUserGroupMembershipType = {
 	whatsappUserId: string;
@@ -18,7 +18,7 @@ export async function ensureUserGroupMembership({
 	groupName,
 }: EnsureUserGroupMembershipType) {
 	// 1. Ensure user
-	const user = await upsertUser({
+	const user = await userRepository.upsert({
 		whatsappId: whatsappUserId,
 		whatsappPn: whatsappUserPn,
 		name: userName,
