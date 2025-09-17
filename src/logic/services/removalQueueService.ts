@@ -57,7 +57,7 @@ export async function removeInactiveMembers(groupWaId?: string) {
 		);
 
 		try {
-			await evolutionAPI.removeMembers(participants, groupWaId);
+			await evolutionAPI.groupService.removeMembers(participants, groupWaId);
 			for (const entry of firstBatch) {
 				await updateRemovalStatus(entry.id, RemovalStatus.PROCESSED);
 				removedMemberIds.push(entry.userId);
