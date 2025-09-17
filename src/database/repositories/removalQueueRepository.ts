@@ -1,5 +1,5 @@
 import prisma from '@database/prisma';
-import type { Group, User } from '@prisma/client';
+import { type Group, type User, RemovalStatus } from '@prisma/client';
 
 // Add to removal queue
 export const addUserToRemovalQueue = async ({
@@ -13,7 +13,7 @@ export const addUserToRemovalQueue = async ({
 		data: {
 			userId: user.id,
 			groupId: group.id,
-			status: 'PENDING',
+			status: RemovalStatus.PENDING,
 		},
 	});
 };

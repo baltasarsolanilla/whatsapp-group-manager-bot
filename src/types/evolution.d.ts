@@ -43,6 +43,7 @@ export type MessageUpsert = {
 	};
 	pushName: string;
 	messageType: MessageType;
+	messageTimestamp: number;
 };
 
 export type EvolutionEvent =

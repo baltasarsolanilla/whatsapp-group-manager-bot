@@ -1,8 +1,8 @@
-import { ensureUserGroupMembership } from '@logic/services/groupMembershipService';
 import type { WebhookPayload } from '../types/evolution';
 import { EVOLUTION_EVENTS } from './../constants/evolution';
 import { isGroupMessage } from './helpers';
-import { groupMapper, userMapper } from './mappers';
+import { groupMapper } from './mappers';
+import { ensureGroupMessageUpsert } from './services/messageService';
 import { addInactiveMembersToRemovalQueue } from './services/removalQueueService';
 
 export const handleMessageUpsert = async (
@@ -11,13 +11,7 @@ export const handleMessageUpsert = async (
 	const { data } = update;
 
 	if (isGroupMessage(data)) {
-		await ensureUserGroupMembership({
-			whatsappUserId: userMapper.id(data),
-			whatsappUserPn: userMapper.pn(data),
-			userName: userMapper.name(data),
-			whatsappGroupId: groupMapper.id(data),
-			groupName: 'unknown',
-		});
+		await ensureGroupMessageUpsert(data);
 
 		await addInactiveMembersToRemovalQueue(groupMapper.id(data));
 	}
