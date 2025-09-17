@@ -10,20 +10,22 @@ export type AddMessageType = {
 	messageTimestamp: number;
 };
 
-export async function addMessage({
-	user,
-	group,
-	whatsappId,
-	messageType,
-	messageTimestamp,
-}: AddMessageType) {
-	await prisma.message.create({
-		data: {
-			userId: user.id,
-			groupId: group.id,
-			whatsappId,
-			messageType,
-			date: new Date(messageTimestamp * 1000),
-		},
-	});
-}
+export const messageRepository = {
+	async add({
+		user,
+		group,
+		whatsappId,
+		messageType,
+		messageTimestamp,
+	}: AddMessageType) {
+		await prisma.message.create({
+			data: {
+				userId: user.id,
+				groupId: group.id,
+				whatsappId,
+				messageType,
+				date: new Date(messageTimestamp * 1000),
+			},
+		});
+	},
+};
