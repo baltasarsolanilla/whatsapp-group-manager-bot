@@ -53,15 +53,16 @@ export type EvolutionData = {
 	remoteJid: string;
 };
 
-export type WebhookPayloadMap = {
+export type WebhookEventMap = {
 	[EVOLUTION_EVENTS.MESSAGES_UPSERT]: MessageUpsert;
 	// add more events here
 };
 
-export type WebhookPayload<
-	T extends keyof WebhookPayloadMap = keyof WebhookPayloadMap,
+export type WebhookEvent<
+	T extends keyof WebhookEventMap = keyof WebhookEventMap,
 > = {
 	event: T;
-	instanceId: string;
-	data: WebhookPayloadMap[T];
+	instance: string;
+	data: WebhookEventMap[T];
+	date_time: string;
 };

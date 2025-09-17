@@ -1,4 +1,4 @@
-import type { MessageUpsert } from 'types/evolution';
+import type { MessageUpsert, WebhookEvent } from 'types/evolution';
 
 // ============================================================================
 // USER
@@ -26,4 +26,15 @@ export const messageMapper = {
 	id: (payload: MessageUpsert) => payload.key.id,
 	type: (payload: MessageUpsert) => payload.messageType,
 	timestamp: (payload: MessageUpsert) => payload.messageTimestamp,
+};
+
+// ============================================================================
+// WEBHOOK_EVENT
+// ============================================================================
+
+export const webhookEventMapper = {
+	event: (payload: WebhookEvent) => payload.event,
+	instance: (payload: WebhookEvent) => payload.instance,
+	data: (payload: WebhookEvent) => payload.data,
+	date: (payload: WebhookEvent) => payload.date_time,
 };
