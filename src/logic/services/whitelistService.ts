@@ -1,6 +1,8 @@
-import { groupRepository } from '@database/repositories/groupRepository';
-import { userRepository } from '@database/repositories/userRepository';
-import { whitelistRepository } from '@database/repositories/whitelistRepository';
+import {
+	groupRepository,
+	userRepository,
+	whitelistRepository,
+} from '@database/repositories';
 import { formatWhatsappId } from '@logic/helpers';
 
 export const whitelistService = {

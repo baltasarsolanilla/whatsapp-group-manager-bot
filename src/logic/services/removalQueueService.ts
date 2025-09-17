@@ -1,6 +1,8 @@
-import { groupMembershipRepository } from '@database/repositories/groupMembershipRepository';
-import { groupRepository } from '@database/repositories/groupRepository';
-import { removalQueueRepository } from '@database/repositories/removalQueueRepository';
+import {
+	groupMembershipRepository,
+	groupRepository,
+	removalQueueRepository,
+} from '@database/repositories';
 import { extractPhoneNumberFromWhatsappPn } from '@logic/helpers';
 import { RemovalStatus } from '@prisma/client';
 import { evolutionAPI } from '@services/evolutionAPI';

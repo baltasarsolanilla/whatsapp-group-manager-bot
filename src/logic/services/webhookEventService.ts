@@ -1,4 +1,4 @@
-import { webhookEventRepository } from '@database/repositories/webhookEventRepository';
+import { webhookEventRepository } from '@database/repositories';
 import { webhookEventMapper } from '@logic/mappers';
 import { WebhookEvent } from 'types/evolution';
 

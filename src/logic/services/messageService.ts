@@ -1,7 +1,9 @@
-import { groupMembershipRepository } from '@database/repositories/groupMembershipRepository';
-import { groupRepository } from '@database/repositories/groupRepository';
-import { messageRepository } from '@database/repositories/messageRepository';
-import { userRepository } from '@database/repositories/userRepository';
+import {
+	groupMembershipRepository,
+	groupRepository,
+	messageRepository,
+	userRepository,
+} from '@database/repositories';
 import { MessageUpsert } from 'types/evolution';
 import { groupMapper, messageMapper, userMapper } from './../mappers';
 

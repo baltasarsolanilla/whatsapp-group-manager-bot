@@ -1,6 +1,8 @@
-import { groupMembershipRepository } from '@database/repositories/groupMembershipRepository';
-import { groupRepository } from '@database/repositories/groupRepository';
-import { userRepository } from '@database/repositories/userRepository';
+import {
+	groupMembershipRepository,
+	groupRepository,
+	userRepository,
+} from '@database/repositories';
 
 type EnsureUserGroupMembershipType = {
 	whatsappUserId: string;
