@@ -1,5 +1,10 @@
+/* eslint-disable no-console */
 import { handlers } from '@logic/handlers';
 import { blacklistService } from '@logic/services/blacklistService';
+import {
+	listInactiveMembers,
+	removeInactiveMembers,
+} from '@logic/services/removalQueueService';
 import { storeWebhookEvent } from '@logic/services/webhookEventService';
 import { whitelistService } from '@logic/services/whitelistService';
 import { Request, Response } from 'express';
@@ -17,14 +22,14 @@ export const controller = <T extends keyof typeof handlers>(
 		const handler = handlers[update.event as T];
 
 		if (handler) {
-			console.log('MESSAGE_UPSERT: ', update);
 			handler(update as WebhookEvent<T>);
 		} else {
 			console.warn('ALERT: Unknown event received', update);
 		}
+		res.sendStatus(200);
 	} catch (err) {
 		console.error(err);
-		res.status(500).json({ error: 'Internal server error' });
+		res.sendStatus(500).json({ error: 'Internal server error' });
 	}
 };
 
@@ -84,6 +89,26 @@ export const listBlacklist = async (req: Request, res: Response) => {
 		const groupId = req.query.groupId as string | undefined;
 		const members = await blacklistService.list(groupId);
 		res.json(members);
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({ error: 'Internal server error' });
+	}
+};
+export const runRemovalQueue = async (req: Request, res: Response) => {
+	try {
+		const { groupId } = req.body;
+		const membersRemoved = await removeInactiveMembers(groupId);
+		return res.json(membersRemoved);
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({ error: 'Internal server error' });
+	}
+};
+export const listRemovalQueue = async (req: Request, res: Response) => {
+	try {
+		const groupId = req.query.groupId as string;
+		const members = await listInactiveMembers(groupId);
+		return res.json(members);
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ error: 'Internal server error' });
