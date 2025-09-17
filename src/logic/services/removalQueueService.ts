@@ -1,4 +1,4 @@
-import { inactiveMembers } from '@database/repositories/groupMembershipRepository';
+import { groupMembershipRepository } from '@database/repositories/groupMembershipRepository';
 import { groupRepository } from '@database/repositories/groupRepository';
 import { removalQueueRepository } from '@database/repositories/removalQueueRepository';
 import { extractPhoneNumberFromWhatsappPn } from '@logic/helpers';
@@ -20,7 +20,7 @@ export async function addInactiveMembersToRemovalQueue(groupId: string) {
 		return;
 	}
 
-	const memberships = await inactiveMembers(group);
+	const memberships = await groupMembershipRepository.inactiveMembers(group);
 	for (const membership of memberships) {
 		await removalQueueRepository.addUser(membership);
 	}

@@ -1,4 +1,4 @@
-import { upsertGroupMembership } from '@database/repositories/groupMembershipRepository';
+import { groupMembershipRepository } from '@database/repositories/groupMembershipRepository';
 import { groupRepository } from '@database/repositories/groupRepository';
 import { userRepository } from '@database/repositories/userRepository';
 
@@ -31,7 +31,7 @@ export async function ensureUserGroupMembership({
 	});
 
 	// 3. Ensure membership
-	const membership = await upsertGroupMembership({
+	const membership = await groupMembershipRepository.upsertGroupMembership({
 		user,
 		group,
 	});
