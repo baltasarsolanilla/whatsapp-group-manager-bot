@@ -1,8 +1,9 @@
 // Starter TypeScript types for Evolution API v2
-import { EVOLUTION_EVENTS } from '@constants/evolutionConstants';
+import { EVOLUTION_EVENTS, GroupAction } from '@constants/evolutionConstants';
 
 export type EvolutionIntegration = 'WHATSAPP-BAILEYS' | 'WHATSAPP-BUSINESS';
 export type MessageType = 'conversation' | 'messageReaction';
+export type GroupActionType = (typeof GroupAction)[keyof typeof GroupAction];
 
 // -------------------------------
 // Messaging
@@ -10,6 +11,11 @@ export type MessageType = 'conversation' | 'messageReaction';
 export type SendTextRequest = {
 	number: string;
 	text: string;
+};
+
+export type RemoveMembersRequest = {
+	action: GroupActionType;
+	participants: string[];
 };
 
 export type messageStatus = 'PENDING' | 'SENT' | 'FAILED';
