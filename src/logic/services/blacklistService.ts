@@ -1,13 +1,15 @@
-import { blacklistRepository } from '@database/repositories/blacklistRepository';
-import { getGroupByWaId } from '@database/repositories/groupRepository';
-import { getUserByPn } from '@database/repositories/userRepository';
+import {
+	blacklistRepository,
+	groupRepository,
+	userRepository,
+} from '@database/repositories';
 import { formatWhatsappId } from '@logic/helpers';
 
 export const blacklistService = {
 	async add(phoneNumber: string, groupWaId: string) {
 		const whatsappPn = formatWhatsappId(phoneNumber);
-		const user = await getUserByPn(whatsappPn);
-		const group = await getGroupByWaId(groupWaId);
+		const user = await userRepository.getByPn(whatsappPn);
+		const group = await groupRepository.getByWaId(groupWaId);
 
 		if (!group || !user) {
 			const warnMsg = `blacklistService.add() - ${!group ? 'Group' : 'User'} not found`;
@@ -20,8 +22,8 @@ export const blacklistService = {
 
 	async remove(phoneNumber: string, groupWaId: string) {
 		const whatsappPn = formatWhatsappId(phoneNumber);
-		const user = await getUserByPn(whatsappPn);
-		const group = await getGroupByWaId(groupWaId);
+		const user = await userRepository.getByPn(whatsappPn);
+		const group = await groupRepository.getByWaId(groupWaId);
 
 		if (!group || !user) {
 			const warnMsg = `blacklistService.add() - ${!group ? 'Group' : 'User'} not found`;
@@ -34,7 +36,7 @@ export const blacklistService = {
 
 	async list(groupWaId?: string) {
 		const groupId = groupWaId
-			? (await getGroupByWaId(groupWaId))?.id
+			? (await groupRepository.getByWaId(groupWaId))?.id
 			: undefined;
 		return blacklistRepository.list(groupId);
 	},

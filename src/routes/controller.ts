@@ -1,14 +1,13 @@
 /* eslint-disable no-console */
 import { handlers } from '@logic/handlers';
-import { blacklistService } from '@logic/services/blacklistService';
 import {
-	listInactiveMembers,
-	removeInactiveMembers,
-} from '@logic/services/removalQueueService';
-import { storeWebhookEvent } from '@logic/services/webhookEventService';
-import { whitelistService } from '@logic/services/whitelistService';
+	blacklistService,
+	removalQueueService,
+	webhookEventService,
+	whitelistService,
+} from '@logic/services';
 import { Request, Response } from 'express';
-import type { WebhookEvent } from '../types/evolution';
+import type { WebhookEvent } from 'types/evolution';
 
 export const controller = <T extends keyof typeof handlers>(
 	// eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -17,7 +16,7 @@ export const controller = <T extends keyof typeof handlers>(
 ) => {
 	try {
 		const update = req.body;
-		storeWebhookEvent(update);
+		webhookEventService.storeEvent(update);
 
 		const handler = handlers[update.event as T];
 
@@ -97,7 +96,8 @@ export const listBlacklist = async (req: Request, res: Response) => {
 export const runRemovalQueue = async (req: Request, res: Response) => {
 	try {
 		const { groupId } = req.body;
-		const membersRemoved = await removeInactiveMembers(groupId);
+		const membersRemoved =
+			await removalQueueService.removeInactiveMembers(groupId);
 		return res.json(membersRemoved);
 	} catch (err) {
 		console.error(err);
@@ -107,7 +107,7 @@ export const runRemovalQueue = async (req: Request, res: Response) => {
 export const listRemovalQueue = async (req: Request, res: Response) => {
 	try {
 		const groupId = req.query.groupId as string;
-		const members = await listInactiveMembers(groupId);
+		const members = await removalQueueService.listInactiveMembers(groupId);
 		return res.json(members);
 	} catch (err) {
 		console.error(err);

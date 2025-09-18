@@ -1,6 +1,5 @@
 import config from '@config';
-import { createGroupService } from './groupService';
-import { createMessageService } from './messageService';
+import { createGroupService, createMessageService } from './index';
 
 export type API_CONFIG_TYPE = {
 	BASE_URL?: string;

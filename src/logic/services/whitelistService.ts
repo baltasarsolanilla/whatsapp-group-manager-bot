@@ -1,13 +1,15 @@
-import { getGroupByWaId } from '@database/repositories/groupRepository';
-import { getUserByPn } from '@database/repositories/userRepository';
-import { whitelistRepository } from '@database/repositories/whitelistRepository';
+import {
+	groupRepository,
+	userRepository,
+	whitelistRepository,
+} from '@database/repositories';
 import { formatWhatsappId } from '@logic/helpers';
 
 export const whitelistService = {
 	async add(phoneNumber: string, groupWaId: string) {
 		const whatsappPn = formatWhatsappId(phoneNumber);
-		const user = await getUserByPn(whatsappPn);
-		const group = await getGroupByWaId(groupWaId);
+		const user = await userRepository.getByPn(whatsappPn);
+		const group = await groupRepository.getByWaId(groupWaId);
 
 		if (!group || !user) {
 			const warnMsg = `whitelistService.add() - ${!group ? 'Group' : 'User'} not found`;
@@ -20,8 +22,8 @@ export const whitelistService = {
 
 	async remove(phoneNumber: string, groupWaId: string) {
 		const whatsappPn = formatWhatsappId(phoneNumber);
-		const user = await getUserByPn(whatsappPn);
-		const group = await getGroupByWaId(groupWaId);
+		const user = await userRepository.getByPn(whatsappPn);
+		const group = await groupRepository.getByWaId(groupWaId);
 
 		if (!group || !user) {
 			const warnMsg = `whitelistService.add() - ${!group ? 'Group' : 'User'} not found`;
@@ -34,7 +36,7 @@ export const whitelistService = {
 
 	async list(groupWaId?: string) {
 		const groupId = groupWaId
-			? (await getGroupByWaId(groupWaId))?.id
+			? (await groupRepository.getByWaId(groupWaId))?.id
 			: undefined;
 		return whitelistRepository.list(groupId);
 	},
