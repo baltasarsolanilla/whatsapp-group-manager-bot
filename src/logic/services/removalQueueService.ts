@@ -4,25 +4,14 @@ import {
 	removalQueueRepository,
 } from '@database/repositories';
 import { extractPhoneNumberFromWhatsappPn } from '@logic/helpers';
-import { RemovalStatus } from '@prisma/client';
-import { evolutionAPI } from '@services/evolutionAPI';
+import { Group, RemovalStatus } from '@prisma/client';
 
 export const removalQueueService = {
 	/**
 	 * Adds all inactive members to the removal queue for a given group.
 	 * @param group The Group object.
 	 */
-	async addInactiveMembersToRemovalQueue(groupId: string) {
-		const group = await groupRepository.getByWaId(groupId);
-
-		if (!group) {
-			console.warn(
-				'addInactiveMembersToRemovalQueue() - Group not found',
-				groupId
-			);
-			return;
-		}
-
+	async addInactiveMembersToRemovalQueue(group: Group) {
 		const memberships = await groupMembershipRepository.inactiveMembers(group);
 		for (const membership of memberships) {
 			await removalQueueRepository.addUser(membership);
@@ -57,7 +46,8 @@ export const removalQueueService = {
 			);
 
 			try {
-				await evolutionAPI.groupService.removeMembers(participants, groupWaId);
+				// ! Keeping it comment out for security reasons
+				// await evolutionAPI.groupService.removeMembers(participants, groupWaId);
 				for (const entry of firstBatch) {
 					await removalQueueRepository.updateStatusById(
 						entry.id,
