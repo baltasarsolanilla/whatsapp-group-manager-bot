@@ -33,7 +33,7 @@ export const groupService = {
 		// 3. Ensure memberships
 		const memberships = await Promise.all(
 			users.map((user) =>
-				groupMembershipRepository.upsertGroupMembership({
+				groupMembershipRepository.upsert({
 					user,
 					group,
 				})

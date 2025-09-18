@@ -24,7 +24,7 @@ export const messageService = {
 		});
 
 		// 3. Ensure membership & update lastActiveAt to keep track of activity
-		const membership = await groupMembershipRepository.upsertGroupMembership({
+		const membership = await groupMembershipRepository.upsert({
 			user,
 			group,
 		});

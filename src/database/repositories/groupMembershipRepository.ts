@@ -2,7 +2,7 @@ import prisma from '@database/prisma';
 import type { Group, GroupMembership, User } from '@prisma/client';
 
 export const groupMembershipRepository = {
-	async upsertGroupMembership({
+	async upsert({
 		user,
 		group,
 	}: {
@@ -24,19 +24,17 @@ export const groupMembershipRepository = {
 		});
 	},
 
-	// Find inactive members (30+ days)
-	async inactiveMembers(group: Group): Promise<{ user: User; group: Group }[]> {
-		const days = 30;
-		const msPerDay = 24 * 60 * 60 * 1000;
-		const threshold = Date.now() - days * msPerDay;
-		// const threshold = Date.now();
-
+	async listByGroupId(groupId: string, excludeWhitelist: boolean = false) {
 		const memberships = await prisma.groupMembership.findMany({
 			where: {
-				groupId: group.id,
-				user: {
-					whitelistEntries: { none: { groupId: group.id } },
-				},
+				groupId,
+				...(excludeWhitelist
+					? {
+							user: {
+								whitelistEntries: { none: { groupId } },
+							},
+						}
+					: {}),
 			},
 			include: {
 				user: true,
@@ -44,9 +42,6 @@ export const groupMembershipRepository = {
 			},
 		});
 
-		return memberships.filter((m) => {
-			const activity = m.lastActiveAt ?? m.joinDate;
-			return activity.getTime() <= threshold;
-		});
+		return memberships;
 	},
 };
