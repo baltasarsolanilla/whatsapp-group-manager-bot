@@ -4,8 +4,10 @@ import {
 	userRepository,
 	whitelistRepository,
 } from '@database/repositories';
+import { groupMapper } from '@logic/mappers';
+import { Group } from '@prisma/client';
+import { evolutionAPI } from '@services/evolutionAPI';
 import { GroupData } from 'types/evolution';
-import { groupMapper } from './../mappers';
 
 export const groupService = {
 	// TODO: Add Atomicity
@@ -55,5 +57,23 @@ export const groupService = {
 		);
 
 		return { group, users, memberships, whitelist };
+	},
+	// Ensure group exists, otherwise fetch group data to ingest DB
+	async ensure(whatsappId: string): Promise<Group | null> {
+		const group = await groupRepository.getByWaId(whatsappId);
+		if (group) {
+			return group;
+		}
+
+		const groupData =
+			await evolutionAPI.groupService.fetchGroupByWaId(whatsappId);
+
+		if (groupData) {
+			const { group } = await this.ingest(groupData);
+
+			return group;
+		}
+
+		return null;
 	},
 };
