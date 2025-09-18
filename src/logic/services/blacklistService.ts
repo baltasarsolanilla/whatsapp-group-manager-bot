@@ -17,7 +17,7 @@ export const blacklistService = {
 			return;
 		}
 
-		return await blacklistRepository.add(user.id, group.id);
+		return await blacklistRepository.upsert(user.id, group.id);
 	},
 
 	async remove(phoneNumber: string, groupWaId: string) {

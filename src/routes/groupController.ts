@@ -10,8 +10,9 @@ export const groupController = {
 				await evolutionAPI.groupService.fetchGroupByWaId(whatsappId);
 
 			if (groupData) {
-				const { group, users } = await groupService.ingest(groupData);
-				res.status(201).json({ group, users });
+				const { group, users, whitelist } =
+					await groupService.ingest(groupData);
+				res.status(201).json({ group, users, whitelist });
 			} else {
 				throw new Error('Group information not found');
 			}

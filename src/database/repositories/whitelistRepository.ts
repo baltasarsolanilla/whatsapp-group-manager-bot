@@ -1,14 +1,21 @@
 import prisma from '@database/prisma';
-import { Whitelist } from '@prisma/client';
+import { Group, User, Whitelist } from '@prisma/client';
 
 export const whitelistRepository = {
-	async add(userId: string, groupId: string): Promise<Whitelist> {
-		return prisma.whitelist.create({
-			data: {
-				userId,
-				groupId,
-			},
+	async upsert(
+		userId: string,
+		groupId: string
+	): Promise<Whitelist & { user: User; group: Group }> {
+		await prisma.whitelist.upsert({
+			where: { userId_groupId: { userId, groupId } },
+			update: {},
+			create: { userId, groupId },
 		});
+
+		return prisma.whitelist.findUnique({
+			where: { userId_groupId: { userId, groupId } },
+			include: { user: true, group: true },
+		}) as Promise<Whitelist & { user: User; group: Group }>;
 	},
 
 	async list(groupId?: string): Promise<Whitelist[]> {

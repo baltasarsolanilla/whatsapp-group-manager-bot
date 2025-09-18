@@ -17,7 +17,7 @@ export const whitelistService = {
 			return;
 		}
 
-		return await whitelistRepository.add(user.id, group.id);
+		return await whitelistRepository.upsert(user.id, group.id);
 	},
 
 	async remove(phoneNumber: string, groupWaId: string) {
