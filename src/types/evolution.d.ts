@@ -72,3 +72,31 @@ export type WebhookEvent<
 	data: WebhookEventMap[T];
 	date_time: string;
 };
+
+// -------------------------------
+// Group info
+// -------------------------------
+export type GroupParticipant = {
+	id: string; // whatsappUserId
+	jid: string; // whatsappPn
+	lid: string;
+	admin: string | null;
+};
+
+export type GroupData = {
+	id: string; // whatsappGroupId
+	subject: string; // whatsapp group name
+	subjectOwner: string;
+	subjectTime: number;
+	pictureUrl: string | null;
+	size: number;
+	creation: number;
+	owner: string;
+	desc: string; // Whatsapp group description
+	descId: string;
+	restrict: boolean;
+	announce: boolean;
+	participants: GroupParticipant[];
+	isCommunity: boolean;
+	isCommunityAnnounce: boolean;
+};

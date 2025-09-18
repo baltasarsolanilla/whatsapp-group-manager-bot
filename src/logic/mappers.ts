@@ -1,20 +1,20 @@
-import type { MessageUpsert, WebhookEvent } from 'types/evolution';
+import type { GroupData, MessageUpsert, WebhookEvent } from 'types/evolution';
 
 // ============================================================================
-// USER
+// MSG USER
 // ============================================================================
 
-export const userMapper = {
+export const msgUserMapper = {
 	id: (payload: MessageUpsert) => payload.key.participant,
 	pn: (payload: MessageUpsert) => payload.key.participantPn ?? undefined,
 	name: (payload: MessageUpsert) => payload.pushName,
 };
 
 // ============================================================================
-// GROUP
+// MSG GROUP
 // ============================================================================
 
-export const groupMapper = {
+export const msgGroupMapper = {
 	id: (payload: MessageUpsert) => payload.key.remoteJid,
 };
 
@@ -37,4 +37,16 @@ export const webhookEventMapper = {
 	instance: (payload: WebhookEvent) => payload.instance,
 	data: (payload: WebhookEvent) => payload.data,
 	date: (payload: WebhookEvent) => payload.date_time,
+};
+
+// ============================================================================
+// GROUP
+// ============================================================================
+
+export const groupMapper = {
+	id: (payload: GroupData) => payload.id,
+	name: (payload: GroupData) => payload.subject,
+	desc: (payload: GroupData) => payload.desc,
+	size: (payload: GroupData) => payload.size,
+	participants: (payload: GroupData) => payload.participants,
 };

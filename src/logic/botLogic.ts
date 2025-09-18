@@ -2,7 +2,7 @@ import { EVOLUTION_EVENTS } from '@constants/evolutionConstants';
 import { messageService, removalQueueService } from '@logic/services';
 import type { WebhookEvent } from 'types/evolution';
 import { isGroupMessage } from './helpers';
-import { groupMapper } from './mappers';
+import { msgGroupMapper } from './mappers';
 
 export const handleMessageUpsert = async (
 	update: WebhookEvent<typeof EVOLUTION_EVENTS.MESSAGES_UPSERT>
@@ -13,7 +13,7 @@ export const handleMessageUpsert = async (
 		await messageService.ensureGroupMessageUpsert(data);
 
 		await removalQueueService.addInactiveMembersToRemovalQueue(
-			groupMapper.id(data)
+			msgGroupMapper.id(data)
 		);
 	}
 };
