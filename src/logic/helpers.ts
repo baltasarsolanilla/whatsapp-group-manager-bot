@@ -3,7 +3,7 @@ import {
 	WHATSAPP_PERSONAL_SUFFIX,
 } from '@constants/messagesConstants';
 import type { MessageUpsert } from 'types/evolution';
-import { groupMapper, userMapper } from './mappers';
+import { msgGroupMapper, msgUserMapper } from './mappers';
 
 export const isGroupMessage = (payload: MessageUpsert) => {
 	return payload.key.remoteJid.endsWith(WHATSAPP_GROUP_SUFFIX);
@@ -15,9 +15,9 @@ export const isPrivateMessage = (data: MessageUpsert) => {
 
 const extractUserFromGroupUpdate = (payload: MessageUpsert) => {
 	return {
-		whatsappId: userMapper.id(payload),
-		whatsappPn: userMapper.pn(payload),
-		name: userMapper.name(payload),
+		whatsappId: msgUserMapper.id(payload),
+		whatsappPn: msgUserMapper.pn(payload),
+		name: msgUserMapper.name(payload),
 	};
 };
 
@@ -31,7 +31,7 @@ export const extractUserFromUpdate = (payload: MessageUpsert) => {
 
 export const extractGroupFromUpdate = (payload: MessageUpsert) => {
 	if (isGroupMessage(payload)) {
-		return { whatsappId: groupMapper.id(payload), name: 'unknown' };
+		return { whatsappId: msgGroupMapper.id(payload), name: 'unknown' };
 	}
 
 	return false;

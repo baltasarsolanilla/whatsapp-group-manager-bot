@@ -1,7 +1,7 @@
 import { GroupAction } from '@constants/evolutionConstants';
 import { handleAxiosError } from '@utils/errorHandler';
 import axios from 'axios';
-import type { RemoveMembersRequest } from 'types/evolution';
+import type { GroupData, RemoveMembersRequest } from 'types/evolution';
 import { API_CONFIG_TYPE } from './evolutionAPI';
 
 export const createGroupService = ({
@@ -33,7 +33,9 @@ export const createGroupService = ({
 				handleAxiosError(err);
 			}
 		},
-		fetchGroupByWaId: async (groupWaId: string) => {
+		fetchGroupByWaId: async (
+			groupWaId: string
+		): Promise<GroupData | undefined> => {
 			try {
 				const res = await axios.get(
 					`${BASE_URL}/group/findGroupInfos/${INSTANCE}/?groupJid=${groupWaId}`,
@@ -43,9 +45,11 @@ export const createGroupService = ({
 						},
 					}
 				);
-				console.log(res);
+
+				return res.data;
 			} catch (err: unknown) {
 				handleAxiosError(err);
+				return undefined;
 			}
 		},
 	};

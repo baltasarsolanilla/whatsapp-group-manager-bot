@@ -2,12 +2,11 @@ import prisma from '@database/prisma';
 import { Blacklist } from '@prisma/client';
 
 export const blacklistRepository = {
-	async add(userId: string, groupId: string): Promise<Blacklist> {
-		return prisma.blacklist.create({
-			data: {
-				userId,
-				groupId,
-			},
+	async upsert(userId: string, groupId: string): Promise<Blacklist> {
+		return await prisma.blacklist.upsert({
+			where: { userId_groupId: { userId, groupId } },
+			update: {},
+			create: { userId, groupId },
 		});
 	},
 
