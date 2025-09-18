@@ -27,6 +27,10 @@ export const fetchMembers = async (
 			...(groupId ? { groupId } : {}),
 			...(status ? { status } : {}),
 		},
+		include: {
+			user: true,
+			group: true,
+		},
 	});
 };
 

@@ -48,3 +48,13 @@ export const formatWhatsappId = (phoneNumber: string) => {
 	// Append the suffix
 	return `${normalized}${WHATSAPP_PERSONAL_SUFFIX}`;
 };
+
+// Extract phone number from whatsappPn
+// e.g. "61xxxxxxxxx@s.whatsapp.net" => "+61xxxxxxxxx"
+export const extractPhoneNumberFromWhatsappPn = (whatsappPn: string | null) => {
+	if (whatsappPn?.endsWith(WHATSAPP_PERSONAL_SUFFIX)) {
+		const number = whatsappPn.slice(0, -WHATSAPP_PERSONAL_SUFFIX.length);
+		return `+${number}`;
+	}
+	return '';
+};

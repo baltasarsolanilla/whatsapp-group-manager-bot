@@ -1,32 +1,20 @@
 import config from '@config';
-import { handleAxiosError } from '@utils/errorHandler';
-import axios from 'axios';
-import type { SendTextRequest } from '../types/evolution.d';
+import { createGroupService } from './groupService';
+import { createMessageService } from './messageService';
 
-const BASE_URL = config.evolutionApiUrl;
-const API_KEY = config.evolutionApiKey;
-const INSTANCE = config.instance;
+export type API_CONFIG_TYPE = {
+	BASE_URL?: string;
+	API_KEY?: string;
+	INSTANCE?: string;
+};
+
+const API_CONFIG: API_CONFIG_TYPE = {
+	BASE_URL: config.evolutionApiUrl,
+	API_KEY: config.evolutionApiKey,
+	INSTANCE: config.instance,
+};
 
 export const evolutionAPI = {
-	sendMessage: async (to: string, message: string) => {
-		const payload: SendTextRequest = {
-			number: to,
-			text: message,
-		};
-
-		try {
-			await axios.post(`${BASE_URL}/message/sendText/${INSTANCE}`, payload, {
-				headers: {
-					apikey: API_KEY,
-				},
-			});
-		} catch (err: unknown) {
-			handleAxiosError(err);
-		}
-	},
-
-	removeMember: async (userId: string, groupId: string) => {
-		console.log('REMOVE MEMBER', userId, groupId);
-		return true;
-	},
+	groupService: createGroupService(API_CONFIG),
+	messageService: createMessageService(API_CONFIG),
 };
