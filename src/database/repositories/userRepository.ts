@@ -5,7 +5,7 @@ import type { User } from '@prisma/client';
 type UpsertUserType = {
 	whatsappId: string;
 	whatsappPn?: string;
-	name: string;
+	name?: string;
 };
 
 export const userRepository = {
@@ -16,8 +16,15 @@ export const userRepository = {
 	}: UpsertUserType): Promise<User> {
 		return prisma.user.upsert({
 			where: { whatsappId },
-			update: { name, whatsappPn },
-			create: { whatsappId, name, whatsappPn },
+			update: {
+				...(name !== undefined ? { name } : {}),
+				...(whatsappPn !== undefined ? { whatsappPn } : {}),
+			},
+			create: {
+				whatsappId,
+				...(name !== undefined ? { name } : {}),
+				...(whatsappPn !== undefined ? { whatsappPn } : {}),
+			},
 		});
 	},
 
