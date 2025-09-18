@@ -9,6 +9,7 @@ export const handleMessageUpsert = async (
 	const { data } = update;
 
 	if (isGroupMessage(data)) {
+		console.log('🚀 ~ handleMessageUpsert ~ update:', update);
 		const { group } =
 			(await messageService.ensureGroupMessageUpsert(data)) ?? {};
 

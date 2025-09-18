@@ -15,7 +15,10 @@ export const userRepository = {
 		name,
 	}: UpsertUserType): Promise<User> {
 		return prisma.user.upsert({
-			where: { whatsappId },
+			where: {
+				whatsappId,
+				...(whatsappPn !== undefined ? { whatsappPn } : {}),
+			},
 			update: {
 				...(name !== undefined ? { name } : {}),
 				...(whatsappPn !== undefined ? { whatsappPn } : {}),
