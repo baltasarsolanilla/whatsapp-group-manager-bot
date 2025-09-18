@@ -1,9 +1,8 @@
-import { EVOLUTION_EVENTS } from '../constants/evolutionConstants';
-import type { WebhookEvent } from '../types/evolution';
+import { EVOLUTION_EVENTS } from '@constants/evolutionConstants';
+import { messageService, removalQueueService } from '@logic/services';
+import type { WebhookEvent } from 'types/evolution';
 import { isGroupMessage } from './helpers';
 import { groupMapper } from './mappers';
-import { ensureGroupMessageUpsert } from './services/messageService';
-import { addInactiveMembersToRemovalQueue } from './services/removalQueueService';
 
 export const handleMessageUpsert = async (
 	update: WebhookEvent<typeof EVOLUTION_EVENTS.MESSAGES_UPSERT>
@@ -11,8 +10,10 @@ export const handleMessageUpsert = async (
 	const { data } = update;
 
 	if (isGroupMessage(data)) {
-		await ensureGroupMessageUpsert(data);
+		await messageService.ensureGroupMessageUpsert(data);
 
-		await addInactiveMembersToRemovalQueue(groupMapper.id(data));
+		await removalQueueService.addInactiveMembersToRemovalQueue(
+			groupMapper.id(data)
+		);
 	}
 };

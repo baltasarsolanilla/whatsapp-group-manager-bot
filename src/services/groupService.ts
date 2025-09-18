@@ -1,7 +1,7 @@
 import { GroupAction } from '@constants/evolutionConstants';
 import { handleAxiosError } from '@utils/errorHandler';
 import axios from 'axios';
-import type { RemoveMembersRequest } from '../types/evolution';
+import type { RemoveMembersRequest } from 'types/evolution';
 import { API_CONFIG_TYPE } from './evolutionAPI';
 
 export const createGroupService = ({

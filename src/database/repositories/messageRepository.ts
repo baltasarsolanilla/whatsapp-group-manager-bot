@@ -1,6 +1,6 @@
 import prisma from '@database/prisma';
 import { Group, User } from '@prisma/client';
-import { MessageType } from './../../types/evolution.d';
+import { MessageType } from 'types/evolution.d';
 
 export type AddMessageType = {
 	user: User;
