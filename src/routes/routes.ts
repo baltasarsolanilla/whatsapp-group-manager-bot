@@ -1,45 +1,40 @@
 import { PATHS } from '@constants/routesConstants';
-import {
-	addToBlacklist,
-	addToWhitelist,
-	controller,
-	listBlacklist,
-	listRemovalQueue,
-	removeFromBlacklist,
-	runRemovalQueue,
-} from '@routes/controller';
 import express from 'express';
-import { listWhitelist, removeFromWhitelist } from './controller';
+import {
+	blacklistController,
+	groupController,
+	removalQueueController,
+	webhookController,
+	whitelistController,
+} from '.';
 
 const router = express.Router();
 
-// ============================================================================
-// WEBHOOK
-// ============================================================================
+// ======================== WEBHOOK ========================
+router.post(PATHS.DEFAULT, webhookController);
+router.post(PATHS.WEBHOOK, webhookController);
 
-router.post(PATHS.DEFAULT, controller);
+// ======================== ADMIN WHITELIST ========================
+router.post(`/${PATHS.ADMIN.LISTS.WHITELIST}`, whitelistController.add);
+router.get(`/${PATHS.ADMIN.LISTS.WHITELIST}`, whitelistController.list);
+router.delete(`/${PATHS.ADMIN.LISTS.WHITELIST}`, whitelistController.remove);
 
-// ============================================================================
-// WHITELIST
-// ============================================================================
+// ======================== ADMIN BLACKLIST ========================
+router.post(`/${PATHS.ADMIN.LISTS.BLACKLIST}`, blacklistController.add);
+router.get(`/${PATHS.ADMIN.LISTS.BLACKLIST}`, blacklistController.list);
+router.delete(`/${PATHS.ADMIN.LISTS.BLACKLIST}`, blacklistController.remove);
 
-router.post(PATHS.WHITELIST, addToWhitelist);
-router.get(PATHS.WHITELIST, listWhitelist);
-router.delete(PATHS.WHITELIST, removeFromWhitelist);
+// ======================== ADMIN REMOVE QUEUE ========================
+router.get(
+	`/${PATHS.ADMIN.REMOVE_QUEUE}`,
+	removalQueueController.listRemovalQueue
+);
+router.post(
+	`/${PATHS.ADMIN.REMOVE_QUEUE}`,
+	removalQueueController.runRemovalQueue
+);
 
-// ============================================================================
-// BLACKLIST
-// ============================================================================
-
-router.post(PATHS.BLACKLIST, addToBlacklist);
-router.get(PATHS.BLACKLIST, listBlacklist);
-router.delete(PATHS.BLACKLIST, removeFromBlacklist);
-
-// ============================================================================
-// REMOVE QUEUE
-// ============================================================================
-
-router.get(PATHS.REMOVE_QUEUE, listRemovalQueue);
-router.post(PATHS.REMOVE_QUEUE, runRemovalQueue);
+// ======================== ADMIN GROUPS INGEST ========================
+router.post(`/${PATHS.ADMIN.GROUPS.INGEST}`, groupController.ingest);
 
 export default router;
