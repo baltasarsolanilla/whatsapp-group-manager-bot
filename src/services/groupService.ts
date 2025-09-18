@@ -33,5 +33,20 @@ export const createGroupService = ({
 				handleAxiosError(err);
 			}
 		},
+		fetchGroupByWaId: async (groupWaId: string) => {
+			try {
+				const res = await axios.get(
+					`${BASE_URL}/group/findGroupInfos/${INSTANCE}/?groupJid=${groupWaId}`,
+					{
+						headers: {
+							apikey: API_KEY,
+						},
+					}
+				);
+				console.log(res);
+			} catch (err: unknown) {
+				handleAxiosError(err);
+			}
+		},
 	};
 };

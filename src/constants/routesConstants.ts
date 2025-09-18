@@ -1,7 +1,17 @@
 export const PATHS = {
+	// ======================== BOT ========================
 	DEFAULT: '/',
-	WHITELIST: '/whitelist',
-	BLACKLIST: '/blacklist',
 	WEBHOOK: '/webhook',
-	REMOVE_QUEUE: '/removeQueue',
+
+	// ======================== ADMIN ========================
+	ADMIN: {
+		REMOVE_QUEUE: 'admin/removeQueue',
+		LISTS: {
+			WHITELIST: 'admin/list/whitelist',
+			BLACKLIST: 'admin/list/blacklist',
+		},
+		GROUPS: {
+			INGEST: 'admin/groups/ingest',
+		},
+	},
 };
