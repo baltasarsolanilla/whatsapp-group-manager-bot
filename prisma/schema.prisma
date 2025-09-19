@@ -24,6 +24,7 @@ model User {
   whitelistEntries Whitelist[]
   blacklistEntries Blacklist[]
   removalQueue     RemovalQueue[]
+  removalHistory   RemovalHistory[]
 
   @@map("users")
 }
@@ -41,6 +42,7 @@ model Group {
   whitelistEntries Whitelist[]
   blacklistEntries Blacklist[]
   removalQueue     RemovalQueue[]
+  removalHistory   RemovalHistory[]
 
   @@map("groups")
 }
@@ -132,6 +134,26 @@ model RemovalQueue {
 
   @@unique([userId, groupId])
   @@map("removal_queue")
+}
+
+enum RemovalOutcome {
+  SUCCESS
+  FAILURE
+}
+
+model RemovalHistory {
+  id          String         @id @default(cuid())
+  userId      String         @map("user_id")
+  groupId     String         @map("group_id")
+  outcome     RemovalOutcome
+  reason      String? // e.g. inactivity, manual admin, error msg
+  processedAt DateTime       @default(now()) @map("processed_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([userId, groupId])
+  @@map("removal_history")
 }
 
 // ============================================================================
