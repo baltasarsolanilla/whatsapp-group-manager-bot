@@ -3,7 +3,7 @@ import {
 	removalQueueRepository,
 } from '@database/repositories';
 import { extractPhoneNumberFromWhatsappPn } from '@logic/helpers';
-import { Group, RemovalStatus } from '@prisma/client';
+import { Group } from '@prisma/client';
 import { AppError } from '@utils/AppError';
 import { groupMembershipService } from './groupMembershipService';
 
@@ -22,21 +22,18 @@ export const removalQueueService = {
 		}
 	},
 
-	async listInactiveMembers(groupWaId?: string, processStatus?: RemovalStatus) {
+	async listInactiveMembers(groupWaId?: string) {
 		const groupId = groupWaId
 			? (await groupRepository.getByWaId(groupWaId))?.id
 			: undefined;
 
-		return removalQueueRepository.getUsersByGroupId(groupId, processStatus);
+		return removalQueueRepository.getUsersByGroupId(groupId);
 	},
 
 	async removeInactiveMembers(groupWaId?: string) {
 		if (groupWaId) {
-			const removedMemberIds: string[] = [];
-			const entriesToRemove = await this.listInactiveMembers(
-				groupWaId,
-				RemovalStatus.PENDING
-			);
+			// const removedMemberIds: string[] = [];
+			const entriesToRemove = await this.listInactiveMembers(groupWaId);
 
 			console.log(entriesToRemove);
 			// ! Need to implement batch logic to avoid max limits
@@ -49,22 +46,13 @@ export const removalQueueService = {
 			try {
 				// ! Keeping it comment out for security reasons
 				// await evolutionAPI.groupService.removeMembers(participants, groupWaId);
-				for (const entry of firstBatch) {
-					await removalQueueRepository.updateStatusById(
-						entry.id,
-						RemovalStatus.PROCESSED
-					);
-					removedMemberIds.push(entry.userId);
-				}
+				// Add to removalHistory -> SUCCESS
+				// Remove from removalQueue
 			} catch {
-				for (const entry of firstBatch) {
-					await removalQueueRepository.updateStatusById(
-						entry.id,
-						RemovalStatus.FAILED
-					);
-					removedMemberIds.push(entry.userId);
-				}
+				// Add to removalHistory -> FAILED
+				// Remove from removalQueue
 			}
+
 			return participants;
 		}
 
