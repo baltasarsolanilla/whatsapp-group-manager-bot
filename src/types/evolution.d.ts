@@ -1,8 +1,14 @@
 // Starter TypeScript types for Evolution API v2
-import { EVOLUTION_EVENTS, GroupAction } from '@constants/evolutionConstants';
+import {
+	EVOLUTION_EVENTS,
+	EvolutionIntegration,
+	GroupAction,
+	MessageType,
+} from '@constants/evolutionConstants';
 
-export type EvolutionIntegration = 'WHATSAPP-BAILEYS' | 'WHATSAPP-BUSINESS';
-export type MessageType = 'conversation' | 'messageReaction';
+export type EvolutionIntegrationType =
+	(typeof EvolutionIntegration)[keyof typeof EvolutionIntegration];
+export type MessageType = (typeof MessageType)[keyof typeof MessageType];
 export type GroupActionType = (typeof GroupAction)[keyof typeof GroupAction];
 
 // -------------------------------

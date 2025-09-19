@@ -13,3 +13,16 @@ export const GroupAction = {
 	PROMOTE: 'promote',
 	DEMOTE: 'demote',
 } as const;
+
+export const MessageType = {
+	CONVERSATION: 'conversation',
+	REACTION: 'reactionMessage',
+	IMAGE: 'imageMessage',
+	CONTACT: 'contactMessage',
+	POLL: 'pollCreationMessageV3',
+} as const;
+
+export const EvolutionIntegration = {
+	WHATSAPP_BAILEYS: 'WHATSAPP-BAILEYS',
+	WHATSAPP_BUSINESS: 'WHATSAPP-BUSINESS',
+} as const;
