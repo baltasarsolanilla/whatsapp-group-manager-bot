@@ -27,7 +27,7 @@ export const removalQueueService = {
 			? (await groupRepository.getByWaId(groupWaId))?.id
 			: undefined;
 
-		return removalQueueRepository.getUsersByGroupId(groupId);
+		return removalQueueRepository.getUsers(groupId);
 	},
 
 	async removeInactiveMembers(groupWaId?: string) {
