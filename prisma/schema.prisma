@@ -29,10 +29,11 @@ model User {
 }
 
 model Group {
-  id         String   @id @default(cuid())
-  whatsappId String   @unique @map("whatsapp_group_id")
-  name       String?
-  createdAt  DateTime @default(now()) @map("created_at")
+  id                         String   @id @default(cuid())
+  whatsappId                 String   @unique @map("whatsapp_group_id")
+  name                       String?
+  inactivityThresholdMinutes Int      @default(43200) @map("inactivity_threshold_minutes") // 30 days
+  createdAt                  DateTime @default(now()) @map("created_at")
 
   // Relations
   groupMemberships GroupMembership[]
