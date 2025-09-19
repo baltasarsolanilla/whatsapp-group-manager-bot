@@ -1,56 +1,46 @@
 import { groupService } from '@logic/services';
 import { Group } from '@prisma/client';
 import { evolutionAPI } from '@services/evolutionAPI';
+import { AppError } from '@utils/AppError';
+import { catchAsync } from '@utils/catchAsync';
+import { resSuccess } from '@utils/resSuccess';
 import { Request, Response } from 'express';
 
 export const groupController = {
-	async ingest(req: Request, res: Response) {
-		try {
-			const { whatsappId } = req.body;
-			if (!whatsappId) {
-				return res.status(400).json({ error: 'whatsappId is required' });
-			}
-			const groupData = await evolutionAPI.groupService.fetchGroup(whatsappId);
-
-			if (!groupData) {
-				return res.status(404).json({ error: 'Group information not found' });
-			}
-
-			const { group, users, whitelist } = await groupService.ingest(groupData);
-			res.status(201).json({ group, users, whitelist });
-		} catch (err) {
-			console.error('Ingest error:', err);
-			res.status(500).json({
-				error: err instanceof Error ? err.message : 'Internal server error',
-			});
+	ingest: catchAsync(async (req: Request, res: Response) => {
+		const { whatsappId } = req.body;
+		if (!whatsappId) {
+			throw AppError.required('whatsappId is required');
 		}
-	},
-	async update(
-		// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-		req: Request<{}, {}, Partial<Group>>,
-		res: Response
-	) {
-		try {
+		const groupData = await evolutionAPI.groupService.fetchGroup(whatsappId);
+
+		if (!groupData) {
+			throw AppError.notFound('Group information not found');
+		}
+
+		const { group, users, whitelist } = await groupService.ingest(groupData);
+		resSuccess(res, { group, users, whitelist });
+	}),
+	update: catchAsync(
+		async (
+			// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+			req: Request<{}, {}, Partial<Group>>,
+			res: Response
+		) => {
 			const whatsappId = req.query.groupId as string;
 			const payload = req.body;
 
 			if (!whatsappId) {
-				return res
-					.status(400)
-					.json({ error: 'groupId query parameter is required' });
+				throw AppError.required('whatsappId query parameter is required');
 			}
 
 			const group = await groupService.update(whatsappId, payload);
 
 			if (!group) {
-				return res.status(404).json({ error: 'Group not found' });
+				throw AppError.notFound('Group not found');
 			}
 
-			res.status(200).json({ group });
-		} catch (err) {
-			res.status(500).json({
-				error: err instanceof Error ? err.message : 'Internal server error',
-			});
+			resSuccess(res, { group });
 		}
-	},
+	),
 };
