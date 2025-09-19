@@ -142,6 +142,7 @@ model RemovalQueue {
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, groupId])
   @@index([status])
   @@index([createdAt])
   @@map("removal_queue")
