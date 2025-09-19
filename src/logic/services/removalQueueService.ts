@@ -31,26 +31,28 @@ export const removalQueueService = {
 	},
 
 	async removeInactiveMembers(groupWaId?: string) {
+		// ! Forcing groupWaId for now to avoid catastrophes :P
 		if (groupWaId) {
 			// const removedMemberIds: string[] = [];
 			const entriesToRemove = await this.listInactiveMembers(groupWaId);
 
-			console.log(entriesToRemove);
 			// ! Need to implement batch logic to avoid max limits
 			// * Let's make a batch of 2 for now
-			const firstBatch = entriesToRemove.slice(0, 2);
-			const participants = firstBatch.map((entry) =>
-				extractPhoneNumberFromWhatsappPn(entry.user.whatsappPn)
+			const queueItems = entriesToRemove.slice(0, 2);
+			const participants = queueItems.map((item) =>
+				extractPhoneNumberFromWhatsappPn(item.user.whatsappPn)
 			);
 
 			try {
 				// ! Keeping it comment out for security reasons
 				// await evolutionAPI.groupService.removeMembers(participants, groupWaId);
-				// Add to removalHistory -> SUCCESS
-				// Remove from removalQueue
 			} catch {
-				// Add to removalHistory -> FAILED
+				// Add to removalHistory -> FAILED | FAILED
 				// Remove from removalQueue
+			}
+
+			for (const item of queueItems) {
+				removalQueueRepository.remove(item.id);
 			}
 
 			return participants;

@@ -17,7 +17,13 @@ export const removalQueueRepository = {
 		});
 	},
 
-	async getUsersByGroupId(groupId?: string) {
+	async remove(id: string) {
+		return prisma.removalQueue.delete({
+			where: { id },
+		});
+	},
+
+	async getUsers(groupId?: string) {
 		return prisma.removalQueue.findMany({
 			where: {
 				...(groupId ? { groupId } : {}),
