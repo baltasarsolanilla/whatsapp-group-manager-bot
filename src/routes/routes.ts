@@ -34,7 +34,8 @@ router.post(
 	removalQueueController.runRemovalQueue
 );
 
-// ======================== ADMIN GROUPS INGEST ========================
+// ======================== ADMIN GROUPS ========================
 router.post(`/${PATHS.ADMIN.GROUPS.INGEST}`, groupController.ingest);
+router.patch(`/${PATHS.ADMIN.GROUPS.UPDATE}`, groupController.update);
 
 export default router;

@@ -3,6 +3,7 @@ import {
 	messageRepository,
 	userRepository,
 } from '@database/repositories';
+import { AppError } from '@utils/AppError';
 import { MessageUpsert } from 'types/evolution';
 import { messageMapper, msgGroupMapper, msgUserMapper } from './../mappers';
 import { groupService } from './groupService';
@@ -13,7 +14,7 @@ export const messageService = {
 		const group = await groupService.ensure(msgGroupMapper.id(payload));
 
 		if (!group) {
-			return;
+			throw AppError.notFound('Group not found');
 		}
 
 		// 2. Ensure user
@@ -24,7 +25,7 @@ export const messageService = {
 		});
 
 		// 3. Ensure membership & update lastActiveAt to keep track of activity
-		const membership = await groupMembershipRepository.upsertGroupMembership({
+		const membership = await groupMembershipRepository.upsert({
 			user,
 			group,
 		});

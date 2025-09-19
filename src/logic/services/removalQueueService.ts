@@ -1,10 +1,10 @@
 import {
-	groupMembershipRepository,
 	groupRepository,
 	removalQueueRepository,
 } from '@database/repositories';
 import { extractPhoneNumberFromWhatsappPn } from '@logic/helpers';
 import { Group, RemovalStatus } from '@prisma/client';
+import { groupMembershipService } from './groupMembershipService';
 
 export const removalQueueService = {
 	/**
@@ -12,7 +12,7 @@ export const removalQueueService = {
 	 * @param group The Group object.
 	 */
 	async addInactiveMembersToRemovalQueue(group: Group) {
-		const memberships = await groupMembershipRepository.inactiveMembers(group);
+		const memberships = await groupMembershipService.getInactive(group);
 		for (const membership of memberships) {
 			await removalQueueRepository.addUser(membership);
 		}

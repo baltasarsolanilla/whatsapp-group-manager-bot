@@ -33,9 +33,7 @@ export const createGroupService = ({
 				handleAxiosError(err);
 			}
 		},
-		fetchGroupByWaId: async (
-			groupWaId: string
-		): Promise<GroupData | undefined> => {
+		fetchGroup: async (groupWaId: string): Promise<GroupData | undefined> => {
 			try {
 				const res = await axios.get(
 					`${BASE_URL}/group/findGroupInfos/${INSTANCE}/?groupJid=${groupWaId}`,

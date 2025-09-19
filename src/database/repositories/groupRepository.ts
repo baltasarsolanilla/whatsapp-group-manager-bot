@@ -21,4 +21,11 @@ export const groupRepository = {
 	async getByWaId(id: string): Promise<Group | null> {
 		return prisma.group.findUnique({ where: { whatsappId: id } });
 	},
+
+	async update(groupId: string, data: Partial<Group>) {
+		return prisma.group.update({
+			where: { id: groupId },
+			data,
+		});
+	},
 };
