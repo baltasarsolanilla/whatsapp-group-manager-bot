@@ -1,11 +1,12 @@
 import {
 	groupRepository,
+	removalHistoryRepository,
 	removalQueueRepository,
 } from '@database/repositories';
 import { extractPhoneNumberFromWhatsappPn } from '@logic/helpers';
-import { Group } from '@prisma/client';
+import { groupMembershipService } from '@logic/services';
+import { Group, RemovalOutcome } from '@prisma/client';
 import { AppError } from '@utils/AppError';
-import { groupMembershipService } from './groupMembershipService';
 
 export const removalQueueService = {
 	/**
@@ -33,29 +34,40 @@ export const removalQueueService = {
 	async removeInactiveMembers(groupWaId?: string) {
 		// ! Forcing groupWaId for now to avoid catastrophes :P
 		if (groupWaId) {
-			// const removedMemberIds: string[] = [];
-			const entriesToRemove = await this.listInactiveMembers(groupWaId);
-
 			// ! Need to implement batch logic to avoid max limits
 			// * Let's make a batch of 2 for now
+			const entriesToRemove = await this.listInactiveMembers(groupWaId);
 			const queueItems = entriesToRemove.slice(0, 2);
-			const participants = queueItems.map((item) =>
+			const queuePhoneNumbers = queueItems.map((item) =>
 				extractPhoneNumberFromWhatsappPn(item.user.whatsappPn)
 			);
 
+			let outcome: RemovalOutcome = RemovalOutcome.FAILURE;
+			let reason: string;
+
 			try {
 				// ! Keeping it comment out for security reasons
-				// await evolutionAPI.groupService.removeMembers(participants, groupWaId);
-			} catch {
-				// Add to removalHistory -> FAILED | FAILED
-				// Remove from removalQueue
+				// await evolutionAPI.groupService.removeMembers(queuePhoneNumbers, groupWaId);
+				outcome = RemovalOutcome.SUCCESS;
+				reason = 'Inactive user removal';
+
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			} catch (err: any) {
+				outcome = RemovalOutcome.FAILURE;
+				reason = err?.message ?? 'Unknown error';
 			}
 
 			for (const item of queueItems) {
 				removalQueueRepository.remove(item.id);
+				removalHistoryRepository.add({
+					userId: item.user.id,
+					groupId: item.group.id,
+					outcome,
+					reason,
+				});
 			}
 
-			return participants;
+			return queuePhoneNumbers;
 		}
 
 		throw AppError.required('GroupId is required');
