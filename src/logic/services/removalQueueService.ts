@@ -4,6 +4,7 @@ import {
 } from '@database/repositories';
 import { extractPhoneNumberFromWhatsappPn } from '@logic/helpers';
 import { Group, RemovalStatus } from '@prisma/client';
+import { AppError } from '@utils/AppError';
 import { groupMembershipService } from './groupMembershipService';
 
 export const removalQueueService = {
@@ -30,17 +31,14 @@ export const removalQueueService = {
 	},
 
 	async removeInactiveMembers(groupWaId?: string) {
-		const groupId = groupWaId
-			? (await groupRepository.getByWaId(groupWaId))?.id
-			: undefined;
-
-		if (groupId && groupWaId) {
+		if (groupWaId) {
 			const removedMemberIds: string[] = [];
 			const entriesToRemove = await this.listInactiveMembers(
-				groupId,
+				groupWaId,
 				RemovalStatus.PENDING
 			);
 
+			console.log(entriesToRemove);
 			// ! Need to implement batch logic to avoid max limits
 			// * Let's make a batch of 2 for now
 			const firstBatch = entriesToRemove.slice(0, 2);
@@ -70,6 +68,6 @@ export const removalQueueService = {
 			return participants;
 		}
 
-		return [];
+		throw AppError.required('GroupId is required');
 	},
 };

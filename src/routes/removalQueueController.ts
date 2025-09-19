@@ -11,8 +11,8 @@ export const removalQueueController = {
 		resSuccess(res, membersRemoved);
 	}),
 	listRemovalQueue: catchAsync(async (req: Request, res: Response) => {
-		const groupId = req.query.groupId as string;
-		const members = await removalQueueService.listInactiveMembers(groupId);
+		const groupWaId = req.query.groupId as string;
+		const members = await removalQueueService.listInactiveMembers(groupWaId);
 		resSuccess(res, members);
 	}),
 };
