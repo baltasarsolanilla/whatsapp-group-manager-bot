@@ -12,6 +12,7 @@ export const PATHS = {
 		},
 		GROUPS: {
 			INGEST: 'admin/groups/ingest',
+			UPDATE: 'admin/groups/update',
 		},
 	},
 };

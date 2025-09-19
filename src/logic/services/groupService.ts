@@ -65,8 +65,7 @@ export const groupService = {
 			return group;
 		}
 
-		const groupData =
-			await evolutionAPI.groupService.fetchGroupByWaId(whatsappId);
+		const groupData = await evolutionAPI.groupService.fetchGroup(whatsappId);
 
 		if (groupData) {
 			const { group } = await this.ingest(groupData);
@@ -75,5 +74,14 @@ export const groupService = {
 		}
 
 		return null;
+	},
+
+	async update(whatsappId: string, data: Partial<Group>) {
+		const group = await groupRepository.getByWaId(whatsappId);
+		if (group) {
+			return groupRepository.update(group.id, data);
+		}
+
+		return;
 	},
 };
