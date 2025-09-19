@@ -14,7 +14,10 @@ export const removalQueueService = {
 	async addInactiveMembersToRemovalQueue(group: Group) {
 		const memberships = await groupMembershipService.getInactive(group);
 		for (const membership of memberships) {
-			await removalQueueRepository.addUser(membership);
+			await removalQueueRepository.addUser({
+				userId: membership.user.id,
+				groupId: membership.group.id,
+			});
 		}
 	},
 

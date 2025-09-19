@@ -1,13 +1,22 @@
 import prisma from '@database/prisma';
-import { type Group, type User, RemovalStatus } from '@prisma/client';
+import { RemovalStatus } from '@prisma/client';
 
 export const removalQueueRepository = {
 	// Add to removal queue
-	async addUser({ user, group }: { user: User; group: Group }) {
-		await prisma.removalQueue.create({
-			data: {
-				userId: user.id,
-				groupId: group.id,
+	async addUser({ userId, groupId }: { userId: string; groupId: string }) {
+		return prisma.removalQueue.upsert({
+			where: {
+				userId_groupId: {
+					userId,
+					groupId,
+				},
+			},
+			update: {
+				status: RemovalStatus.PENDING,
+			},
+			create: {
+				userId,
+				groupId,
 				status: RemovalStatus.PENDING,
 			},
 		});
