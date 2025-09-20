@@ -1,4 +1,5 @@
 import {
+	groupMembershipRepository,
 	groupRepository,
 	removalHistoryRepository,
 	removalQueueRepository,
@@ -77,12 +78,22 @@ export const removalQueueService = {
 		}
 
 		for (const item of queueItems) {
-			removalQueueRepository.remove(item.id);
+			const {
+				id,
+				user: { id: userId },
+				group: { id: groupId },
+			} = item;
+
+			removalQueueRepository.remove(id);
 			removalHistoryRepository.add({
-				userId: item.user.id,
-				groupId: item.group.id,
+				userId,
+				groupId,
 				outcome,
 				reason,
+			});
+			groupMembershipRepository.removeByUserAndGroup({
+				userId,
+				groupId,
 			});
 		}
 
