@@ -1,40 +1,27 @@
 import {
-	WHATSAPP_GROUP_SUFFIX,
-	WHATSAPP_PERSONAL_SUFFIX,
+	WHATSAPP_GROUP_ID_SUFFIX,
+	WHATSAPP_USER_PN_SUFFIX,
 } from '@constants/messagesConstants';
 import type { MessageUpsert } from 'types/evolution';
-import { msgGroupMapper, msgUserMapper } from './mappers';
 
 export const isGroupMessage = (payload: MessageUpsert) => {
-	return payload.key.remoteJid.endsWith(WHATSAPP_GROUP_SUFFIX);
+	return payload.key.remoteJid.endsWith(WHATSAPP_GROUP_ID_SUFFIX);
 };
 
 export const isPrivateMessage = (data: MessageUpsert) => {
-	return data.key.remoteJid.endsWith(WHATSAPP_PERSONAL_SUFFIX);
+	return data.key.remoteJid.endsWith(WHATSAPP_USER_PN_SUFFIX);
 };
 
-const extractUserFromGroupUpdate = (payload: MessageUpsert) => {
-	return {
-		whatsappId: msgUserMapper.id(payload),
-		whatsappPn: msgUserMapper.pn(payload),
-		name: msgUserMapper.name(payload),
-	};
+export const isUserWhatsappPn = (pn: string) => {
+	return pn.endsWith(WHATSAPP_USER_PN_SUFFIX);
 };
 
-export const extractUserFromUpdate = (payload: MessageUpsert) => {
-	if (isGroupMessage(payload)) {
-		return extractUserFromGroupUpdate(payload);
-	}
-
-	return false;
+export const isUserWhatsappId = (id: string) => {
+	return id.endsWith(WHATSAPP_USER_PN_SUFFIX);
 };
 
-export const extractGroupFromUpdate = (payload: MessageUpsert) => {
-	if (isGroupMessage(payload)) {
-		return { whatsappId: msgGroupMapper.id(payload), name: 'unknown' };
-	}
-
-	return false;
+export const isGroupWhatsappId = (id: string) => {
+	return id.endsWith(WHATSAPP_GROUP_ID_SUFFIX);
 };
 
 // Format plain phone number to create a whatsappPn
@@ -46,15 +33,12 @@ export const formatWhatsappId = (phoneNumber: string) => {
 		: phoneNumber;
 
 	// Append the suffix
-	return `${normalized}${WHATSAPP_PERSONAL_SUFFIX}`;
+	return `${normalized}${WHATSAPP_USER_PN_SUFFIX}`;
 };
 
 // Extract phone number from whatsappPn
 // e.g. "61xxxxxxxxx@s.whatsapp.net" => "+61xxxxxxxxx"
-export const extractPhoneNumberFromWhatsappPn = (whatsappPn: string | null) => {
-	if (whatsappPn?.endsWith(WHATSAPP_PERSONAL_SUFFIX)) {
-		const number = whatsappPn.slice(0, -WHATSAPP_PERSONAL_SUFFIX.length);
-		return `+${number}`;
-	}
-	return '';
+export const extractPhoneNumberFromWhatsappPn = (whatsappPn: string) => {
+	const number = whatsappPn.slice(0, -WHATSAPP_USER_PN_SUFFIX.length);
+	return `+${number}`;
 };

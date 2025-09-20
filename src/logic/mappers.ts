@@ -1,12 +1,48 @@
+import { AppError } from '@utils/AppError';
 import type { GroupData, MessageUpsert, WebhookEvent } from 'types/evolution';
+import { isUserWhatsappPn } from './helpers';
 
 // ============================================================================
 // MSG USER
 // ============================================================================
 
+// WhatsappPn might be in "participant" or "participantPn"
+const getUserWaPn = ({
+	participant,
+	participantPn,
+}: {
+	participant?: string;
+	participantPn?: string;
+}) => {
+	for (const value of [participant, participantPn]) {
+		if (value && isUserWhatsappPn(value)) {
+			return value;
+		}
+	}
+
+	throw AppError.notFound('Invalid WhatsApp participant');
+};
+
+// WhatsappId might be in "participant" or "participantLid"
+const getUserWaId = ({
+	participant,
+	participantLid,
+}: {
+	participant?: string;
+	participantLid?: string;
+}) => {
+	for (const value of [participant, participantLid]) {
+		if (value && isUserWhatsappPn(value)) {
+			return value;
+		}
+	}
+
+	throw AppError.notFound('Invalid WhatsApp participant');
+};
+
 export const msgUserMapper = {
-	id: (payload: MessageUpsert) => payload.key.participant,
-	pn: (payload: MessageUpsert) => payload.key.participantPn ?? undefined,
+	id: (payload: MessageUpsert) => getUserWaId(payload.key),
+	pn: (payload: MessageUpsert) => getUserWaPn(payload.key),
 	name: (payload: MessageUpsert) => payload.pushName,
 };
 

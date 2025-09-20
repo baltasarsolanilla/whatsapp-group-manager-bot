@@ -60,9 +60,11 @@ export const removalQueueService = {
 		let queuePhoneNumbers: string[] = [];
 
 		try {
-			queuePhoneNumbers = queueItems.map((item) =>
-				extractPhoneNumberFromWhatsappPn(item.user.whatsappPn)
-			);
+			queuePhoneNumbers = queueItems
+				.filter(Boolean)
+				.map((item) =>
+					extractPhoneNumberFromWhatsappPn(item.user.whatsappPn as string)
+				);
 
 			console.log(
 				'Evolution API ~ remove members from group',
