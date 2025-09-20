@@ -1,23 +1,32 @@
 import prisma from '@database/prisma';
-import { type Group, type User, RemovalStatus } from '@prisma/client';
 
 export const removalQueueRepository = {
-	// Add to removal queue
-	async addUser({ user, group }: { user: User; group: Group }) {
-		await prisma.removalQueue.create({
-			data: {
-				userId: user.id,
-				groupId: group.id,
-				status: RemovalStatus.PENDING,
+	async addUser({ userId, groupId }: { userId: string; groupId: string }) {
+		return prisma.removalQueue.upsert({
+			where: {
+				userId_groupId: {
+					userId,
+					groupId,
+				},
+			},
+			update: {}, // no-op on duplicate
+			create: {
+				userId,
+				groupId,
 			},
 		});
 	},
 
-	async getUsersByGroupId(groupId?: string, status?: RemovalStatus) {
+	async remove(id: string) {
+		return prisma.removalQueue.delete({
+			where: { id },
+		});
+	},
+
+	async getUsers(groupId?: string) {
 		return prisma.removalQueue.findMany({
 			where: {
 				...(groupId ? { groupId } : {}),
-				...(status ? { status } : {}),
 			},
 			include: {
 				user: true,
@@ -26,10 +35,14 @@ export const removalQueueRepository = {
 		});
 	},
 
-	async updateStatusById(id: string, status: RemovalStatus) {
-		return prisma.removalQueue.update({
-			where: { id },
-			data: { status },
+	async getBatch({ groupId, take }: { groupId?: string; take: number }) {
+		return await prisma.removalQueue.findMany({
+			where: {
+				...(groupId ? { groupId } : {}),
+			},
+			take,
+			orderBy: { createdAt: 'asc' }, // oldest first
+			include: { user: true, group: true },
 		});
 	},
 };

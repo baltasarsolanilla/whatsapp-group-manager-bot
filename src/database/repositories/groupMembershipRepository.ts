@@ -25,7 +25,7 @@ export const groupMembershipRepository = {
 	},
 
 	async listByGroupId(groupId: string, excludeWhitelist: boolean = false) {
-		const memberships = await prisma.groupMembership.findMany({
+		return prisma.groupMembership.findMany({
 			where: {
 				groupId,
 				...(excludeWhitelist
@@ -41,7 +41,22 @@ export const groupMembershipRepository = {
 				group: true,
 			},
 		});
+	},
 
-		return memberships;
+	async removeByUserAndGroup({
+		userId,
+		groupId,
+	}: {
+		userId: string;
+		groupId: string;
+	}) {
+		return await prisma.groupMembership.delete({
+			where: {
+				userId_groupId: {
+					userId,
+					groupId,
+				},
+			},
+		});
 	},
 };

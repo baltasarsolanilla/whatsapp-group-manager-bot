@@ -1,10 +1,13 @@
 import {
+	groupMembershipRepository,
 	groupRepository,
+	removalHistoryRepository,
 	removalQueueRepository,
 } from '@database/repositories';
 import { extractPhoneNumberFromWhatsappPn } from '@logic/helpers';
-import { Group, RemovalStatus } from '@prisma/client';
-import { groupMembershipService } from './groupMembershipService';
+import { groupMembershipService } from '@logic/services';
+import { Group, RemovalOutcome } from '@prisma/client';
+import { AppError } from '@utils/AppError';
 
 export const removalQueueService = {
 	/**
@@ -14,59 +17,86 @@ export const removalQueueService = {
 	async addInactiveMembersToRemovalQueue(group: Group) {
 		const memberships = await groupMembershipService.getInactive(group);
 		for (const membership of memberships) {
-			await removalQueueRepository.addUser(membership);
+			await removalQueueRepository.addUser({
+				userId: membership.user.id,
+				groupId: membership.group.id,
+			});
 		}
 	},
 
-	async listInactiveMembers(groupWaId?: string, processStatus?: RemovalStatus) {
+	async listInactiveMembers(groupWaId?: string) {
 		const groupId = groupWaId
 			? (await groupRepository.getByWaId(groupWaId))?.id
 			: undefined;
 
-		return removalQueueRepository.getUsersByGroupId(groupId, processStatus);
+		return removalQueueRepository.getUsers(groupId);
 	},
 
 	async removeInactiveMembers(groupWaId?: string) {
+		// TODO: set/update by admin, although this is whatsapp sensitive, shouldn't change.
+		const BATCH_SIZE = 5;
+
+		// ! Forcing groupWaId for now to avoid catastrophes :P
+		if (!groupWaId) {
+			throw AppError.required('GroupId is required');
+		}
+
 		const groupId = groupWaId
 			? (await groupRepository.getByWaId(groupWaId))?.id
 			: undefined;
 
-		if (groupId && groupWaId) {
-			const removedMemberIds: string[] = [];
-			const entriesToRemove = await this.listInactiveMembers(
-				groupId,
-				RemovalStatus.PENDING
-			);
-
-			// ! Need to implement batch logic to avoid max limits
-			// * Let's make a batch of 2 for now
-			const firstBatch = entriesToRemove.slice(0, 2);
-			const participants = firstBatch.map((entry) =>
-				extractPhoneNumberFromWhatsappPn(entry.user.whatsappPn)
-			);
-
-			try {
-				// ! Keeping it comment out for security reasons
-				// await evolutionAPI.groupService.removeMembers(participants, groupWaId);
-				for (const entry of firstBatch) {
-					await removalQueueRepository.updateStatusById(
-						entry.id,
-						RemovalStatus.PROCESSED
-					);
-					removedMemberIds.push(entry.userId);
-				}
-			} catch {
-				for (const entry of firstBatch) {
-					await removalQueueRepository.updateStatusById(
-						entry.id,
-						RemovalStatus.FAILED
-					);
-					removedMemberIds.push(entry.userId);
-				}
-			}
-			return participants;
+		// ! Avoid running batch if group not found (for now)
+		if (!groupId) {
+			throw AppError.notFound(`Group not found: ${groupWaId}`);
 		}
 
-		return [];
+		const queueItems = await removalQueueRepository.getBatch({
+			groupId,
+			take: BATCH_SIZE,
+		});
+
+		let outcome: RemovalOutcome = RemovalOutcome.FAILURE;
+		let reason: string;
+		let queuePhoneNumbers: string[] = [];
+
+		try {
+			queuePhoneNumbers = queueItems.map((item) =>
+				extractPhoneNumberFromWhatsappPn(item.user.whatsappPn)
+			);
+
+			console.log(
+				'Evolution API ~ remove members from group',
+				queuePhoneNumbers
+			);
+			// ! Keeping it comment out for security reasons
+			// await evolutionAPI.groupService.removeMembers(queuePhoneNumbers, groupWaId);
+			outcome = RemovalOutcome.SUCCESS;
+			reason = 'Inactive user removal';
+		} catch {
+			outcome = RemovalOutcome.FAILURE;
+			reason = 'Unknown error';
+		}
+
+		for (const item of queueItems) {
+			const {
+				id,
+				user: { id: userId },
+				group: { id: groupId },
+			} = item;
+
+			removalQueueRepository.remove(id);
+			removalHistoryRepository.add({
+				userId,
+				groupId,
+				outcome,
+				reason,
+			});
+			groupMembershipRepository.removeByUserAndGroup({
+				userId,
+				groupId,
+			});
+		}
+
+		return queuePhoneNumbers;
 	},
 };

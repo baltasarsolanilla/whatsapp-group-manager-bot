@@ -18,8 +18,10 @@ export const messageRepository = {
 		messageType,
 		messageTimestamp,
 	}: AddMessageType) {
-		await prisma.message.create({
-			data: {
+		return prisma.message.upsert({
+			where: { whatsappId },
+			update: {}, // no-op on duplicate
+			create: {
 				userId: user.id,
 				groupId: group.id,
 				whatsappId,
