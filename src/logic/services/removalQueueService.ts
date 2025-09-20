@@ -32,44 +32,60 @@ export const removalQueueService = {
 	},
 
 	async removeInactiveMembers(groupWaId?: string) {
+		// TODO: set/update by admin, although this is whatsapp sensitive, shouldn't change.
+		const BATCH_SIZE = 5;
+
 		// ! Forcing groupWaId for now to avoid catastrophes :P
-		if (groupWaId) {
-			// ! Need to implement batch logic to avoid max limits
-			// * Let's make a batch of 2 for now
-			const entriesToRemove = await this.listInactiveMembers(groupWaId);
-			const queueItems = entriesToRemove.slice(0, 2);
-			const queuePhoneNumbers = queueItems.map((item) =>
+		if (!groupWaId) {
+			throw AppError.required('GroupId is required');
+		}
+
+		const groupId = groupWaId
+			? (await groupRepository.getByWaId(groupWaId))?.id
+			: undefined;
+
+		// ! Avoid running batch if group not found (for now)
+		if (!groupId) {
+			throw AppError.notFound(`Group not found: ${groupWaId}`);
+		}
+
+		const queueItems = await removalQueueRepository.getBatch({
+			groupId,
+			take: BATCH_SIZE,
+		});
+
+		let outcome: RemovalOutcome = RemovalOutcome.FAILURE;
+		let reason: string;
+		let queuePhoneNumbers: string[] = [];
+
+		try {
+			queuePhoneNumbers = queueItems.map((item) =>
 				extractPhoneNumberFromWhatsappPn(item.user.whatsappPn)
 			);
 
-			let outcome: RemovalOutcome = RemovalOutcome.FAILURE;
-			let reason: string;
-
-			try {
-				// ! Keeping it comment out for security reasons
-				// await evolutionAPI.groupService.removeMembers(queuePhoneNumbers, groupWaId);
-				outcome = RemovalOutcome.SUCCESS;
-				reason = 'Inactive user removal';
-
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			} catch (err: any) {
-				outcome = RemovalOutcome.FAILURE;
-				reason = err?.message ?? 'Unknown error';
-			}
-
-			for (const item of queueItems) {
-				removalQueueRepository.remove(item.id);
-				removalHistoryRepository.add({
-					userId: item.user.id,
-					groupId: item.group.id,
-					outcome,
-					reason,
-				});
-			}
-
-			return queuePhoneNumbers;
+			console.log(
+				'Evolution API ~ remove members from group',
+				queuePhoneNumbers
+			);
+			// ! Keeping it comment out for security reasons
+			// await evolutionAPI.groupService.removeMembers(queuePhoneNumbers, groupWaId);
+			outcome = RemovalOutcome.SUCCESS;
+			reason = 'Inactive user removal';
+		} catch {
+			outcome = RemovalOutcome.FAILURE;
+			reason = 'Unknown error';
 		}
 
-		throw AppError.required('GroupId is required');
+		for (const item of queueItems) {
+			removalQueueRepository.remove(item.id);
+			removalHistoryRepository.add({
+				userId: item.user.id,
+				groupId: item.group.id,
+				outcome,
+				reason,
+			});
+		}
+
+		return queuePhoneNumbers;
 	},
 };
