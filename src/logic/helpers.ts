@@ -3,7 +3,6 @@ import {
 	WHATSAPP_USER_PN_SUFFIX,
 } from '@constants/messagesConstants';
 import type { MessageUpsert } from 'types/evolution';
-import { msgGroupMapper, msgUserMapper } from './mappers';
 
 export const isGroupMessage = (payload: MessageUpsert) => {
 	return payload.key.remoteJid.endsWith(WHATSAPP_GROUP_ID_SUFFIX);
@@ -11,42 +10,6 @@ export const isGroupMessage = (payload: MessageUpsert) => {
 
 export const isPrivateMessage = (data: MessageUpsert) => {
 	return data.key.remoteJid.endsWith(WHATSAPP_USER_PN_SUFFIX);
-};
-
-const extractUserFromGroupUpdate = (payload: MessageUpsert) => {
-	return {
-		whatsappId: msgUserMapper.id(payload),
-		whatsappPn: msgUserMapper.pn(payload),
-		name: msgUserMapper.name(payload),
-	};
-};
-
-export const extractUserFromUpdate = (payload: MessageUpsert) => {
-	if (isGroupMessage(payload)) {
-		return extractUserFromGroupUpdate(payload);
-	}
-
-	return false;
-};
-
-export const extractGroupFromUpdate = (payload: MessageUpsert) => {
-	if (isGroupMessage(payload)) {
-		return { whatsappId: msgGroupMapper.id(payload), name: 'unknown' };
-	}
-
-	return false;
-};
-
-// Format plain phone number to create a whatsappPn
-// e.g. "+61xxxxxxxxx" => "61xxxxxxxxx@s.whatsapp.net"
-export const formatWhatsappId = (phoneNumber: string) => {
-	// Remove leading '+' if it exists
-	const normalized = phoneNumber.startsWith('+')
-		? phoneNumber.slice(1)
-		: phoneNumber;
-
-	// Append the suffix
-	return `${normalized}${WHATSAPP_USER_PN_SUFFIX}`;
 };
 
 export const isUserWhatsappPn = (pn: string) => {
@@ -61,12 +24,21 @@ export const isGroupWhatsappId = (id: string) => {
 	return id.endsWith(WHATSAPP_GROUP_ID_SUFFIX);
 };
 
+// Format plain phone number to create a whatsappPn
+// e.g. "+61xxxxxxxxx" => "61xxxxxxxxx@s.whatsapp.net"
+export const formatWhatsappId = (phoneNumber: string) => {
+	// Remove leading '+' if it exists
+	const normalized = phoneNumber.startsWith('+')
+		? phoneNumber.slice(1)
+		: phoneNumber;
+
+	// Append the suffix
+	return `${normalized}${WHATSAPP_USER_PN_SUFFIX}`;
+};
+
 // Extract phone number from whatsappPn
 // e.g. "61xxxxxxxxx@s.whatsapp.net" => "+61xxxxxxxxx"
-export const extractPhoneNumberFromWhatsappPn = (whatsappPn: string | null) => {
-	if (whatsappPn?.endsWith(WHATSAPP_USER_PN_SUFFIX)) {
-		const number = whatsappPn.slice(0, -WHATSAPP_USER_PN_SUFFIX.length);
-		return `+${number}`;
-	}
-	return '';
+export const extractPhoneNumberFromWhatsappPn = (whatsappPn: string) => {
+	const number = whatsappPn.slice(0, -WHATSAPP_USER_PN_SUFFIX.length);
+	return `+${number}`;
 };
