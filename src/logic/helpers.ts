@@ -1,5 +1,6 @@
 import {
 	WHATSAPP_GROUP_ID_SUFFIX,
+	WHATSAPP_USER_ID_SUFFIX,
 	WHATSAPP_USER_PN_SUFFIX,
 } from '@constants/messagesConstants';
 import type { MessageUpsert } from 'types/evolution';
@@ -17,7 +18,7 @@ export const isUserWhatsappPn = (pn: string) => {
 };
 
 export const isUserWhatsappId = (id: string) => {
-	return id.endsWith(WHATSAPP_USER_PN_SUFFIX);
+	return id.endsWith(WHATSAPP_USER_ID_SUFFIX);
 };
 
 export const isGroupWhatsappId = (id: string) => {
