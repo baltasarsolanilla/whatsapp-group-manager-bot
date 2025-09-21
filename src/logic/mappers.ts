@@ -1,6 +1,6 @@
 import { AppError } from '@utils/AppError';
 import type { GroupData, MessageUpsert, WebhookEvent } from 'types/evolution';
-import { isUserWhatsappPn } from './helpers';
+import { isUserWhatsappId, isUserWhatsappPn } from './helpers';
 
 // ============================================================================
 // MSG USER
@@ -20,7 +20,7 @@ const getUserWaPn = ({
 		}
 	}
 
-	throw AppError.notFound('Invalid WhatsApp participant');
+	return null;
 };
 
 // WhatsappId might be in "participant" or "participantLid"
@@ -32,7 +32,7 @@ const getUserWaId = ({
 	participantLid?: string;
 }) => {
 	for (const value of [participant, participantLid]) {
-		if (value && isUserWhatsappPn(value)) {
+		if (value && isUserWhatsappId(value)) {
 			return value;
 		}
 	}

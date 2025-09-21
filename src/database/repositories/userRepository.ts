@@ -17,11 +17,10 @@ export const userRepository = {
 		return prisma.user.upsert({
 			where: {
 				whatsappId,
-				...(whatsappPn !== undefined ? { whatsappPn } : {}),
 			},
 			update: {
-				...(name !== undefined ? { name } : {}),
-				...(whatsappPn !== undefined ? { whatsappPn } : {}),
+				...(name ? { name } : {}),
+				...(whatsappPn ? { whatsappPn } : {}), // whatsappPn might be null here
 			},
 			create: {
 				whatsappId,

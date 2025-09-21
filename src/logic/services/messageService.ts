@@ -20,7 +20,7 @@ export const messageService = {
 		// 2. Ensure user
 		const user = await userRepository.upsert({
 			whatsappId: msgUserMapper.id(payload),
-			whatsappPn: msgUserMapper.pn(payload),
+			whatsappPn: msgUserMapper.pn(payload) ?? undefined,
 			name: msgUserMapper.name(payload),
 		});
 
