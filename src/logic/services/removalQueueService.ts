@@ -6,22 +6,26 @@ import {
 } from '@database/repositories';
 import { extractPhoneNumberFromWhatsappPn } from '@logic/helpers';
 import { groupMembershipService } from '@logic/services';
-import { Group, RemovalOutcome } from '@prisma/client';
+import { RemovalOutcome, RemovalQueue } from '@prisma/client';
 import { AppError } from '@utils/AppError';
 
 export const removalQueueService = {
 	/**
 	 * Adds all inactive members to the removal queue for a given group.
-	 * @param group The Group object.
+	 * @param groupWaId The Group whatsapp id.
 	 */
-	async addInactiveMembersToRemovalQueue(group: Group) {
-		const memberships = await groupMembershipService.getInactive(group);
+	async addInactiveMembersToRemovalQueue(groupWaId: string) {
+		const memberships = await groupMembershipService.getInactive(groupWaId);
+		const newQueueMembers: RemovalQueue[] = [];
 		for (const membership of memberships) {
-			await removalQueueRepository.addUser({
+			const newMember = await removalQueueRepository.upsertUser({
 				userId: membership.user.id,
 				groupId: membership.group.id,
 			});
+			newQueueMembers.push(newMember);
 		}
+
+		return newQueueMembers;
 	},
 
 	async listInactiveMembers(groupWaId?: string) {
@@ -35,11 +39,6 @@ export const removalQueueService = {
 	async removeInactiveMembers(groupWaId?: string) {
 		// TODO: set/update by admin, although this is whatsapp sensitive, shouldn't change.
 		const BATCH_SIZE = 5;
-
-		// ! Forcing groupWaId for now to avoid catastrophes :P
-		if (!groupWaId) {
-			throw AppError.required('GroupId is required');
-		}
 
 		const groupId = groupWaId
 			? (await groupRepository.getByWaId(groupWaId))?.id
