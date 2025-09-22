@@ -15,8 +15,9 @@ export const PATHS = {
 			BLACKLIST: 'admin/lists/blacklist',
 		},
 		GROUPS: {
+			BASE: 'admin/groups',
+			UPDATE: 'admin/groups/:id',
 			INGEST: 'admin/groups/ingest',
-			UPDATE: 'admin/groups/update',
 		},
 	},
 };

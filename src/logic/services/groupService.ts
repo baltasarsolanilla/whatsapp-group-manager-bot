@@ -7,6 +7,7 @@ import {
 import { groupMapper } from '@logic/mappers';
 import { Group } from '@prisma/client';
 import { evolutionAPI } from '@services/evolutionAPI';
+import { AppError } from '@utils/AppError';
 import { GroupData } from 'types/evolution';
 
 export const groupService = {
@@ -78,10 +79,9 @@ export const groupService = {
 
 	async update(whatsappId: string, data: Partial<Group>) {
 		const group = await groupRepository.getByWaId(whatsappId);
-		if (group) {
-			return groupRepository.update(group.id, data);
+		if (!group) {
+			throw AppError.notFound(`Group not found: ${whatsappId}`);
 		}
-
-		return;
+		return groupRepository.update(group.id, data);
 	},
 };

@@ -5,30 +5,31 @@ import { resSuccess } from '@utils/resSuccess';
 import { Request, Response } from 'express';
 
 export const removalQueueController = {
-	runRemovalQueue: catchAsync(async (req: Request, res: Response) => {
-		const { groupId } = req.body ?? {};
-		// ! Forcing groupWaId for now to avoid catastrophes :P
-		if (!groupId) {
-			throw AppError.required('GroupId is required');
-		}
-
-		const membersRemoved =
-			await removalQueueService.removeInactiveMembers(groupId);
-		resSuccess(res, membersRemoved);
-	}),
 	listRemovalQueue: catchAsync(async (req: Request, res: Response) => {
-		const groupWaId = req.query.groupId as string;
-		const members = await removalQueueService.listInactiveMembers(groupWaId);
+		const groupJid = req.query.groupJid as string;
+		const members = await removalQueueService.listInactiveMembers(groupJid);
 		resSuccess(res, members);
 	}),
 	syncRemovalQueue: catchAsync(async (req: Request, res: Response) => {
-		const { groupId } = req.body ?? {};
-		if (!groupId) {
-			throw AppError.required('GroupId is required');
+		const { groupJid } = req.body ?? {};
+
+		if (!groupJid) {
+			throw AppError.required('groupJid is required');
 		}
 
 		const removalQueue =
-			await removalQueueService.addInactiveMembersToRemovalQueue(groupId);
+			await removalQueueService.addInactiveMembersToRemovalQueue(groupJid);
 		resSuccess(res, removalQueue);
+	}),
+	runRemovalQueue: catchAsync(async (req: Request, res: Response) => {
+		const { groupJid } = req.body ?? {};
+		// ! Forcing groupWaId for now to avoid catastrophes :P
+		if (!groupJid) {
+			throw AppError.required('groupJid is required');
+		}
+
+		const membersRemoved =
+			await removalQueueService.removeInactiveMembers(groupJid);
+		resSuccess(res, membersRemoved);
 	}),
 };
