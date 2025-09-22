@@ -1,7 +1,7 @@
 import prisma from '@database/prisma';
 
 export const removalQueueRepository = {
-	async addUser({ userId, groupId }: { userId: string; groupId: string }) {
+	async upsertUser({ userId, groupId }: { userId: string; groupId: string }) {
 		return prisma.removalQueue.upsert({
 			where: {
 				userId_groupId: {

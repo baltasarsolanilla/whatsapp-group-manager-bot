@@ -5,14 +5,19 @@ export const PATHS = {
 
 	// ======================== ADMIN ========================
 	ADMIN: {
-		REMOVE_QUEUE: 'admin/removeQueue',
+		REMOVAL_QUEUE: {
+			BASE: 'admin/removalQueue',
+			RUN: 'admin/removalQueue/run',
+			SYNC: 'admin/removalQueue/sync',
+		},
 		LISTS: {
 			WHITELIST: 'admin/lists/whitelist',
 			BLACKLIST: 'admin/lists/blacklist',
 		},
 		GROUPS: {
+			BASE: 'admin/groups',
+			UPDATE: 'admin/groups/:id',
 			INGEST: 'admin/groups/ingest',
-			UPDATE: 'admin/groups/update',
 		},
 	},
 };

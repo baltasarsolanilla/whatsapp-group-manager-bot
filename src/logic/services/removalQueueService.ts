@@ -6,22 +6,26 @@ import {
 } from '@database/repositories';
 import { extractPhoneNumberFromWhatsappPn } from '@logic/helpers';
 import { groupMembershipService } from '@logic/services';
-import { Group, RemovalOutcome } from '@prisma/client';
+import { RemovalOutcome, RemovalQueue } from '@prisma/client';
 import { AppError } from '@utils/AppError';
 
 export const removalQueueService = {
 	/**
 	 * Adds all inactive members to the removal queue for a given group.
-	 * @param group The Group object.
+	 * @param groupWaId The Group whatsapp id.
 	 */
-	async addInactiveMembersToRemovalQueue(group: Group) {
-		const memberships = await groupMembershipService.getInactive(group);
+	async addInactiveMembersToRemovalQueue(groupWaId: string) {
+		const memberships = await groupMembershipService.getInactive(groupWaId);
+		const newQueueMembers: RemovalQueue[] = [];
 		for (const membership of memberships) {
-			await removalQueueRepository.addUser({
+			const newMember = await removalQueueRepository.upsertUser({
 				userId: membership.user.id,
 				groupId: membership.group.id,
 			});
+			newQueueMembers.push(newMember);
 		}
+
+		return newQueueMembers;
 	},
 
 	async listInactiveMembers(groupWaId?: string) {
@@ -32,18 +36,18 @@ export const removalQueueService = {
 		return removalQueueRepository.getUsers(groupId);
 	},
 
-	async removeInactiveMembers(groupWaId?: string) {
-		// TODO: set/update by admin, although this is whatsapp sensitive, shouldn't change.
-		const BATCH_SIZE = 5;
-
-		// ! Forcing groupWaId for now to avoid catastrophes :P
-		if (!groupWaId) {
-			throw AppError.required('GroupId is required');
-		}
-
+	async removeInactiveMembers({
+		groupWaId,
+		batchSize,
+		dryRun,
+	}: {
+		groupWaId?: string;
+		batchSize: number;
+		dryRun: boolean;
+	}) {
 		const groupId = groupWaId
 			? (await groupRepository.getByWaId(groupWaId))?.id
-			: undefined;
+			: null;
 
 		// ! Avoid running batch if group not found (for now)
 		if (!groupId) {
@@ -52,7 +56,7 @@ export const removalQueueService = {
 
 		const queueItems = await removalQueueRepository.getBatch({
 			groupId,
-			take: BATCH_SIZE,
+			take: batchSize,
 		});
 
 		let outcome: RemovalOutcome = RemovalOutcome.FAILURE;
@@ -66,12 +70,20 @@ export const removalQueueService = {
 					extractPhoneNumberFromWhatsappPn(item.user.whatsappPn as string)
 				);
 
-			console.log(
-				'Evolution API ~ remove members from group',
-				queuePhoneNumbers
-			);
-			// ! Keeping it comment out for security reasons
-			// await evolutionAPI.groupService.removeMembers(queuePhoneNumbers, groupWaId);
+			if (dryRun) {
+				console.log(
+					'Evolution API ~ DRY RUN ~ remove members from group',
+					queuePhoneNumbers
+				);
+			} else {
+				console.log(
+					'Evolution API ~ LEGIT RUN ~ remove members from group',
+					queuePhoneNumbers
+				);
+				// ! Keeping it comment out for security reasons
+				// await evolutionAPI.groupService.removeMembers(queuePhoneNumbers, groupWaId);
+			}
+
 			outcome = RemovalOutcome.SUCCESS;
 			reason = 'Inactive user removal';
 		} catch {

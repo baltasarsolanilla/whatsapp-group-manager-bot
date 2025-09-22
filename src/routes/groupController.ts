@@ -8,39 +8,29 @@ import { Request, Response } from 'express';
 
 export const groupController = {
 	ingest: catchAsync(async (req: Request, res: Response) => {
-		const { whatsappId } = req.body;
-		if (!whatsappId) {
-			throw AppError.required('whatsappId is required');
+		const { groupWaId } = req.body;
+		if (!groupWaId) {
+			throw AppError.required('groupWaId is required');
 		}
-		const groupData = await evolutionAPI.groupService.fetchGroup(whatsappId);
+		const groupData = await evolutionAPI.groupService.fetchGroup(groupWaId);
 
 		if (!groupData) {
-			throw AppError.notFound('Group information not found');
+			throw AppError.notFound('Group not found');
 		}
 
 		const { group, users, whitelist } = await groupService.ingest(groupData);
 		resSuccess(res, { group, users, whitelist });
 	}),
-	update: catchAsync(
-		async (
-			// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-			req: Request<{}, {}, Partial<Group>>,
-			res: Response
-		) => {
-			const whatsappId = req.query.groupId as string;
-			const payload = req.body;
+	update: catchAsync(async (req: Request, res: Response) => {
+		const groupWaId = (req.params as { id: string }).id;
+		const payload = req.body as Partial<Group>;
 
-			if (!whatsappId) {
-				throw AppError.required('whatsappId query parameter is required');
-			}
+		const group = await groupService.update(groupWaId, payload);
 
-			const group = await groupService.update(whatsappId, payload);
-
-			if (!group) {
-				throw AppError.notFound('Group not found');
-			}
-
-			resSuccess(res, { group });
+		if (!group) {
+			throw AppError.notFound(`Group not found: ${groupWaId}`);
 		}
-	),
+
+		resSuccess(res, { group });
+	}),
 };
