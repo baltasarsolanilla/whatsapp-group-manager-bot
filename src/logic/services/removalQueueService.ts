@@ -36,13 +36,18 @@ export const removalQueueService = {
 		return removalQueueRepository.getUsers(groupId);
 	},
 
-	async removeInactiveMembers(groupWaId?: string) {
-		// TODO: set/update by admin, although this is whatsapp sensitive, shouldn't change.
-		const BATCH_SIZE = 5;
-
+	async removeInactiveMembers({
+		groupWaId,
+		batchSize,
+		dryRun,
+	}: {
+		groupWaId?: string;
+		batchSize: number;
+		dryRun: boolean;
+	}) {
 		const groupId = groupWaId
 			? (await groupRepository.getByWaId(groupWaId))?.id
-			: undefined;
+			: null;
 
 		// ! Avoid running batch if group not found (for now)
 		if (!groupId) {
@@ -51,7 +56,7 @@ export const removalQueueService = {
 
 		const queueItems = await removalQueueRepository.getBatch({
 			groupId,
-			take: BATCH_SIZE,
+			take: batchSize,
 		});
 
 		let outcome: RemovalOutcome = RemovalOutcome.FAILURE;
@@ -65,12 +70,20 @@ export const removalQueueService = {
 					extractPhoneNumberFromWhatsappPn(item.user.whatsappPn as string)
 				);
 
-			console.log(
-				'Evolution API ~ remove members from group',
-				queuePhoneNumbers
-			);
-			// ! Keeping it comment out for security reasons
-			// await evolutionAPI.groupService.removeMembers(queuePhoneNumbers, groupWaId);
+			if (dryRun) {
+				console.log(
+					'Evolution API ~ DRY RUN ~ remove members from group',
+					queuePhoneNumbers
+				);
+			} else {
+				console.log(
+					'Evolution API ~ LEGIT RUN ~ remove members from group',
+					queuePhoneNumbers
+				);
+				// ! Keeping it comment out for security reasons
+				// await evolutionAPI.groupService.removeMembers(queuePhoneNumbers, groupWaId);
+			}
+
 			outcome = RemovalOutcome.SUCCESS;
 			reason = 'Inactive user removal';
 		} catch {

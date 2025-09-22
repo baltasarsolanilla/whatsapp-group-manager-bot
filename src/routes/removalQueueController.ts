@@ -22,14 +22,21 @@ export const removalQueueController = {
 		resSuccess(res, removalQueue);
 	}),
 	runRemovalQueue: catchAsync(async (req: Request, res: Response) => {
-		const { groupWaId } = req.body ?? {};
+		const { groupWaId, batchSize = 5, dryRun = true } = req.body ?? {};
+
 		// ! Forcing groupWaId for now to avoid catastrophes :P
 		if (!groupWaId) {
 			throw AppError.required('groupWaId is required');
 		}
 
-		const membersRemoved =
-			await removalQueueService.removeInactiveMembers(groupWaId);
-		resSuccess(res, membersRemoved);
+		const config = {
+			groupWaId,
+			batchSize,
+			dryRun,
+		};
+
+		const removedMembers =
+			await removalQueueService.removeInactiveMembers(config);
+		resSuccess(res, removedMembers);
 	}),
 };
