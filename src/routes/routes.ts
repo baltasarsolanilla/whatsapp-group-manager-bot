@@ -25,17 +25,18 @@ router.get(`/${PATHS.ADMIN.LISTS.BLACKLIST}`, blacklistController.list);
 router.delete(`/${PATHS.ADMIN.LISTS.BLACKLIST}`, blacklistController.remove);
 
 // ======================== ADMIN REMOVE QUEUE ========================
-router.get(
-	`/${PATHS.ADMIN.REMOVAL_QUEUE.BASE}`,
-	removalQueueController.listRemovalQueue
-);
+router.get(`/${PATHS.ADMIN.REMOVAL_QUEUE.BASE}`, removalQueueController.list);
 router.post(
 	`/${PATHS.ADMIN.REMOVAL_QUEUE.RUN}`,
-	removalQueueController.runRemovalQueue
+	removalQueueController.runQueue
 );
 router.post(
 	`/${PATHS.ADMIN.REMOVAL_QUEUE.SYNC}`,
-	removalQueueController.syncRemovalQueue
+	removalQueueController.syncQueue
+);
+router.post(
+	`/${PATHS.ADMIN.REMOVAL_QUEUE.RUN_WORKFLOW}`,
+	removalQueueController.runWorkflow
 );
 
 // ======================== ADMIN GROUPS ========================

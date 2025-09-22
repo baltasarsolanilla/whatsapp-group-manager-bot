@@ -9,6 +9,7 @@ export const PATHS = {
 			BASE: 'admin/removalQueue',
 			RUN: 'admin/removalQueue/run',
 			SYNC: 'admin/removalQueue/sync',
+			RUN_WORKFLOW: 'admin/removalQueue/runWorkflow',
 		},
 		LISTS: {
 			WHITELIST: 'admin/lists/whitelist',
