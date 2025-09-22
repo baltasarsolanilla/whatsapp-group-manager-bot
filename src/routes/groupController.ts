@@ -8,11 +8,11 @@ import { Request, Response } from 'express';
 
 export const groupController = {
 	ingest: catchAsync(async (req: Request, res: Response) => {
-		const { groupJid } = req.body;
-		if (!groupJid) {
-			throw AppError.required('groupJid is required');
+		const { groupWaId } = req.body;
+		if (!groupWaId) {
+			throw AppError.required('groupWaId is required');
 		}
-		const groupData = await evolutionAPI.groupService.fetchGroup(groupJid);
+		const groupData = await evolutionAPI.groupService.fetchGroup(groupWaId);
 
 		if (!groupData) {
 			throw AppError.notFound('Group not found');
@@ -22,13 +22,13 @@ export const groupController = {
 		resSuccess(res, { group, users, whitelist });
 	}),
 	update: catchAsync(async (req: Request, res: Response) => {
-		const groupJid = (req.params as { id: string }).id;
+		const groupWaId = (req.params as { id: string }).id;
 		const payload = req.body as Partial<Group>;
 
-		const group = await groupService.update(groupJid, payload);
+		const group = await groupService.update(groupWaId, payload);
 
 		if (!group) {
-			throw AppError.notFound(`Group not found: ${groupJid}`);
+			throw AppError.notFound(`Group not found: ${groupWaId}`);
 		}
 
 		resSuccess(res, { group });
