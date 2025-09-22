@@ -35,7 +35,7 @@ export const removalQueueRepository = {
 		});
 	},
 
-	async getBatch({ groupId, take }: { groupId?: string; take: number }) {
+	async getNextBatch({ groupId, take }: { groupId?: string; take: number }) {
 		return await prisma.removalQueue.findMany({
 			where: {
 				...(groupId ? { groupId } : {}),

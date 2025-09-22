@@ -17,7 +17,7 @@ export const groupMembershipService = {
 
 		const group = await groupRepository.getByWaId(groupWaId);
 		if (!group) {
-			throw AppError.notFound('Group not found');
+			throw AppError.notFound(`Group not found: ${groupWaId}`);
 		}
 		const memberships = await groupMembershipRepository.listByGroupId(
 			group.id,

@@ -43,3 +43,6 @@ export const extractPhoneNumberFromWhatsappPn = (whatsappPn: string) => {
 	const number = whatsappPn.slice(0, -WHATSAPP_USER_PN_SUFFIX.length);
 	return `+${number}`;
 };
+
+export const sleep = (ms: number) =>
+	new Promise((resolve) => setTimeout(resolve, ms));
