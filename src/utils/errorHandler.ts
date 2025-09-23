@@ -4,12 +4,17 @@ import { NextFunction, Request, Response } from 'express';
 
 /* eslint-disable no-console */
 import axios from 'axios';
+import { AppError } from './AppError';
 
 export function handleAxiosError(err: unknown): void {
 	if (axios.isAxiosError(err)) {
 		console.error('[AxiosError]', err.message, err.response?.data);
+		throw AppError.notFound(
+			JSON.stringify({ message: err.message, data: err.response?.data })
+		);
 	} else {
 		console.error('[UnexpectedError]', err);
+		throw AppError.notFound('UnexpectedError');
 	}
 }
 
