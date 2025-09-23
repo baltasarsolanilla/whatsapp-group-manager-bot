@@ -4,6 +4,7 @@ import {
 	userRepository,
 } from '@database/repositories';
 import { formatWhatsappId } from '@logic/helpers';
+import { AppError } from '@utils/AppError';
 
 export const blacklistService = {
 	async add(phoneNumber: string, groupWaId: string) {
@@ -14,7 +15,7 @@ export const blacklistService = {
 		if (!group || !user) {
 			const warnMsg = `blacklistService.add() - ${!group ? 'Group' : 'User'} not found`;
 			console.warn(warnMsg);
-			return;
+			throw AppError.notFound('Group or user not found');
 		}
 
 		return await blacklistRepository.upsert(user.id, group.id);
@@ -28,7 +29,7 @@ export const blacklistService = {
 		if (!group || !user) {
 			const warnMsg = `blacklistService.add() - ${!group ? 'Group' : 'User'} not found`;
 			console.warn(warnMsg);
-			return;
+			throw AppError.notFound('Group or user not found');
 		}
 
 		return await blacklistRepository.remove(user.id, group.id);
