@@ -43,26 +43,31 @@ npm run test:coverage
 ### Currently Tested Components ✅
 
 #### Utils Layer (100% coverage)
+
 - **AppError**: Custom error class with status codes
 - **catchAsync**: Async error handling wrapper
 - **resSuccess**: Response success helper
 - **errorHandler**: HTTP error handling middleware
 
 #### Logic Layer (95%+ coverage)
+
 - **helpers**: WhatsApp ID validation and formatting utilities
 - **mappers**: Data transformation between Evolution API and internal models
 - **botLogic**: Core message processing logic
 - **handlers**: Event routing and delegation
 
 #### Services Layer
+
 - **messageService**: Evolution API HTTP client
 - **webhookEventService**: Event persistence service
 
 #### Constants (100% coverage)
+
 - **evolutionConstants**: API event types and message formats
 - **routesConstants**: API endpoint paths and structure
 
 ### Integration Tests ✅
+
 - **Webhook Endpoints**: POST / and /webhook with various payloads
 - **Admin APIs**: Complete CRUD operations for whitelist, blacklist, removal queue
 - **Error Handling**: Malformed JSON, missing parameters, service failures
@@ -70,13 +75,16 @@ npm run test:coverage
 ## Mock Strategy
 
 ### Global Mocks
+
 - **Prisma Client**: All database operations mocked
 - **Evolution API**: HTTP calls to WhatsApp API mocked
 - **Configuration**: Environment variables mocked
 - **Console**: Noise reduction in test output
 
 ### Service Mocks
+
 All external dependencies are properly mocked:
+
 ```typescript
 // Database repositories
 userRepository, groupRepository, messageRepository...
@@ -91,11 +99,13 @@ axios (for Evolution API calls)
 ## Running Tests
 
 ### Prerequisites
+
 ```bash
 npm install
 ```
 
 ### Basic Test Run
+
 ```bash
 # Run all working tests (excludes Prisma-dependent files)
 npm test
@@ -108,11 +118,13 @@ npm test -- src/__tests__/unit/utils/AppError.test.ts
 ```
 
 ### Coverage Report
+
 ```bash
 npm run test:coverage
 ```
 
 Generates coverage reports in:
+
 - Terminal output
 - `coverage/lcov-report/index.html` (detailed HTML report)
 - `coverage/lcov.info` (for CI/CD integration)
@@ -120,12 +132,14 @@ Generates coverage reports in:
 ## Test Categories
 
 ### Unit Tests (80+ test cases)
+
 - **Pure functions**: No external dependencies
 - **Business logic**: Core application functionality
 - **Error handling**: All error scenarios covered
 - **Data validation**: Input/output validation
 
 ### Integration Tests (15+ test cases)
+
 - **API endpoints**: Full HTTP request/response cycle
 - **Middleware**: Error handling and request processing
 - **Service integration**: Multiple services working together
@@ -133,6 +147,7 @@ Generates coverage reports in:
 ## Deployment Readiness
 
 ### Quality Gates ✅
+
 1. **All critical paths tested**: Message processing, webhook handling, admin operations
 2. **Error scenarios covered**: Network failures, invalid data, missing resources
 3. **External dependencies mocked**: No real database or API calls during testing
@@ -140,6 +155,7 @@ Generates coverage reports in:
 5. **CI/CD ready**: Tests run consistently across environments
 
 ### Performance Considerations
+
 - Tests complete in under 20 seconds
 - Parallel execution enabled
 - Minimal setup/teardown overhead
@@ -150,19 +166,25 @@ Generates coverage reports in:
 ### Common Issues
 
 #### Prisma Type Errors
+
 Some tests may fail with Prisma type errors if the database client isn't generated:
+
 ```bash
 npx prisma generate
 ```
 
 #### Module Resolution
+
 If path aliases don't work:
+
 1. Check `jest.config.js` moduleNameMapper
 2. Verify `tsconfig.json` paths configuration
 3. Ensure test setup files are properly loaded
 
 #### Mock Issues
+
 If mocks aren't working:
+
 1. Clear Jest cache: `npx jest --clearCache`
 2. Check mock placement in `setup.ts`
 3. Verify mock is called before import
@@ -170,6 +192,7 @@ If mocks aren't working:
 ## Best Practices
 
 ### Writing New Tests
+
 1. **Use descriptive test names**: What functionality is being tested
 2. **Follow AAA pattern**: Arrange, Act, Assert
 3. **Mock external dependencies**: Keep tests isolated
@@ -177,6 +200,7 @@ If mocks aren't working:
 5. **Use type-safe mocks**: Leverage TypeScript for better testing
 
 ### Test Data
+
 - Use fixtures from `mockData.ts` for consistency
 - Create realistic test data that matches production patterns
 - Include edge cases and boundary conditions
@@ -184,12 +208,14 @@ If mocks aren't working:
 ## Future Enhancements
 
 ### Potential Additions
+
 - **E2E tests**: Full application workflow testing
 - **Performance tests**: Load testing for webhook endpoints
 - **Database integration tests**: With test database instance
 - **Visual regression tests**: For any UI components
 
 ### Monitoring
+
 - Test execution time tracking
 - Coverage threshold enforcement
 - Flaky test detection

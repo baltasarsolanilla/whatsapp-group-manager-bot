@@ -16,7 +16,9 @@ describe('Routes Constants', () => {
 			expect(PATHS.ADMIN.REMOVAL_QUEUE.BASE).toBe('admin/removalQueue');
 			expect(PATHS.ADMIN.REMOVAL_QUEUE.RUN).toBe('admin/removalQueue/run');
 			expect(PATHS.ADMIN.REMOVAL_QUEUE.SYNC).toBe('admin/removalQueue/sync');
-			expect(PATHS.ADMIN.REMOVAL_QUEUE.RUN_WORKFLOW).toBe('admin/removalQueue/runWorkflow');
+			expect(PATHS.ADMIN.REMOVAL_QUEUE.RUN_WORKFLOW).toBe(
+				'admin/removalQueue/runWorkflow'
+			);
 		});
 
 		it('should have correct list paths', () => {
@@ -52,7 +54,7 @@ describe('Routes Constants', () => {
 				PATHS.ADMIN.GROUPS.INGEST,
 			];
 
-			adminPaths.forEach(path => {
+			adminPaths.forEach((path) => {
 				expect(path).toMatch(/^admin\//);
 			});
 		});

@@ -41,9 +41,7 @@ describe('Webhook Integration Tests', () => {
 		});
 
 		it('should handle missing body', async () => {
-			const response = await request(app)
-				.post('/')
-				.expect(200);
+			const response = await request(app).post('/').expect(200);
 
 			// Should still process with undefined body
 			expect(response.status).toBe(200);

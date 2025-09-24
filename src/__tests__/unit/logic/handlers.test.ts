@@ -25,7 +25,7 @@ describe('Handlers', () => {
 		it('should have messages.upsert handler', async () => {
 			const { handlers } = await import('@logic/handlers');
 			const eventKey = EVOLUTION_EVENTS.MESSAGES_UPSERT;
-			
+
 			// Check if the handler exists and is a function
 			expect(handlers).toHaveProperty(eventKey);
 			expect(typeof handlers[eventKey]).toBe('function');
@@ -34,7 +34,7 @@ describe('Handlers', () => {
 		it('should call handleMessageUpsert when handler is executed', async () => {
 			const { handlers } = await import('@logic/handlers');
 			const handler = handlers[EVOLUTION_EVENTS.MESSAGES_UPSERT];
-			
+
 			if (handler) {
 				handler(mockWebhookEvent);
 				expect(mockHandleMessageUpsert).toHaveBeenCalledWith(mockWebhookEvent);
