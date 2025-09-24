@@ -3,7 +3,7 @@ import { Blacklist } from '@prisma/client';
 
 export const blacklistRepository = {
 	async upsert(userId: string, groupId: string): Promise<Blacklist> {
-		return await prisma.blacklist.upsert({
+		return prisma.blacklist.upsert({
 			where: { userId_groupId: { userId, groupId } },
 			update: {},
 			create: { userId, groupId },
