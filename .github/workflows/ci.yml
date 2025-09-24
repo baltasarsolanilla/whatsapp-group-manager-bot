@@ -34,3 +34,10 @@ jobs:
 
       - name: Build project
         run: npm run build
+
+      - name: Check server starts without errors
+        run: |
+          npm start &
+          SERVER_PID=$!
+          sleep 5
+          kill $SERVER_PID
