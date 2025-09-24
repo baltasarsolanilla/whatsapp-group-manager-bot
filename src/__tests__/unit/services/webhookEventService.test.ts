@@ -7,19 +7,25 @@ import { mockWebhookEvent } from '../../fixtures/mockData';
 jest.mock('@database/repositories');
 jest.mock('@logic/mappers');
 
-const mockedRepository = webhookEventRepository as jest.Mocked<typeof webhookEventRepository>;
-const mockedMapper = webhookEventMapper as jest.Mocked<typeof webhookEventMapper>;
+const mockedRepository = webhookEventRepository as jest.Mocked<
+	typeof webhookEventRepository
+>;
+const mockedMapper = webhookEventMapper as jest.Mocked<
+	typeof webhookEventMapper
+>;
 
 describe('Webhook Event Service', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
-		
+
 		// Setup mapper mocks
 		mockedMapper.event = jest.fn().mockReturnValue(mockWebhookEvent.event);
-		mockedMapper.instance = jest.fn().mockReturnValue(mockWebhookEvent.instance);
+		mockedMapper.instance = jest
+			.fn()
+			.mockReturnValue(mockWebhookEvent.instance);
 		mockedMapper.data = jest.fn().mockReturnValue(mockWebhookEvent.data);
 		mockedMapper.date = jest.fn().mockReturnValue(mockWebhookEvent.date_time);
-		
+
 		// Setup repository mock
 		mockedRepository.add = jest.fn().mockResolvedValue(undefined);
 	});
@@ -47,9 +53,9 @@ describe('Webhook Event Service', () => {
 			const repositoryError = new Error('Database insert failed');
 			mockedRepository.add.mockRejectedValue(repositoryError);
 
-			await expect(webhookEventService.storeEvent(mockWebhookEvent)).rejects.toThrow(
-				repositoryError
-			);
+			await expect(
+				webhookEventService.storeEvent(mockWebhookEvent)
+			).rejects.toThrow(repositoryError);
 
 			expect(mockedRepository.add).toHaveBeenCalledTimes(1);
 		});
@@ -60,9 +66,9 @@ describe('Webhook Event Service', () => {
 				throw mapperError;
 			});
 
-			await expect(webhookEventService.storeEvent(mockWebhookEvent)).rejects.toThrow(
-				mapperError
-			);
+			await expect(
+				webhookEventService.storeEvent(mockWebhookEvent)
+			).rejects.toThrow(mapperError);
 
 			expect(mockedMapper.event).toHaveBeenCalledWith(mockWebhookEvent);
 			expect(mockedRepository.add).not.toHaveBeenCalled();

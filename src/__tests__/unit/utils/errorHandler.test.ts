@@ -64,7 +64,7 @@ describe('errorHandler', () => {
 
 	it('should handle Error instance', () => {
 		const error = new Error('Test error message');
-		
+
 		errorHandler(error, mockReq as Request, mockRes as Response, mockNext);
 
 		expect(mockStatus).toHaveBeenCalledWith(500);
@@ -75,7 +75,7 @@ describe('errorHandler', () => {
 
 	it('should handle non-Error instance', () => {
 		const error = 'String error';
-		
+
 		errorHandler(error, mockReq as Request, mockRes as Response, mockNext);
 
 		expect(mockStatus).toHaveBeenCalledWith(500);

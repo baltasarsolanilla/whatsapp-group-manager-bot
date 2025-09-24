@@ -238,7 +238,9 @@ describe('Admin API Integration Tests', () => {
 		describe('POST /admin/removalQueue/runWorkflow', () => {
 			it('should run workflow', async () => {
 				const { removalWorkflowService } = require('@logic/services');
-				removalWorkflowService.runWorkflow.mockResolvedValue({ completed: true });
+				removalWorkflowService.runWorkflow.mockResolvedValue({
+					completed: true,
+				});
 
 				const response = await request(app)
 					.post('/admin/removalQueue/runWorkflow')

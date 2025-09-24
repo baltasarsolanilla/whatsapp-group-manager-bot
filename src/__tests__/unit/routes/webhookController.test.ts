@@ -9,7 +9,9 @@ jest.mock('@logic/handlers');
 jest.mock('@logic/services');
 
 const mockedHandlers = handlers as jest.Mocked<typeof handlers>;
-const mockedWebhookEventService = webhookEventService as jest.Mocked<typeof webhookEventService>;
+const mockedWebhookEventService = webhookEventService as jest.Mocked<
+	typeof webhookEventService
+>;
 
 describe('Webhook Controller', () => {
 	let mockReq: Partial<Request>;
@@ -19,14 +21,14 @@ describe('Webhook Controller', () => {
 
 	beforeEach(() => {
 		jest.clearAllMocks();
-		
+
 		mockJson = jest.fn();
 		mockStatus = jest.fn().mockReturnValue({ json: mockJson });
-		
+
 		mockReq = {
 			body: mockWebhookEvent,
 		};
-		
+
 		mockRes = {
 			status: mockStatus,
 			json: mockJson,
@@ -41,7 +43,9 @@ describe('Webhook Controller', () => {
 
 		await webhookController(mockReq as Request, mockRes as Response, jest.fn());
 
-		expect(mockedWebhookEventService.storeEvent).toHaveBeenCalledWith(mockWebhookEvent);
+		expect(mockedWebhookEventService.storeEvent).toHaveBeenCalledWith(
+			mockWebhookEvent
+		);
 		expect(mockHandler).toHaveBeenCalledWith(mockWebhookEvent);
 		expect(mockStatus).toHaveBeenCalledWith(200);
 		expect(mockJson).toHaveBeenCalledWith(undefined);
@@ -57,8 +61,13 @@ describe('Webhook Controller', () => {
 
 		await webhookController(mockReq as Request, mockRes as Response, jest.fn());
 
-		expect(mockedWebhookEventService.storeEvent).toHaveBeenCalledWith(unknownEvent);
-		expect(console.warn).toHaveBeenCalledWith('Unknown event received', unknownEvent);
+		expect(mockedWebhookEventService.storeEvent).toHaveBeenCalledWith(
+			unknownEvent
+		);
+		expect(console.warn).toHaveBeenCalledWith(
+			'Unknown event received',
+			unknownEvent
+		);
 		expect(mockStatus).toHaveBeenCalledWith(200);
 	});
 
@@ -69,7 +78,9 @@ describe('Webhook Controller', () => {
 		// The webhook controller should still complete successfully
 		await webhookController(mockReq as Request, mockRes as Response, jest.fn());
 
-		expect(mockedWebhookEventService.storeEvent).toHaveBeenCalledWith(mockWebhookEvent);
+		expect(mockedWebhookEventService.storeEvent).toHaveBeenCalledWith(
+			mockWebhookEvent
+		);
 		expect(mockHandler).toHaveBeenCalledWith(mockWebhookEvent);
 		expect(mockStatus).toHaveBeenCalledWith(200);
 	});
@@ -82,6 +93,8 @@ describe('Webhook Controller', () => {
 			webhookController(mockReq as Request, mockRes as Response, jest.fn())
 		).rejects.toThrow(storeError);
 
-		expect(mockedWebhookEventService.storeEvent).toHaveBeenCalledWith(mockWebhookEvent);
+		expect(mockedWebhookEventService.storeEvent).toHaveBeenCalledWith(
+			mockWebhookEvent
+		);
 	});
 });

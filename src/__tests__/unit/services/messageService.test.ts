@@ -7,7 +7,9 @@ jest.mock('axios');
 jest.mock('@utils/errorHandler');
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
-const mockedHandleAxiosError = handleAxiosError as jest.MockedFunction<typeof handleAxiosError>;
+const mockedHandleAxiosError = handleAxiosError as jest.MockedFunction<
+	typeof handleAxiosError
+>;
 
 describe('Message Service', () => {
 	const mockConfig = {
@@ -54,9 +56,9 @@ describe('Message Service', () => {
 				throw error;
 			});
 
-			await expect(messageService.sendMessage(testPhoneNumber, testMessage)).rejects.toThrow(
-				error
-			);
+			await expect(
+				messageService.sendMessage(testPhoneNumber, testMessage)
+			).rejects.toThrow(error);
 
 			expect(mockedAxios.post).toHaveBeenCalledTimes(1);
 			expect(mockedHandleAxiosError).toHaveBeenCalledWith(error);

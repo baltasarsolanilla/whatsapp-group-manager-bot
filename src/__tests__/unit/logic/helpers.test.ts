@@ -8,7 +8,10 @@ import {
 	extractPhoneNumberFromWhatsappPn,
 	sleep,
 } from '@logic/helpers';
-import { mockMessageUpsert, mockPrivateMessageUpsert } from '../../fixtures/mockData';
+import {
+	mockMessageUpsert,
+	mockPrivateMessageUpsert,
+} from '../../fixtures/mockData';
 
 describe('Logic Helpers', () => {
 	describe('isGroupMessage', () => {
@@ -75,11 +78,15 @@ describe('Logic Helpers', () => {
 
 	describe('formatWhatsappId', () => {
 		it('should format phone number with leading plus', () => {
-			expect(formatWhatsappId('+61123456789')).toBe('61123456789@s.whatsapp.net');
+			expect(formatWhatsappId('+61123456789')).toBe(
+				'61123456789@s.whatsapp.net'
+			);
 		});
 
 		it('should format phone number without leading plus', () => {
-			expect(formatWhatsappId('61123456789')).toBe('61123456789@s.whatsapp.net');
+			expect(formatWhatsappId('61123456789')).toBe(
+				'61123456789@s.whatsapp.net'
+			);
 		});
 
 		it('should handle empty string', () => {
@@ -89,13 +96,15 @@ describe('Logic Helpers', () => {
 
 	describe('extractPhoneNumberFromWhatsappPn', () => {
 		it('should extract phone number from WhatsApp PN', () => {
-			expect(extractPhoneNumberFromWhatsappPn('61123456789@s.whatsapp.net')).toBe(
-				'+61123456789'
-			);
+			expect(
+				extractPhoneNumberFromWhatsappPn('61123456789@s.whatsapp.net')
+			).toBe('+61123456789');
 		});
 
 		it('should handle short WhatsApp PN', () => {
-			expect(extractPhoneNumberFromWhatsappPn('123@s.whatsapp.net')).toBe('+123');
+			expect(extractPhoneNumberFromWhatsappPn('123@s.whatsapp.net')).toBe(
+				'+123'
+			);
 		});
 	});
 

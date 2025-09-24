@@ -5,7 +5,11 @@ import {
 	webhookEventMapper,
 	groupMapper,
 } from '@logic/mappers';
-import { mockMessageUpsert, mockWebhookEvent, mockGroupData } from '../../fixtures/mockData';
+import {
+	mockMessageUpsert,
+	mockWebhookEvent,
+	mockGroupData,
+} from '../../fixtures/mockData';
 import { AppError } from '@utils/AppError';
 
 describe('Logic Mappers', () => {
@@ -36,7 +40,9 @@ describe('Logic Mappers', () => {
 			};
 
 			expect(() => msgUserMapper.id(invalidPayload)).toThrow(AppError);
-			expect(() => msgUserMapper.id(invalidPayload)).toThrow('Invalid WhatsApp participant');
+			expect(() => msgUserMapper.id(invalidPayload)).toThrow(
+				'Invalid WhatsApp participant'
+			);
 		});
 
 		it('should return null when no valid phone number found', () => {
