@@ -54,7 +54,7 @@ describe('Webhook Controller', () => {
 	it('should handle unknown events gracefully', async () => {
 		const unknownEvent = {
 			...mockWebhookEvent,
-			event: 'unknown.event' as any,
+			event: 'unknown.event' as 'messages.upsert',
 		};
 
 		mockReq.body = unknownEvent;
@@ -64,6 +64,7 @@ describe('Webhook Controller', () => {
 		expect(mockedWebhookEventService.storeEvent).toHaveBeenCalledWith(
 			unknownEvent
 		);
+		// eslint-disable-next-line no-console
 		expect(console.warn).toHaveBeenCalledWith(
 			'Unknown event received',
 			unknownEvent

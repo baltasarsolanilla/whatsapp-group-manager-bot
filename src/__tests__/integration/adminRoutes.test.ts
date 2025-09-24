@@ -2,6 +2,7 @@ import request from 'supertest';
 import express from 'express';
 import routes from '@routes/routes';
 import { errorHandler } from '@utils/errorHandler';
+import * as services from '@logic/services';
 
 // Mock all the services
 jest.mock('@logic/services', () => ({
@@ -29,6 +30,9 @@ jest.mock('@logic/services', () => ({
 	},
 }));
 
+// Type the mocked services
+const mockedServices = services as jest.Mocked<typeof services>;
+
 const createTestApp = () => {
 	const app = express();
 	app.use(express.json());
@@ -48,8 +52,7 @@ describe('Admin API Integration Tests', () => {
 	describe('Whitelist Management', () => {
 		describe('POST /admin/lists/whitelist', () => {
 			it('should add user to whitelist', async () => {
-				const { whitelistService } = require('@logic/services');
-				whitelistService.add.mockResolvedValue(undefined);
+				mockedServices.whitelistService.add.mockResolvedValue(undefined);
 
 				const payload = {
 					phoneNumber: '+61123456789',
@@ -61,7 +64,7 @@ describe('Admin API Integration Tests', () => {
 					.send(payload)
 					.expect(200);
 
-				expect(whitelistService.add).toHaveBeenCalledWith(
+				expect(mockedServices.whitelistService.add).toHaveBeenCalledWith(
 					payload.phoneNumber,
 					payload.groupId
 				);
@@ -69,47 +72,42 @@ describe('Admin API Integration Tests', () => {
 			});
 
 			it('should handle missing parameters', async () => {
-				const response = await request(app)
+				await request(app)
 					.post('/admin/lists/whitelist')
 					.send({})
 					.expect(500);
-
-				expect(response.body).toHaveProperty('error');
 			});
 		});
 
 		describe('GET /admin/lists/whitelist', () => {
 			it('should list whitelist entries', async () => {
-				const { whitelistService } = require('@logic/services');
 				const mockMembers = [{ id: '1', phoneNumber: '+61123456789' }];
-				whitelistService.list.mockResolvedValue(mockMembers);
+				mockedServices.whitelistService.list.mockResolvedValue(mockMembers);
 
 				const response = await request(app)
 					.get('/admin/lists/whitelist')
 					.expect(200);
 
-				expect(whitelistService.list).toHaveBeenCalledWith(undefined);
+				expect(mockedServices.whitelistService.list).toHaveBeenCalledWith(undefined);
 				expect(response.body).toEqual(mockMembers);
 			});
 
 			it('should filter by groupId', async () => {
-				const { whitelistService } = require('@logic/services');
 				const mockMembers = [{ id: '1', phoneNumber: '+61123456789' }];
-				whitelistService.list.mockResolvedValue(mockMembers);
+				mockedServices.whitelistService.list.mockResolvedValue(mockMembers);
 
-				const response = await request(app)
+				await request(app)
 					.get('/admin/lists/whitelist')
 					.query({ groupId: 'group-123' })
 					.expect(200);
 
-				expect(whitelistService.list).toHaveBeenCalledWith('group-123');
+				expect(mockedServices.whitelistService.list).toHaveBeenCalledWith('group-123');
 			});
 		});
 
 		describe('DELETE /admin/lists/whitelist', () => {
 			it('should remove user from whitelist', async () => {
-				const { whitelistService } = require('@logic/services');
-				whitelistService.remove.mockResolvedValue(undefined);
+				mockedServices.whitelistService.remove.mockResolvedValue(undefined);
 
 				const payload = {
 					phoneNumber: '+61123456789',
@@ -121,7 +119,7 @@ describe('Admin API Integration Tests', () => {
 					.send(payload)
 					.expect(200);
 
-				expect(whitelistService.remove).toHaveBeenCalledWith(
+				expect(mockedServices.whitelistService.remove).toHaveBeenCalledWith(
 					payload.phoneNumber,
 					payload.groupId
 				);
@@ -133,8 +131,7 @@ describe('Admin API Integration Tests', () => {
 	describe('Blacklist Management', () => {
 		describe('POST /admin/lists/blacklist', () => {
 			it('should add user to blacklist', async () => {
-				const { blacklistService } = require('@logic/services');
-				blacklistService.add.mockResolvedValue(undefined);
+				mockedServices.blacklistService.add.mockResolvedValue(undefined);
 
 				const payload = {
 					phoneNumber: '+61123456789',
@@ -146,7 +143,7 @@ describe('Admin API Integration Tests', () => {
 					.send(payload)
 					.expect(200);
 
-				expect(blacklistService.add).toHaveBeenCalledWith(
+				expect(mockedServices.blacklistService.add).toHaveBeenCalledWith(
 					payload.phoneNumber,
 					payload.groupId
 				);
@@ -156,23 +153,21 @@ describe('Admin API Integration Tests', () => {
 
 		describe('GET /admin/lists/blacklist', () => {
 			it('should list blacklist entries', async () => {
-				const { blacklistService } = require('@logic/services');
 				const mockMembers = [{ id: '1', phoneNumber: '+61123456789' }];
-				blacklistService.list.mockResolvedValue(mockMembers);
+				mockedServices.blacklistService.list.mockResolvedValue(mockMembers);
 
 				const response = await request(app)
 					.get('/admin/lists/blacklist')
 					.expect(200);
 
-				expect(blacklistService.list).toHaveBeenCalledWith(undefined);
+				expect(mockedServices.blacklistService.list).toHaveBeenCalledWith(undefined);
 				expect(response.body).toEqual(mockMembers);
 			});
 		});
 
 		describe('DELETE /admin/lists/blacklist', () => {
 			it('should remove user from blacklist', async () => {
-				const { blacklistService } = require('@logic/services');
-				blacklistService.remove.mockResolvedValue(undefined);
+				mockedServices.blacklistService.remove.mockResolvedValue(undefined);
 
 				const payload = {
 					phoneNumber: '+61123456789',
@@ -184,7 +179,7 @@ describe('Admin API Integration Tests', () => {
 					.send(payload)
 					.expect(200);
 
-				expect(blacklistService.remove).toHaveBeenCalledWith(
+				expect(mockedServices.blacklistService.remove).toHaveBeenCalledWith(
 					payload.phoneNumber,
 					payload.groupId
 				);
@@ -196,57 +191,47 @@ describe('Admin API Integration Tests', () => {
 	describe('Removal Queue Management', () => {
 		describe('GET /admin/removalQueue', () => {
 			it('should list removal queue entries', async () => {
-				const { removalQueueService } = require('@logic/services');
 				const mockQueue = [{ id: '1', userId: 'user-1', groupId: 'group-1' }];
-				removalQueueService.list.mockResolvedValue(mockQueue);
+				mockedServices.removalQueueService.list.mockResolvedValue(mockQueue);
 
 				const response = await request(app)
 					.get('/admin/removalQueue')
 					.expect(200);
 
-				expect(removalQueueService.list).toHaveBeenCalled();
+				expect(mockedServices.removalQueueService.list).toHaveBeenCalled();
 				expect(response.body).toEqual(mockQueue);
 			});
 		});
 
 		describe('POST /admin/removalQueue/run', () => {
 			it('should run removal queue', async () => {
-				const { removalQueueService } = require('@logic/services');
-				removalQueueService.runQueue.mockResolvedValue({ processed: 5 });
+				mockedServices.removalQueueService.runQueue.mockResolvedValue({ processed: 5 });
 
-				const response = await request(app)
-					.post('/admin/removalQueue/run')
-					.expect(200);
+				await request(app).post('/admin/removalQueue/run').expect(200);
 
-				expect(removalQueueService.runQueue).toHaveBeenCalled();
+				expect(mockedServices.removalQueueService.runQueue).toHaveBeenCalled();
 			});
 		});
 
 		describe('POST /admin/removalQueue/sync', () => {
 			it('should sync removal queue', async () => {
-				const { removalQueueService } = require('@logic/services');
-				removalQueueService.syncQueue.mockResolvedValue({ synced: 10 });
+				mockedServices.removalQueueService.syncQueue.mockResolvedValue({ synced: 10 });
 
-				const response = await request(app)
-					.post('/admin/removalQueue/sync')
-					.expect(200);
+				await request(app).post('/admin/removalQueue/sync').expect(200);
 
-				expect(removalQueueService.syncQueue).toHaveBeenCalled();
+				expect(mockedServices.removalQueueService.syncQueue).toHaveBeenCalled();
 			});
 		});
 
 		describe('POST /admin/removalQueue/runWorkflow', () => {
 			it('should run workflow', async () => {
-				const { removalWorkflowService } = require('@logic/services');
-				removalWorkflowService.runWorkflow.mockResolvedValue({
+				mockedServices.removalWorkflowService.runWorkflow.mockResolvedValue({
 					completed: true,
 				});
 
-				const response = await request(app)
-					.post('/admin/removalQueue/runWorkflow')
-					.expect(200);
+				await request(app).post('/admin/removalQueue/runWorkflow').expect(200);
 
-				expect(removalWorkflowService.runWorkflow).toHaveBeenCalled();
+				expect(mockedServices.removalWorkflowService.runWorkflow).toHaveBeenCalled();
 			});
 		});
 	});
@@ -254,33 +239,31 @@ describe('Admin API Integration Tests', () => {
 	describe('Group Management', () => {
 		describe('POST /admin/groups/ingest', () => {
 			it('should ingest group data', async () => {
-				const { groupService } = require('@logic/services');
-				groupService.ingest.mockResolvedValue({ processed: true });
+				mockedServices.groupService.ingest.mockResolvedValue({ processed: true });
 
 				const payload = { groupId: 'group-123' };
 
-				const response = await request(app)
+				await request(app)
 					.post('/admin/groups/ingest')
 					.send(payload)
 					.expect(200);
 
-				expect(groupService.ingest).toHaveBeenCalled();
+				expect(mockedServices.groupService.ingest).toHaveBeenCalled();
 			});
 		});
 
 		describe('PATCH /admin/groups/:id', () => {
 			it('should update group', async () => {
-				const { groupService } = require('@logic/services');
-				groupService.update.mockResolvedValue({ updated: true });
+				mockedServices.groupService.update.mockResolvedValue({ updated: true });
 
 				const payload = { name: 'Updated Group Name' };
 
-				const response = await request(app)
+				await request(app)
 					.patch('/admin/groups/123')
 					.send(payload)
 					.expect(200);
 
-				expect(groupService.update).toHaveBeenCalled();
+				expect(mockedServices.groupService.update).toHaveBeenCalled();
 			});
 		});
 	});

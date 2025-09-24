@@ -61,7 +61,7 @@ describe('Webhook Integration Tests', () => {
 		it('should handle different event types', async () => {
 			const customEvent = {
 				...mockWebhookEvent,
-				event: 'custom.event' as any,
+				event: 'custom.event' as 'messages.upsert',
 			};
 
 			const response = await request(app)

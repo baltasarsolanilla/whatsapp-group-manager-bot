@@ -46,9 +46,7 @@ describe('Bot Logic', () => {
 			};
 
 			mockedIsGroupMessage.mockReturnValue(true);
-			mockedMessageService.ensureGroupMessageUpsert.mockResolvedValue(
-				mockResult as any
-			);
+			mockedMessageService.ensureGroupMessageUpsert.mockResolvedValue(mockResult);
 
 			await handleMessageUpsert(mockWebhookEvent);
 
