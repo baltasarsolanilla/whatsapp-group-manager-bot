@@ -6,6 +6,11 @@ dist/
 build/
 coverage/
 
+# Docker files
+docker-compose.yml
+docker-compose.*.yml
+Dockerfile*
+
 # Config files (optional - you might want to format these)
 *.config.ts
 
