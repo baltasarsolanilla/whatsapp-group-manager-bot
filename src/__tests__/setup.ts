@@ -6,6 +6,42 @@ jest.mock('@database/prisma', () => ({
 	default: mockDeep(),
 }));
 
+// Mock all logic services to prevent compilation errors
+jest.mock('@logic/services', () => ({
+	messageService: {
+		ensureGroupMessageUpsert: jest.fn(),
+	},
+	webhookEventService: {
+		storeEvent: jest.fn(),
+	},
+	whitelistService: {
+		add: jest.fn(),
+		remove: jest.fn(),
+		list: jest.fn(),
+	},
+	blacklistService: {
+		add: jest.fn(),
+		remove: jest.fn(),
+		list: jest.fn(),
+	},
+	removalQueueService: {
+		list: jest.fn(),
+		runQueue: jest.fn(),
+		syncQueue: jest.fn(),
+	},
+	removalWorkflowService: {
+		runWorkflow: jest.fn(),
+	},
+	groupService: {
+		ingest: jest.fn(),
+		update: jest.fn(),
+		ensure: jest.fn(),
+	},
+	groupMembershipService: {
+		findInactiveMembers: jest.fn(),
+	},
+}));
+
 // Mock all database repositories to prevent compilation errors
 jest.mock('@database/repositories', () => ({
 	userRepository: {

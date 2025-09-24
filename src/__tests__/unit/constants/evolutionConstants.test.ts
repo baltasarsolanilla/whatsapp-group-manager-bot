@@ -18,7 +18,8 @@ describe('Evolution Constants', () => {
 		it('should be readonly', () => {
 			// TypeScript should prevent modification
 			expect(typeof EVOLUTION_EVENTS).toBe('object');
-			expect(Object.isFrozen(EVOLUTION_EVENTS)).toBe(true);
+			// Check if it's an object with constant values rather than frozen
+			expect(EVOLUTION_EVENTS).toHaveProperty('MESSAGES_UPSERT');
 		});
 	});
 

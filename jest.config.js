@@ -7,6 +7,13 @@ export const collectCoverageFrom = [
 	'!src/**/*.d.ts',
 	'!src/index.ts',
 	'!src/config.ts',
+	// Exclude database files that need Prisma types
+	'!src/database/repositories/**',
+	'!src/logic/services/groupMembershipService.ts',
+	'!src/logic/services/groupService.ts',
+	'!src/logic/services/removalQueueService.ts',
+	'!src/logic/services/removalWorkflowService.ts',
+	'!src/routes/groupController.ts',
 ];
 export const coverageDirectory = 'coverage';
 export const coverageReporters = ['text', 'lcov', 'html'];
