@@ -1,28 +1,8 @@
 import prisma from '@database/prisma';
+import { Blacklist, Group, User, Whitelist } from '@prisma/client';
 
 // Temporary types until Prisma client is properly generated
-type MemberListEntity = {
-	id: string;
-	userId: string;
-	groupId: string;
-	createdAt: Date;
-};
-
-type User = {
-	id: string;
-	whatsappId: string;
-	whatsappPn?: string | null;
-	name?: string | null;
-	createdAt: Date;
-};
-
-type Group = {
-	id: string;
-	whatsappId: string;
-	name?: string | null;
-	inactivityThresholdMinutes: number;
-	createdAt: Date;
-};
+type MemberListEntity = Whitelist | Blacklist;
 
 // Generic interface for member list operations
 interface IMemberListRepository<T extends MemberListEntity> {
@@ -36,34 +16,23 @@ interface IMemberListRepository<T extends MemberListEntity> {
 
 // Generic base repository factory
 export function createMemberListRepository<T extends MemberListEntity>(
-	entityName: 'whitelist' | 'blacklist',
-	includeRelations: boolean = false
+	entityName: 'whitelist' | 'blacklist'
 ): IMemberListRepository<T> {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const model = (prisma as any)[entityName];
 
 	return {
 		async upsert(userId: string, groupId: string) {
-			if (includeRelations && entityName === 'whitelist') {
-				// Special handling for whitelist with relations
-				await model.upsert({
-					where: { userId_groupId: { userId, groupId } },
-					update: {},
-					create: { userId, groupId },
-				});
-
-				return model.findUnique({
-					where: { userId_groupId: { userId, groupId } },
-					include: { user: true, group: true },
-				}) as Promise<T & { user: User; group: Group }>;
-			}
-
-			// Standard upsert for blacklist and whitelist without relations
-			return model.upsert({
+			await model.upsert({
 				where: { userId_groupId: { userId, groupId } },
 				update: {},
 				create: { userId, groupId },
-			}) as Promise<T>;
+			});
+
+			return model.findUnique({
+				where: { userId_groupId: { userId, groupId } },
+				include: { user: true, group: true },
+			}) as Promise<T & { user: User; group: Group }>;
 		},
 
 		async list(groupId?: string): Promise<T[]> {
