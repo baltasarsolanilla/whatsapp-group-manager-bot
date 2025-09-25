@@ -8,4 +8,5 @@ type Blacklist = {
 	createdAt: Date;
 };
 
-export const blacklistRepository = createMemberListRepository<Blacklist>('blacklist');
+export const blacklistRepository =
+	createMemberListRepository<Blacklist>('blacklist');

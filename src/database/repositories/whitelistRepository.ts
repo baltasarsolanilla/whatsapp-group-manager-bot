@@ -8,4 +8,7 @@ type Whitelist = {
 	createdAt: Date;
 };
 
-export const whitelistRepository = createMemberListRepository<Whitelist>('whitelist', true);
+export const whitelistRepository = createMemberListRepository<Whitelist>(
+	'whitelist',
+	true
+);

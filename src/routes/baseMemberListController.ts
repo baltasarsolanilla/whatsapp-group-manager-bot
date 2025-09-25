@@ -4,9 +4,9 @@ import { Request, Response } from 'express';
 
 // Generic interface for member list service operations
 interface IMemberListService {
-	add(phoneNumber: string, groupWaId: string): Promise<any>;
-	remove(phoneNumber: string, groupWaId: string): Promise<any>;
-	list(groupWaId?: string): Promise<any[]>;
+	add(phoneNumber: string, groupWaId: string): Promise<unknown>;
+	remove(phoneNumber: string, groupWaId: string): Promise<unknown>;
+	list(groupWaId?: string): Promise<unknown[]>;
 }
 
 // Generic controller factory

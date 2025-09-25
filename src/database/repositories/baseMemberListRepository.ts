@@ -26,7 +26,10 @@ type Group = {
 
 // Generic interface for member list operations
 interface IMemberListRepository<T extends MemberListEntity> {
-	upsert(userId: string, groupId: string): Promise<T | (T & { user: User; group: Group })>;
+	upsert(
+		userId: string,
+		groupId: string
+	): Promise<T | (T & { user: User; group: Group })>;
 	list(groupId?: string): Promise<T[]>;
 	remove(userId: string, groupId: string): Promise<T | null>;
 }
@@ -36,8 +39,9 @@ export function createMemberListRepository<T extends MemberListEntity>(
 	entityName: 'whitelist' | 'blacklist',
 	includeRelations: boolean = false
 ): IMemberListRepository<T> {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const model = (prisma as any)[entityName];
-	
+
 	return {
 		async upsert(userId: string, groupId: string) {
 			if (includeRelations && entityName === 'whitelist') {
@@ -69,13 +73,16 @@ export function createMemberListRepository<T extends MemberListEntity>(
 		},
 
 		async remove(userId: string, groupId: string): Promise<T | null> {
-			return model
-				.deleteMany({
-					where: { userId, groupId },
-				})
-				.then((result: any) =>
-					result.count > 0 ? ({ userId, groupId } as T) : null
-				);
+			return (
+				model
+					.deleteMany({
+						where: { userId, groupId },
+					})
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					.then((result: any) =>
+						result.count > 0 ? ({ userId, groupId } as T) : null
+					)
+			);
 		},
 	};
 }

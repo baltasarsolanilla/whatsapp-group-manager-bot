@@ -4,16 +4,16 @@ import { AppError } from '@utils/AppError';
 
 // Generic interface for member list repository operations
 interface IMemberListRepository {
-	upsert(userId: string, groupId: string): Promise<any>;
-	list(groupId?: string): Promise<any[]>;
-	remove(userId: string, groupId: string): Promise<any>;
+	upsert(userId: string, groupId: string): Promise<unknown>;
+	list(groupId?: string): Promise<unknown[]>;
+	remove(userId: string, groupId: string): Promise<unknown>;
 }
 
 // Generic interface for member list service operations
 interface IMemberListService {
-	add(phoneNumber: string, groupWaId: string): Promise<any>;
-	remove(phoneNumber: string, groupWaId: string): Promise<any>;
-	list(groupWaId?: string): Promise<any[]>;
+	add(phoneNumber: string, groupWaId: string): Promise<unknown>;
+	remove(phoneNumber: string, groupWaId: string): Promise<unknown>;
+	list(groupWaId?: string): Promise<unknown[]>;
 }
 
 // Generic service factory
@@ -29,6 +29,7 @@ export function createMemberListService(
 
 			if (!group || !user) {
 				const warnMsg = `${entityName}Service.add() - ${!group ? 'Group' : 'User'} not found`;
+				// eslint-disable-next-line no-console
 				console.warn(warnMsg);
 				throw AppError.notFound('Group or user not found');
 			}
@@ -43,6 +44,7 @@ export function createMemberListService(
 
 			if (!group || !user) {
 				const warnMsg = `${entityName}Service.remove() - ${!group ? 'Group' : 'User'} not found`;
+				// eslint-disable-next-line no-console
 				console.warn(warnMsg);
 				throw AppError.notFound('Group or user not found');
 			}
