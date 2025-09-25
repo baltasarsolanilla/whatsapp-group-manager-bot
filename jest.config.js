@@ -2,7 +2,6 @@ export const preset = 'ts-jest';
 export const testEnvironment = 'node';
 export const testMatch = ['**/?(*.)+(spec|test).[jt]s?(x)'];
 export const moduleFileExtensions = ['ts', 'js', 'json'];
-export const setupFilesAfterEnv = ['<rootDir>/jest.setup.js'];
 export const moduleNameMapper = {
 	'^@database/(.*)$': '<rootDir>/src/database/$1',
 	'^@logic/(.*)$': '<rootDir>/src/logic/$1',
