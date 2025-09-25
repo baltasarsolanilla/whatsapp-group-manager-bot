@@ -1,14 +1,98 @@
+// Mock the prisma module before imports
+jest.mock('@database/prisma', () => ({
+	blacklist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	group: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+		update: jest.fn(),
+	},
+	user: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+	},
+	whitelist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		findUnique: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	removalQueue: {
+		upsert: jest.fn(),
+		delete: jest.fn(),
+		findMany: jest.fn(),
+	},
+	groupMembership: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		delete: jest.fn(),
+	},
+	message: {
+		upsert: jest.fn(),
+	},
+	removalHistory: {
+		create: jest.fn(),
+	},
+	webhookEvent: {
+		create: jest.fn(),
+	},
+}));
+
+// Mock the prisma module before imports
+jest.mock('@database/prisma', () => ({
+	blacklist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	group: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+		update: jest.fn(),
+	},
+	user: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+	},
+	whitelist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		findUnique: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	removalQueue: {
+		upsert: jest.fn(),
+		delete: jest.fn(),
+		findMany: jest.fn(),
+	},
+	groupMembership: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		delete: jest.fn(),
+	},
+	message: {
+		upsert: jest.fn(),
+	},
+	removalHistory: {
+		create: jest.fn(),
+	},
+	webhookEvent: {
+		create: jest.fn(),
+	},
+}));
+
 import { removalHistoryRepository } from '@database/repositories/removalHistoryRepository';
-import mockPrisma from '@database/__mocks__/prisma';
 
-// Mock the prisma module
-jest.mock('@database/prisma', () => mockPrisma);
+const mockPrisma = require('@database/prisma');
 
-// Define RemovalOutcome enum to match the implementation
-const RemovalOutcome = {
-	SUCCESS: 'SUCCESS',
-	FAILURE: 'FAILURE'
-} as const;
+// Define RemovalOutcome enum for testing
+enum RemovalOutcome {
+	SUCCESS = 'SUCCESS',
+	FAILURE = 'FAILURE',
+}
 
 describe('removalHistoryRepository', () => {
 	beforeEach(() => {
@@ -21,7 +105,7 @@ describe('removalHistoryRepository', () => {
 				userId: 'user123',
 				groupId: 'group456',
 				outcome: RemovalOutcome.SUCCESS,
-				reason: 'User was inactive for more than 30 days'
+				reason: 'User was inactive for more than 30 days',
 			};
 			const mockHistoryEntry = {
 				id: 'history1',
@@ -29,7 +113,7 @@ describe('removalHistoryRepository', () => {
 				groupId: historyData.groupId,
 				outcome: historyData.outcome,
 				reason: historyData.reason,
-				processedAt: new Date()
+				processedAt: new Date(),
 			};
 
 			mockPrisma.removalHistory.create.mockResolvedValue(mockHistoryEntry);
@@ -52,7 +136,7 @@ describe('removalHistoryRepository', () => {
 				userId: 'user123',
 				groupId: 'group456',
 				outcome: RemovalOutcome.FAILURE,
-				reason: 'Failed to remove user - insufficient permissions'
+				reason: 'Failed to remove user - insufficient permissions',
 			};
 			const mockHistoryEntry = {
 				id: 'history2',
@@ -60,7 +144,7 @@ describe('removalHistoryRepository', () => {
 				groupId: historyData.groupId,
 				outcome: historyData.outcome,
 				reason: historyData.reason,
-				processedAt: new Date()
+				processedAt: new Date(),
 			};
 
 			mockPrisma.removalHistory.create.mockResolvedValue(mockHistoryEntry);
@@ -83,7 +167,7 @@ describe('removalHistoryRepository', () => {
 				userId: '',
 				groupId: '',
 				outcome: RemovalOutcome.SUCCESS,
-				reason: ''
+				reason: '',
 			};
 			const mockHistoryEntry = {
 				id: 'history3',
@@ -91,7 +175,7 @@ describe('removalHistoryRepository', () => {
 				groupId: '',
 				outcome: RemovalOutcome.SUCCESS,
 				reason: '',
-				processedAt: new Date()
+				processedAt: new Date(),
 			};
 
 			mockPrisma.removalHistory.create.mockResolvedValue(mockHistoryEntry);
@@ -115,7 +199,7 @@ describe('removalHistoryRepository', () => {
 				userId: 'user123',
 				groupId: 'group456',
 				outcome: RemovalOutcome.FAILURE,
-				reason: longReason
+				reason: longReason,
 			};
 			const mockHistoryEntry = {
 				id: 'history4',
@@ -123,7 +207,7 @@ describe('removalHistoryRepository', () => {
 				groupId: historyData.groupId,
 				outcome: historyData.outcome,
 				reason: longReason,
-				processedAt: new Date()
+				processedAt: new Date(),
 			};
 
 			mockPrisma.removalHistory.create.mockResolvedValue(mockHistoryEntry);
@@ -150,15 +234,17 @@ describe('removalHistoryRepository', () => {
 				'Bot malfunction - retry needed',
 				'WhatsApp API error',
 				'Group permissions insufficient',
-				null, // Some reasons might be null
 			];
 
 			for (const reason of reasons) {
 				const historyData = {
 					userId: `user-${Math.random()}`,
 					groupId: `group-${Math.random()}`,
-					outcome: Math.random() > 0.5 ? RemovalOutcome.SUCCESS : RemovalOutcome.FAILURE,
-					reason
+					outcome:
+						Math.random() > 0.5
+							? RemovalOutcome.SUCCESS
+							: RemovalOutcome.FAILURE,
+					reason,
 				};
 				const mockHistoryEntry = {
 					id: `history-${Math.random()}`,
@@ -166,7 +252,7 @@ describe('removalHistoryRepository', () => {
 					groupId: historyData.groupId,
 					outcome: historyData.outcome,
 					reason,
-					processedAt: new Date()
+					processedAt: new Date(),
 				};
 
 				mockPrisma.removalHistory.create.mockResolvedValue(mockHistoryEntry);
@@ -182,7 +268,7 @@ describe('removalHistoryRepository', () => {
 					},
 				});
 				expect(result).toEqual(mockHistoryEntry);
-				
+
 				jest.clearAllMocks();
 			}
 		});
@@ -192,14 +278,15 @@ describe('removalHistoryRepository', () => {
 				userId: 'user123',
 				groupId: 'group456',
 				outcome: RemovalOutcome.SUCCESS,
-				reason: 'User was inactive'
+				reason: 'User was inactive',
 			};
 			const error = new Error('Database connection failed');
 
 			mockPrisma.removalHistory.create.mockRejectedValue(error);
 
-			await expect(removalHistoryRepository.add(historyData))
-				.rejects.toThrow('Database connection failed');
+			await expect(removalHistoryRepository.add(historyData)).rejects.toThrow(
+				'Database connection failed'
+			);
 
 			expect(mockPrisma.removalHistory.create).toHaveBeenCalledWith({
 				data: {
@@ -216,14 +303,15 @@ describe('removalHistoryRepository', () => {
 				userId: 'nonexistent-user',
 				groupId: 'nonexistent-group',
 				outcome: RemovalOutcome.SUCCESS,
-				reason: 'Test reason'
+				reason: 'Test reason',
 			};
 			const error = new Error('Foreign key constraint failed');
 
 			mockPrisma.removalHistory.create.mockRejectedValue(error);
 
-			await expect(removalHistoryRepository.add(historyData))
-				.rejects.toThrow('Foreign key constraint failed');
+			await expect(removalHistoryRepository.add(historyData)).rejects.toThrow(
+				'Foreign key constraint failed'
+			);
 
 			expect(mockPrisma.removalHistory.create).toHaveBeenCalledWith({
 				data: {
@@ -240,14 +328,15 @@ describe('removalHistoryRepository', () => {
 				userId: 'user123',
 				groupId: 'group456',
 				outcome: 'INVALID_OUTCOME' as any, // Invalid enum value
-				reason: 'Test reason'
+				reason: 'Test reason',
 			};
 			const error = new Error('Validation error: Invalid enum value');
 
 			mockPrisma.removalHistory.create.mockRejectedValue(error);
 
-			await expect(removalHistoryRepository.add(historyData))
-				.rejects.toThrow('Validation error: Invalid enum value');
+			await expect(removalHistoryRepository.add(historyData)).rejects.toThrow(
+				'Validation error: Invalid enum value'
+			);
 
 			expect(mockPrisma.removalHistory.create).toHaveBeenCalledWith({
 				data: {
@@ -265,26 +354,26 @@ describe('removalHistoryRepository', () => {
 					userId: 'user1',
 					groupId: 'group1',
 					outcome: RemovalOutcome.SUCCESS,
-					reason: 'Reason 1'
+					reason: 'Reason 1',
 				},
 				{
 					userId: 'user2',
 					groupId: 'group2',
 					outcome: RemovalOutcome.FAILURE,
-					reason: 'Reason 2'
+					reason: 'Reason 2',
 				},
 				{
 					userId: 'user3',
 					groupId: 'group3',
 					outcome: RemovalOutcome.SUCCESS,
-					reason: 'Reason 3'
-				}
+					reason: 'Reason 3',
+				},
 			];
 
 			const mockResults = historyEntries.map((entry, index) => ({
 				id: `history${index + 1}`,
 				...entry,
-				processedAt: new Date()
+				processedAt: new Date(),
 			}));
 
 			mockPrisma.removalHistory.create
@@ -292,7 +381,9 @@ describe('removalHistoryRepository', () => {
 				.mockResolvedValueOnce(mockResults[1])
 				.mockResolvedValueOnce(mockResults[2]);
 
-			const promises = historyEntries.map(entry => removalHistoryRepository.add(entry));
+			const promises = historyEntries.map((entry) =>
+				removalHistoryRepository.add(entry)
+			);
 			const results = await Promise.all(promises);
 
 			expect(results).toHaveLength(3);

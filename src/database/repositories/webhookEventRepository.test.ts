@@ -1,8 +1,49 @@
-import { webhookEventRepository } from '@database/repositories/webhookEventRepository';
-import mockPrisma from '@database/__mocks__/prisma';
+// Mock the prisma module before imports
+jest.mock('@database/prisma', () => ({
+	blacklist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	group: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+		update: jest.fn(),
+	},
+	user: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+	},
+	whitelist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		findUnique: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	removalQueue: {
+		upsert: jest.fn(),
+		delete: jest.fn(),
+		findMany: jest.fn(),
+	},
+	groupMembership: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		delete: jest.fn(),
+	},
+	message: {
+		upsert: jest.fn(),
+	},
+	removalHistory: {
+		create: jest.fn(),
+	},
+	webhookEvent: {
+		create: jest.fn(),
+	},
+}));
 
-// Mock the prisma module
-jest.mock('@database/prisma', () => mockPrisma);
+import { webhookEventRepository } from '@database/repositories/webhookEventRepository';
+
+const mockPrisma = require('@database/prisma');
 
 describe('webhookEventRepository', () => {
 	beforeEach(() => {
@@ -14,13 +55,13 @@ describe('webhookEventRepository', () => {
 			const webhookData = {
 				event: 'message.text',
 				instance: 'test-instance',
-				data: { 
-					message: 'Hello world', 
+				data: {
+					message: 'Hello world',
 					from: 'user@c.us',
 					group: 'group@g.us',
-					timestamp: 1640995200
+					timestamp: 1640995200,
 				},
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 
 			mockPrisma.webhookEvent.create.mockResolvedValue(undefined);
@@ -48,19 +89,19 @@ describe('webhookEventRepository', () => {
 				'group.participant.remove',
 				'connection.update',
 				'qr.updated',
-				'instance.status'
+				'instance.status',
 			];
 
 			for (const eventType of eventTypes) {
 				const webhookData = {
 					event: eventType,
 					instance: 'test-instance',
-					data: { 
+					data: {
 						eventType,
 						timestamp: Date.now(),
-						metadata: { test: true }
+						metadata: { test: true },
 					},
-					createdAt: new Date()
+					createdAt: new Date(),
 				};
 
 				mockPrisma.webhookEvent.create.mockResolvedValue(undefined);
@@ -75,7 +116,7 @@ describe('webhookEventRepository', () => {
 						createdAt: webhookData.createdAt,
 					},
 				});
-				
+
 				jest.clearAllMocks();
 			}
 		});
@@ -86,18 +127,18 @@ describe('webhookEventRepository', () => {
 				'dev-instance',
 				'test-instance-123',
 				'staging_bot',
-				'main-bot-v2'
+				'main-bot-v2',
 			];
 
 			for (const instance of instances) {
 				const webhookData = {
 					event: 'message.text',
 					instance,
-					data: { 
+					data: {
 						message: `Message from ${instance}`,
-						timestamp: Date.now()
+						timestamp: Date.now(),
 					},
-					createdAt: new Date()
+					createdAt: new Date(),
 				};
 
 				mockPrisma.webhookEvent.create.mockResolvedValue(undefined);
@@ -112,7 +153,7 @@ describe('webhookEventRepository', () => {
 						createdAt: webhookData.createdAt,
 					},
 				});
-				
+
 				jest.clearAllMocks();
 			}
 		});
@@ -127,35 +168,35 @@ describe('webhookEventRepository', () => {
 					quotedMessage: {
 						id: 'quoted123',
 						content: 'Original message',
-						author: 'user3@c.us'
-					}
+						author: 'user3@c.us',
+					},
 				},
 				sender: {
 					id: 'sender@c.us',
 					name: 'John Doe',
-					isGroup: false
+					isGroup: false,
 				},
 				group: {
 					id: 'group@g.us',
 					name: 'Test Group',
 					participants: [
 						{ id: 'user1@c.us', role: 'admin' },
-						{ id: 'user2@c.us', role: 'member' }
-					]
+						{ id: 'user2@c.us', role: 'member' },
+					],
 				},
 				metadata: {
 					timestamp: 1640995200,
 					forwarded: false,
 					broadcast: true,
-					readReceipts: ['user1@c.us']
-				}
+					readReceipts: ['user1@c.us'],
+				},
 			};
 
 			const webhookData = {
 				event: 'message.complex',
 				instance: 'test-instance',
 				data: complexData,
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 
 			mockPrisma.webhookEvent.create.mockResolvedValue(undefined);
@@ -180,7 +221,7 @@ describe('webhookEventRepository', () => {
 				{ data: '' },
 				{ data: 0 },
 				{ data: false },
-				{ data: undefined }
+				{ data: undefined },
 			];
 
 			for (const testCase of testCases) {
@@ -188,7 +229,7 @@ describe('webhookEventRepository', () => {
 					event: 'test.event',
 					instance: 'test-instance',
 					...testCase,
-					createdAt: new Date()
+					createdAt: new Date(),
 				};
 
 				mockPrisma.webhookEvent.create.mockResolvedValue(undefined);
@@ -203,7 +244,7 @@ describe('webhookEventRepository', () => {
 						createdAt: webhookData.createdAt,
 					},
 				});
-				
+
 				jest.clearAllMocks();
 			}
 		});
@@ -213,7 +254,7 @@ describe('webhookEventRepository', () => {
 				event: '',
 				instance: '',
 				data: { message: 'test' },
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 
 			mockPrisma.webhookEvent.create.mockResolvedValue(undefined);
@@ -234,7 +275,7 @@ describe('webhookEventRepository', () => {
 			const webhookData = {
 				event: 'message.text',
 				instance: 'test-instance',
-				data: { message: 'Hello' }
+				data: { message: 'Hello' },
 				// createdAt is undefined - should use default
 			};
 
@@ -258,7 +299,7 @@ describe('webhookEventRepository', () => {
 				event: 'message.text',
 				instance: 'test-instance',
 				data: { message: 'Christmas message' },
-				createdAt: specificDate
+				createdAt: specificDate,
 			};
 
 			mockPrisma.webhookEvent.create.mockResolvedValue(undefined);
@@ -280,14 +321,15 @@ describe('webhookEventRepository', () => {
 				event: 'message.text',
 				instance: 'test-instance',
 				data: { message: 'Hello' },
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 			const error = new Error('Database connection failed');
 
 			mockPrisma.webhookEvent.create.mockRejectedValue(error);
 
-			await expect(webhookEventRepository.add(webhookData))
-				.rejects.toThrow('Database connection failed');
+			await expect(webhookEventRepository.add(webhookData)).rejects.toThrow(
+				'Database connection failed'
+			);
 
 			expect(mockPrisma.webhookEvent.create).toHaveBeenCalledWith({
 				data: {
@@ -304,14 +346,15 @@ describe('webhookEventRepository', () => {
 				event: 'message.text',
 				instance: 'test-instance',
 				data: { message: 'Hello' },
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 			const error = new Error('Validation failed: Required field missing');
 
 			mockPrisma.webhookEvent.create.mockRejectedValue(error);
 
-			await expect(webhookEventRepository.add(webhookData))
-				.rejects.toThrow('Validation failed: Required field missing');
+			await expect(webhookEventRepository.add(webhookData)).rejects.toThrow(
+				'Validation failed: Required field missing'
+			);
 		});
 
 		it('should handle large JSON data payloads', async () => {
@@ -324,34 +367,34 @@ describe('webhookEventRepository', () => {
 					metadata: {
 						index: i,
 						processed: false,
-						tags: Array.from({ length: 10 }, (_, j) => `tag${j}`)
-					}
+						tags: Array.from({ length: 10 }, (_, j) => `tag${j}`),
+					},
 				})),
 				participants: Array.from({ length: 50 }, (_, i) => ({
 					id: `user${i}@c.us`,
 					name: `User ${i}`,
 					joinedAt: new Date(2023, 0, i + 1).toISOString(),
-					permissions: ['read', 'write', 'mention']
+					permissions: ['read', 'write', 'mention'],
 				})),
 				groupInfo: {
 					settings: {
 						allowMemberAdd: true,
 						allowMemberRemove: false,
-						allowGroupInfoChange: false
+						allowGroupInfoChange: false,
 					},
 					statistics: {
 						totalMessages: 10000,
 						activeMembers: 45,
-						adminCount: 3
-					}
-				}
+						adminCount: 3,
+					},
+				},
 			};
 
 			const webhookData = {
 				event: 'group.bulk.update',
 				instance: 'bulk-processor',
 				data: largeData,
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 
 			mockPrisma.webhookEvent.create.mockResolvedValue(undefined);
@@ -373,24 +416,29 @@ describe('webhookEventRepository', () => {
 				event: `event${i}`,
 				instance: `instance${i}`,
 				data: { index: i, message: `Concurrent message ${i}` },
-				createdAt: new Date(Date.now() + i * 1000)
+				createdAt: new Date(Date.now() + i * 1000),
 			}));
 
 			mockPrisma.webhookEvent.create.mockResolvedValue(undefined);
 
-			const promises = webhookEvents.map(webhook => webhookEventRepository.add(webhook));
+			const promises = webhookEvents.map((webhook) =>
+				webhookEventRepository.add(webhook)
+			);
 			await Promise.all(promises);
 
 			expect(mockPrisma.webhookEvent.create).toHaveBeenCalledTimes(5);
 			webhookEvents.forEach((webhook, index) => {
-				expect(mockPrisma.webhookEvent.create).toHaveBeenNthCalledWith(index + 1, {
-					data: {
-						event: webhook.event,
-						instance: webhook.instance,
-						data: webhook.data,
-						createdAt: webhook.createdAt,
-					},
-				});
+				expect(mockPrisma.webhookEvent.create).toHaveBeenNthCalledWith(
+					index + 1,
+					{
+						data: {
+							event: webhook.event,
+							instance: webhook.instance,
+							data: webhook.data,
+							createdAt: webhook.createdAt,
+						},
+					}
+				);
 			});
 		});
 	});

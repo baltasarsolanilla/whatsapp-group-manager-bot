@@ -12,9 +12,12 @@ export const moduleNameMapper = {
 	'^@utils/(.*)$': '<rootDir>/src/utils/$1',
 };
 export const transform = {
-	'^.+\\.(ts|tsx)$': ['ts-jest', {
-		tsconfig: 'tsconfig.json',
-	}],
+	'^.+\\.(ts|tsx)$': [
+		'ts-jest',
+		{
+			tsconfig: 'tsconfig.json',
+		},
+	],
 };
 export const collectCoverageFrom = [
 	'src/database/**/*.ts',

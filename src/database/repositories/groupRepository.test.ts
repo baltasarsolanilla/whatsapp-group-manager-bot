@@ -1,8 +1,49 @@
-import { groupRepository } from '@database/repositories/groupRepository';
-import mockPrisma from '@database/__mocks__/prisma';
+// Mock the prisma module before imports
+jest.mock('@database/prisma', () => ({
+	blacklist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	group: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+		update: jest.fn(),
+	},
+	user: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+	},
+	whitelist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		findUnique: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	removalQueue: {
+		upsert: jest.fn(),
+		delete: jest.fn(),
+		findMany: jest.fn(),
+	},
+	groupMembership: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		delete: jest.fn(),
+	},
+	message: {
+		upsert: jest.fn(),
+	},
+	removalHistory: {
+		create: jest.fn(),
+	},
+	webhookEvent: {
+		create: jest.fn(),
+	},
+}));
 
-// Mock the prisma module
-jest.mock('@database/prisma', () => mockPrisma);
+import { groupRepository } from '@database/repositories/groupRepository';
+
+const mockPrisma = require('@database/prisma');
 
 describe('groupRepository', () => {
 	beforeEach(() => {
@@ -13,12 +54,12 @@ describe('groupRepository', () => {
 		it('should upsert a group successfully with whatsappId and name', async () => {
 			const whatsappId = 'wa123@g.us';
 			const name = 'Test Group';
-			const mockGroup = { 
-				id: 'group1', 
-				whatsappId, 
-				name, 
+			const mockGroup = {
+				id: 'group1',
+				whatsappId,
+				name,
 				inactivityThresholdMinutes: 43200,
-				createdAt: new Date() 
+				createdAt: new Date(),
 			};
 
 			mockPrisma.group.upsert.mockResolvedValue(mockGroup);
@@ -35,12 +76,12 @@ describe('groupRepository', () => {
 
 		it('should upsert a group successfully with only whatsappId', async () => {
 			const whatsappId = 'wa123@g.us';
-			const mockGroup = { 
-				id: 'group1', 
-				whatsappId, 
-				name: null, 
+			const mockGroup = {
+				id: 'group1',
+				whatsappId,
+				name: null,
 				inactivityThresholdMinutes: 43200,
-				createdAt: new Date() 
+				createdAt: new Date(),
 			};
 
 			mockPrisma.group.upsert.mockResolvedValue(mockGroup);
@@ -58,12 +99,12 @@ describe('groupRepository', () => {
 		it('should handle undefined name properly', async () => {
 			const whatsappId = 'wa123@g.us';
 			const name = undefined;
-			const mockGroup = { 
-				id: 'group1', 
-				whatsappId, 
-				name: null, 
+			const mockGroup = {
+				id: 'group1',
+				whatsappId,
+				name: null,
 				inactivityThresholdMinutes: 43200,
-				createdAt: new Date() 
+				createdAt: new Date(),
 			};
 
 			mockPrisma.group.upsert.mockResolvedValue(mockGroup);
@@ -81,12 +122,12 @@ describe('groupRepository', () => {
 		it('should handle empty string name', async () => {
 			const whatsappId = 'wa123@g.us';
 			const name = '';
-			const mockGroup = { 
-				id: 'group1', 
-				whatsappId, 
-				name: '', 
+			const mockGroup = {
+				id: 'group1',
+				whatsappId,
+				name: '',
 				inactivityThresholdMinutes: 43200,
-				createdAt: new Date() 
+				createdAt: new Date(),
 			};
 
 			mockPrisma.group.upsert.mockResolvedValue(mockGroup);
@@ -108,8 +149,9 @@ describe('groupRepository', () => {
 
 			mockPrisma.group.upsert.mockRejectedValue(error);
 
-			await expect(groupRepository.upsert({ whatsappId, name }))
-				.rejects.toThrow('Database connection failed');
+			await expect(
+				groupRepository.upsert({ whatsappId, name })
+			).rejects.toThrow('Database connection failed');
 
 			expect(mockPrisma.group.upsert).toHaveBeenCalledWith({
 				where: { whatsappId },
@@ -122,12 +164,12 @@ describe('groupRepository', () => {
 	describe('getByWaId', () => {
 		it('should return group when found', async () => {
 			const whatsappId = 'wa123@g.us';
-			const mockGroup = { 
-				id: 'group1', 
-				whatsappId, 
-				name: 'Test Group', 
+			const mockGroup = {
+				id: 'group1',
+				whatsappId,
+				name: 'Test Group',
 				inactivityThresholdMinutes: 43200,
-				createdAt: new Date() 
+				createdAt: new Date(),
 			};
 
 			mockPrisma.group.findUnique.mockResolvedValue(mockGroup);
@@ -135,7 +177,7 @@ describe('groupRepository', () => {
 			const result = await groupRepository.getByWaId(whatsappId);
 
 			expect(mockPrisma.group.findUnique).toHaveBeenCalledWith({
-				where: { whatsappId }
+				where: { whatsappId },
 			});
 			expect(result).toEqual(mockGroup);
 		});
@@ -148,7 +190,7 @@ describe('groupRepository', () => {
 			const result = await groupRepository.getByWaId(whatsappId);
 
 			expect(mockPrisma.group.findUnique).toHaveBeenCalledWith({
-				where: { whatsappId }
+				where: { whatsappId },
 			});
 			expect(result).toBeNull();
 		});
@@ -161,7 +203,7 @@ describe('groupRepository', () => {
 			const result = await groupRepository.getByWaId(whatsappId);
 
 			expect(mockPrisma.group.findUnique).toHaveBeenCalledWith({
-				where: { whatsappId }
+				where: { whatsappId },
 			});
 			expect(result).toBeNull();
 		});
@@ -172,20 +214,24 @@ describe('groupRepository', () => {
 
 			mockPrisma.group.findUnique.mockRejectedValue(error);
 
-			await expect(groupRepository.getByWaId(whatsappId))
-				.rejects.toThrow('Database query failed');
+			await expect(groupRepository.getByWaId(whatsappId)).rejects.toThrow(
+				'Database query failed'
+			);
 		});
 	});
 
 	describe('update', () => {
 		it('should update group successfully with partial data', async () => {
 			const groupId = 'group123';
-			const updateData = { name: 'Updated Group Name', inactivityThresholdMinutes: 60000 };
-			const mockUpdatedGroup = { 
-				id: groupId, 
+			const updateData = {
+				name: 'Updated Group Name',
+				inactivityThresholdMinutes: 60000,
+			};
+			const mockUpdatedGroup = {
+				id: groupId,
 				whatsappId: 'wa123@g.us',
 				...updateData,
-				createdAt: new Date() 
+				createdAt: new Date(),
 			};
 
 			mockPrisma.group.update.mockResolvedValue(mockUpdatedGroup);
@@ -202,12 +248,12 @@ describe('groupRepository', () => {
 		it('should update group with single field', async () => {
 			const groupId = 'group123';
 			const updateData = { name: 'New Name Only' };
-			const mockUpdatedGroup = { 
-				id: groupId, 
+			const mockUpdatedGroup = {
+				id: groupId,
 				whatsappId: 'wa123@g.us',
 				name: 'New Name Only',
 				inactivityThresholdMinutes: 43200,
-				createdAt: new Date() 
+				createdAt: new Date(),
 			};
 
 			mockPrisma.group.update.mockResolvedValue(mockUpdatedGroup);
@@ -224,12 +270,12 @@ describe('groupRepository', () => {
 		it('should handle empty update data', async () => {
 			const groupId = 'group123';
 			const updateData = {};
-			const mockUpdatedGroup = { 
-				id: groupId, 
+			const mockUpdatedGroup = {
+				id: groupId,
 				whatsappId: 'wa123@g.us',
 				name: 'Existing Name',
 				inactivityThresholdMinutes: 43200,
-				createdAt: new Date() 
+				createdAt: new Date(),
 			};
 
 			mockPrisma.group.update.mockResolvedValue(mockUpdatedGroup);
@@ -250,8 +296,9 @@ describe('groupRepository', () => {
 
 			mockPrisma.group.update.mockRejectedValue(error);
 
-			await expect(groupRepository.update(groupId, updateData))
-				.rejects.toThrow('Update failed');
+			await expect(groupRepository.update(groupId, updateData)).rejects.toThrow(
+				'Update failed'
+			);
 
 			expect(mockPrisma.group.update).toHaveBeenCalledWith({
 				where: { id: groupId },
@@ -266,8 +313,9 @@ describe('groupRepository', () => {
 
 			mockPrisma.group.update.mockRejectedValue(error);
 
-			await expect(groupRepository.update(groupId, updateData))
-				.rejects.toThrow('Record to update not found');
+			await expect(groupRepository.update(groupId, updateData)).rejects.toThrow(
+				'Record to update not found'
+			);
 		});
 	});
 });

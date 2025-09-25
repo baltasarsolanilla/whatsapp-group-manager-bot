@@ -57,7 +57,7 @@ export interface Message {
 
 export enum RemovalOutcome {
 	SUCCESS = 'SUCCESS',
-	FAILURE = 'FAILURE'
+	FAILURE = 'FAILURE',
 }
 
 export interface RemovalHistory {

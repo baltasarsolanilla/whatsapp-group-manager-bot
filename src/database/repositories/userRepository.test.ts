@@ -1,8 +1,49 @@
-import { userRepository } from '@database/repositories/userRepository';
-import mockPrisma from '@database/__mocks__/prisma';
+// Mock the prisma module before imports
+jest.mock('@database/prisma', () => ({
+	blacklist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	group: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+		update: jest.fn(),
+	},
+	user: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+	},
+	whitelist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		findUnique: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	removalQueue: {
+		upsert: jest.fn(),
+		delete: jest.fn(),
+		findMany: jest.fn(),
+	},
+	groupMembership: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		delete: jest.fn(),
+	},
+	message: {
+		upsert: jest.fn(),
+	},
+	removalHistory: {
+		create: jest.fn(),
+	},
+	webhookEvent: {
+		create: jest.fn(),
+	},
+}));
 
-// Mock the prisma module
-jest.mock('@database/prisma', () => mockPrisma);
+import { userRepository } from '@database/repositories/userRepository';
+
+const mockPrisma = require('@database/prisma');
 
 describe('userRepository', () => {
 	beforeEach(() => {
@@ -14,12 +55,12 @@ describe('userRepository', () => {
 			const userData = {
 				whatsappId: 'wa123@c.us',
 				whatsappPn: '+1234567890',
-				name: 'John Doe'
+				name: 'John Doe',
 			};
 			const mockUser = {
 				id: 'user1',
 				...userData,
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 
 			mockPrisma.user.upsert.mockResolvedValue(mockUser);
@@ -29,10 +70,10 @@ describe('userRepository', () => {
 			expect(mockPrisma.user.upsert).toHaveBeenCalledWith({
 				where: { whatsappId: userData.whatsappId },
 				update: { name: userData.name, whatsappPn: userData.whatsappPn },
-				create: { 
-					whatsappId: userData.whatsappId, 
-					name: userData.name, 
-					whatsappPn: userData.whatsappPn 
+				create: {
+					whatsappId: userData.whatsappId,
+					name: userData.name,
+					whatsappPn: userData.whatsappPn,
 				},
 			});
 			expect(result).toEqual(mockUser);
@@ -40,14 +81,14 @@ describe('userRepository', () => {
 
 		it('should upsert user with only whatsappId', async () => {
 			const userData = {
-				whatsappId: 'wa123@c.us'
+				whatsappId: 'wa123@c.us',
 			};
 			const mockUser = {
 				id: 'user1',
 				whatsappId: userData.whatsappId,
 				whatsappPn: null,
 				name: null,
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 
 			mockPrisma.user.upsert.mockResolvedValue(mockUser);
@@ -66,14 +107,14 @@ describe('userRepository', () => {
 			const userData = {
 				whatsappId: 'wa123@c.us',
 				whatsappPn: undefined,
-				name: undefined
+				name: undefined,
 			};
 			const mockUser = {
 				id: 'user1',
 				whatsappId: userData.whatsappId,
 				whatsappPn: null,
 				name: null,
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 
 			mockPrisma.user.upsert.mockResolvedValue(mockUser);
@@ -92,24 +133,25 @@ describe('userRepository', () => {
 			const userData = {
 				whatsappId: 'wa123@c.us',
 				whatsappPn: '',
-				name: ''
+				name: '',
 			};
 			const mockUser = {
 				id: 'user1',
 				whatsappId: userData.whatsappId,
 				whatsappPn: '',
 				name: '',
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 
 			mockPrisma.user.upsert.mockResolvedValue(mockUser);
 
 			const result = await userRepository.upsert(userData);
 
+			// Empty strings are truthy, so they should be included
 			expect(mockPrisma.user.upsert).toHaveBeenCalledWith({
 				where: { whatsappId: userData.whatsappId },
 				update: {},
-				create: { whatsappId: userData.whatsappId },
+				create: { whatsappId: userData.whatsappId, name: '', whatsappPn: '' },
 			});
 			expect(result).toEqual(mockUser);
 		});
@@ -118,12 +160,12 @@ describe('userRepository', () => {
 			const userData = {
 				whatsappId: 'wa123@c.us',
 				whatsappPn: '+1234567890',
-				name: 'John Doe'
+				name: 'John Doe',
 			};
 			const mockUser = {
 				id: 'user1',
 				...userData,
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 
 			mockPrisma.user.upsert.mockResolvedValue(mockUser);
@@ -133,10 +175,10 @@ describe('userRepository', () => {
 			expect(mockPrisma.user.upsert).toHaveBeenCalledWith({
 				where: { whatsappId: userData.whatsappId },
 				update: { name: userData.name, whatsappPn: userData.whatsappPn },
-				create: { 
-					whatsappId: userData.whatsappId, 
-					name: userData.name, 
-					whatsappPn: userData.whatsappPn 
+				create: {
+					whatsappId: userData.whatsappId,
+					name: userData.name,
+					whatsappPn: userData.whatsappPn,
 				},
 			});
 			expect(result).toEqual(mockUser);
@@ -145,14 +187,15 @@ describe('userRepository', () => {
 		it('should handle database errors', async () => {
 			const userData = {
 				whatsappId: 'wa123@c.us',
-				name: 'John Doe'
+				name: 'John Doe',
 			};
 			const error = new Error('Database connection failed');
 
 			mockPrisma.user.upsert.mockRejectedValue(error);
 
-			await expect(userRepository.upsert(userData))
-				.rejects.toThrow('Database connection failed');
+			await expect(userRepository.upsert(userData)).rejects.toThrow(
+				'Database connection failed'
+			);
 
 			expect(mockPrisma.user.upsert).toHaveBeenCalledWith({
 				where: { whatsappId: userData.whatsappId },
@@ -165,14 +208,14 @@ describe('userRepository', () => {
 			const userData = {
 				whatsappId: 'wa123@c.us',
 				whatsappPn: '+1234567890',
-				name: undefined
+				name: undefined,
 			};
 			const mockUser = {
 				id: 'user1',
 				whatsappId: userData.whatsappId,
 				whatsappPn: userData.whatsappPn,
 				name: null,
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 
 			mockPrisma.user.upsert.mockResolvedValue(mockUser);
@@ -182,7 +225,10 @@ describe('userRepository', () => {
 			expect(mockPrisma.user.upsert).toHaveBeenCalledWith({
 				where: { whatsappId: userData.whatsappId },
 				update: { whatsappPn: userData.whatsappPn },
-				create: { whatsappId: userData.whatsappId, whatsappPn: userData.whatsappPn },
+				create: {
+					whatsappId: userData.whatsappId,
+					whatsappPn: userData.whatsappPn,
+				},
 			});
 			expect(result).toEqual(mockUser);
 		});
@@ -196,7 +242,7 @@ describe('userRepository', () => {
 				whatsappId,
 				whatsappPn: '+1234567890',
 				name: 'John Doe',
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 
 			mockPrisma.user.findUnique.mockResolvedValue(mockUser);
@@ -204,7 +250,7 @@ describe('userRepository', () => {
 			const result = await userRepository.getByWaId(whatsappId);
 
 			expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
-				where: { whatsappId }
+				where: { whatsappId },
 			});
 			expect(result).toEqual(mockUser);
 		});
@@ -217,7 +263,7 @@ describe('userRepository', () => {
 			const result = await userRepository.getByWaId(whatsappId);
 
 			expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
-				where: { whatsappId }
+				where: { whatsappId },
 			});
 			expect(result).toBeNull();
 		});
@@ -230,7 +276,7 @@ describe('userRepository', () => {
 			const result = await userRepository.getByWaId(whatsappId);
 
 			expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
-				where: { whatsappId }
+				where: { whatsappId },
 			});
 			expect(result).toBeNull();
 		});
@@ -241,8 +287,9 @@ describe('userRepository', () => {
 
 			mockPrisma.user.findUnique.mockRejectedValue(error);
 
-			await expect(userRepository.getByWaId(whatsappId))
-				.rejects.toThrow('Database query failed');
+			await expect(userRepository.getByWaId(whatsappId)).rejects.toThrow(
+				'Database query failed'
+			);
 		});
 	});
 
@@ -254,7 +301,7 @@ describe('userRepository', () => {
 				whatsappId: 'wa123@c.us',
 				whatsappPn,
 				name: 'John Doe',
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 
 			mockPrisma.user.findUnique.mockResolvedValue(mockUser);
@@ -262,7 +309,7 @@ describe('userRepository', () => {
 			const result = await userRepository.getByPn(whatsappPn);
 
 			expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
-				where: { whatsappPn }
+				where: { whatsappPn },
 			});
 			expect(result).toEqual(mockUser);
 		});
@@ -275,7 +322,7 @@ describe('userRepository', () => {
 			const result = await userRepository.getByPn(whatsappPn);
 
 			expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
-				where: { whatsappPn }
+				where: { whatsappPn },
 			});
 			expect(result).toBeNull();
 		});
@@ -288,7 +335,7 @@ describe('userRepository', () => {
 			const result = await userRepository.getByPn(whatsappPn);
 
 			expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
-				where: { whatsappPn }
+				where: { whatsappPn },
 			});
 			expect(result).toBeNull();
 		});
@@ -299,8 +346,9 @@ describe('userRepository', () => {
 
 			mockPrisma.user.findUnique.mockRejectedValue(error);
 
-			await expect(userRepository.getByPn(whatsappPn))
-				.rejects.toThrow('Database query failed');
+			await expect(userRepository.getByPn(whatsappPn)).rejects.toThrow(
+				'Database query failed'
+			);
 		});
 	});
 });

@@ -1,8 +1,49 @@
-import { removalQueueRepository } from '@database/repositories/removalQueueRepository';
-import mockPrisma from '@database/__mocks__/prisma';
+// Mock the prisma module before imports
+jest.mock('@database/prisma', () => ({
+	blacklist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	group: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+		update: jest.fn(),
+	},
+	user: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+	},
+	whitelist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		findUnique: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	removalQueue: {
+		upsert: jest.fn(),
+		delete: jest.fn(),
+		findMany: jest.fn(),
+	},
+	groupMembership: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		delete: jest.fn(),
+	},
+	message: {
+		upsert: jest.fn(),
+	},
+	removalHistory: {
+		create: jest.fn(),
+	},
+	webhookEvent: {
+		create: jest.fn(),
+	},
+}));
 
-// Mock the prisma module
-jest.mock('@database/prisma', () => mockPrisma);
+import { removalQueueRepository } from '@database/repositories/removalQueueRepository';
+
+const mockPrisma = require('@database/prisma');
 
 describe('removalQueueRepository', () => {
 	beforeEach(() => {
@@ -17,12 +58,15 @@ describe('removalQueueRepository', () => {
 				id: 'rq1',
 				userId,
 				groupId,
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 
 			mockPrisma.removalQueue.upsert.mockResolvedValue(mockRemovalQueue);
 
-			const result = await removalQueueRepository.upsertUser({ userId, groupId });
+			const result = await removalQueueRepository.upsertUser({
+				userId,
+				groupId,
+			});
 
 			expect(mockPrisma.removalQueue.upsert).toHaveBeenCalledWith({
 				where: { userId_groupId: { userId, groupId } },
@@ -39,12 +83,15 @@ describe('removalQueueRepository', () => {
 				id: 'rq2',
 				userId,
 				groupId,
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 
 			mockPrisma.removalQueue.upsert.mockResolvedValue(mockRemovalQueue);
 
-			const result = await removalQueueRepository.upsertUser({ userId, groupId });
+			const result = await removalQueueRepository.upsertUser({
+				userId,
+				groupId,
+			});
 
 			expect(mockPrisma.removalQueue.upsert).toHaveBeenCalledWith({
 				where: { userId_groupId: { userId, groupId } },
@@ -61,8 +108,9 @@ describe('removalQueueRepository', () => {
 
 			mockPrisma.removalQueue.upsert.mockRejectedValue(error);
 
-			await expect(removalQueueRepository.upsertUser({ userId, groupId }))
-				.rejects.toThrow('Database connection failed');
+			await expect(
+				removalQueueRepository.upsertUser({ userId, groupId })
+			).rejects.toThrow('Database connection failed');
 
 			expect(mockPrisma.removalQueue.upsert).toHaveBeenCalledWith({
 				where: { userId_groupId: { userId, groupId } },
@@ -79,7 +127,7 @@ describe('removalQueueRepository', () => {
 				id,
 				userId: 'user123',
 				groupId: 'group456',
-				createdAt: new Date()
+				createdAt: new Date(),
 			};
 
 			mockPrisma.removalQueue.delete.mockResolvedValue(mockRemovedEntry);
@@ -111,8 +159,9 @@ describe('removalQueueRepository', () => {
 
 			mockPrisma.removalQueue.delete.mockRejectedValue(error);
 
-			await expect(removalQueueRepository.remove(id))
-				.rejects.toThrow('Delete operation failed');
+			await expect(removalQueueRepository.remove(id)).rejects.toThrow(
+				'Delete operation failed'
+			);
 
 			expect(mockPrisma.removalQueue.delete).toHaveBeenCalledWith({
 				where: { id },
@@ -125,8 +174,9 @@ describe('removalQueueRepository', () => {
 
 			mockPrisma.removalQueue.delete.mockRejectedValue(error);
 
-			await expect(removalQueueRepository.remove(id))
-				.rejects.toThrow('Record to delete does not exist');
+			await expect(removalQueueRepository.remove(id)).rejects.toThrow(
+				'Record to delete does not exist'
+			);
 		});
 	});
 
@@ -139,7 +189,7 @@ describe('removalQueueRepository', () => {
 					groupId: 'group1',
 					createdAt: new Date(),
 					user: { id: 'user1', whatsappId: 'wa1@c.us', name: 'User 1' },
-					group: { id: 'group1', whatsappId: 'group1@g.us', name: 'Group 1' }
+					group: { id: 'group1', whatsappId: 'group1@g.us', name: 'Group 1' },
 				},
 				{
 					id: 'rq2',
@@ -147,8 +197,8 @@ describe('removalQueueRepository', () => {
 					groupId: 'group2',
 					createdAt: new Date(),
 					user: { id: 'user2', whatsappId: 'wa2@c.us', name: 'User 2' },
-					group: { id: 'group2', whatsappId: 'group2@g.us', name: 'Group 2' }
-				}
+					group: { id: 'group2', whatsappId: 'group2@g.us', name: 'Group 2' },
+				},
 			];
 
 			mockPrisma.removalQueue.findMany.mockResolvedValue(mockUsers);
@@ -171,8 +221,12 @@ describe('removalQueueRepository', () => {
 					groupId,
 					createdAt: new Date(),
 					user: { id: 'user1', whatsappId: 'wa1@c.us', name: 'User 1' },
-					group: { id: groupId, whatsappId: 'group123@g.us', name: 'Test Group' }
-				}
+					group: {
+						id: groupId,
+						whatsappId: 'group123@g.us',
+						name: 'Test Group',
+					},
+				},
 			];
 
 			mockPrisma.removalQueue.findMany.mockResolvedValue(mockUsers);
@@ -202,7 +256,9 @@ describe('removalQueueRepository', () => {
 			const error = new Error('Database query failed');
 			mockPrisma.removalQueue.findMany.mockRejectedValue(error);
 
-			await expect(removalQueueRepository.getUsers()).rejects.toThrow('Database query failed');
+			await expect(removalQueueRepository.getUsers()).rejects.toThrow(
+				'Database query failed'
+			);
 		});
 	});
 
@@ -216,7 +272,7 @@ describe('removalQueueRepository', () => {
 					groupId: 'group1',
 					createdAt: new Date(2023, 0, 1),
 					user: { id: 'user1', whatsappId: 'wa1@c.us', name: 'User 1' },
-					group: { id: 'group1', whatsappId: 'group1@g.us', name: 'Group 1' }
+					group: { id: 'group1', whatsappId: 'group1@g.us', name: 'Group 1' },
 				},
 				{
 					id: 'rq2',
@@ -224,8 +280,8 @@ describe('removalQueueRepository', () => {
 					groupId: 'group2',
 					createdAt: new Date(2023, 0, 2),
 					user: { id: 'user2', whatsappId: 'wa2@c.us', name: 'User 2' },
-					group: { id: 'group2', whatsappId: 'group2@g.us', name: 'Group 2' }
-				}
+					group: { id: 'group2', whatsappId: 'group2@g.us', name: 'Group 2' },
+				},
 			];
 
 			mockPrisma.removalQueue.findMany.mockResolvedValue(mockBatch);
@@ -251,13 +307,20 @@ describe('removalQueueRepository', () => {
 					groupId,
 					createdAt: new Date(2023, 0, 1),
 					user: { id: 'user1', whatsappId: 'wa1@c.us', name: 'User 1' },
-					group: { id: groupId, whatsappId: 'group123@g.us', name: 'Test Group' }
-				}
+					group: {
+						id: groupId,
+						whatsappId: 'group123@g.us',
+						name: 'Test Group',
+					},
+				},
 			];
 
 			mockPrisma.removalQueue.findMany.mockResolvedValue(mockBatch);
 
-			const result = await removalQueueRepository.getNextBatch({ groupId, take });
+			const result = await removalQueueRepository.getNextBatch({
+				groupId,
+				take,
+			});
 
 			expect(mockPrisma.removalQueue.findMany).toHaveBeenCalledWith({
 				where: { groupId },
@@ -304,8 +367,9 @@ describe('removalQueueRepository', () => {
 
 			mockPrisma.removalQueue.findMany.mockRejectedValue(error);
 
-			await expect(removalQueueRepository.getNextBatch({ take }))
-				.rejects.toThrow('Database query failed');
+			await expect(
+				removalQueueRepository.getNextBatch({ take })
+			).rejects.toThrow('Database query failed');
 		});
 	});
 });

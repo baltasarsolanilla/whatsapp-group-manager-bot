@@ -1,8 +1,49 @@
-import { whitelistRepository } from '@database/repositories/whitelistRepository';
-import mockPrisma from '@database/__mocks__/prisma';
+// Mock the prisma module before imports
+jest.mock('@database/prisma', () => ({
+	blacklist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	group: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+		update: jest.fn(),
+	},
+	user: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+	},
+	whitelist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		findUnique: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	removalQueue: {
+		upsert: jest.fn(),
+		delete: jest.fn(),
+		findMany: jest.fn(),
+	},
+	groupMembership: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		delete: jest.fn(),
+	},
+	message: {
+		upsert: jest.fn(),
+	},
+	removalHistory: {
+		create: jest.fn(),
+	},
+	webhookEvent: {
+		create: jest.fn(),
+	},
+}));
 
-// Mock the prisma module
-jest.mock('@database/prisma', () => mockPrisma);
+import { whitelistRepository } from '@database/repositories/whitelistRepository';
+
+const mockPrisma = require('@database/prisma');
 
 describe('whitelistRepository', () => {
 	beforeEach(() => {
@@ -23,19 +64,26 @@ describe('whitelistRepository', () => {
 					whatsappId: 'wa123@c.us',
 					name: 'John Doe',
 					whatsappPn: '+1234567890',
-					createdAt: new Date()
+					createdAt: new Date(),
 				},
 				group: {
 					id: groupId,
 					whatsappId: 'group123@g.us',
 					name: 'Test Group',
 					inactivityThresholdMinutes: 43200,
-					createdAt: new Date()
-				}
+					createdAt: new Date(),
+				},
 			};
 
-			mockPrisma.whitelist.upsert.mockResolvedValue({ id: 'whitelist1', userId, groupId, createdAt: new Date() });
-			mockPrisma.whitelist.findUnique.mockResolvedValue(mockWhitelistWithRelations);
+			mockPrisma.whitelist.upsert.mockResolvedValue({
+				id: 'whitelist1',
+				userId,
+				groupId,
+				createdAt: new Date(),
+			});
+			mockPrisma.whitelist.findUnique.mockResolvedValue(
+				mockWhitelistWithRelations
+			);
 
 			const result = await whitelistRepository.upsert(userId, groupId);
 
@@ -64,19 +112,26 @@ describe('whitelistRepository', () => {
 					whatsappId: '',
 					name: null,
 					whatsappPn: null,
-					createdAt: new Date()
+					createdAt: new Date(),
 				},
 				group: {
 					id: groupId,
 					whatsappId: '',
 					name: null,
 					inactivityThresholdMinutes: 43200,
-					createdAt: new Date()
-				}
+					createdAt: new Date(),
+				},
 			};
 
-			mockPrisma.whitelist.upsert.mockResolvedValue({ id: 'whitelist2', userId, groupId, createdAt: new Date() });
-			mockPrisma.whitelist.findUnique.mockResolvedValue(mockWhitelistWithRelations);
+			mockPrisma.whitelist.upsert.mockResolvedValue({
+				id: 'whitelist2',
+				userId,
+				groupId,
+				createdAt: new Date(),
+			});
+			mockPrisma.whitelist.findUnique.mockResolvedValue(
+				mockWhitelistWithRelations
+			);
 
 			const result = await whitelistRepository.upsert(userId, groupId);
 
@@ -95,8 +150,9 @@ describe('whitelistRepository', () => {
 
 			mockPrisma.whitelist.upsert.mockRejectedValue(error);
 
-			await expect(whitelistRepository.upsert(userId, groupId))
-				.rejects.toThrow('Upsert failed');
+			await expect(whitelistRepository.upsert(userId, groupId)).rejects.toThrow(
+				'Upsert failed'
+			);
 
 			expect(mockPrisma.whitelist.upsert).toHaveBeenCalledWith({
 				where: { userId_groupId: { userId, groupId } },
@@ -111,11 +167,17 @@ describe('whitelistRepository', () => {
 			const groupId = 'group456';
 			const error = new Error('Find failed');
 
-			mockPrisma.whitelist.upsert.mockResolvedValue({ id: 'whitelist1', userId, groupId, createdAt: new Date() });
+			mockPrisma.whitelist.upsert.mockResolvedValue({
+				id: 'whitelist1',
+				userId,
+				groupId,
+				createdAt: new Date(),
+			});
 			mockPrisma.whitelist.findUnique.mockRejectedValue(error);
 
-			await expect(whitelistRepository.upsert(userId, groupId))
-				.rejects.toThrow('Find failed');
+			await expect(whitelistRepository.upsert(userId, groupId)).rejects.toThrow(
+				'Find failed'
+			);
 
 			expect(mockPrisma.whitelist.upsert).toHaveBeenCalled();
 			expect(mockPrisma.whitelist.findUnique).toHaveBeenCalled();
@@ -171,7 +233,9 @@ describe('whitelistRepository', () => {
 			const error = new Error('Database query failed');
 			mockPrisma.whitelist.findMany.mockRejectedValue(error);
 
-			await expect(whitelistRepository.list()).rejects.toThrow('Database query failed');
+			await expect(whitelistRepository.list()).rejects.toThrow(
+				'Database query failed'
+			);
 		});
 	});
 
@@ -228,8 +292,9 @@ describe('whitelistRepository', () => {
 
 			mockPrisma.whitelist.deleteMany.mockRejectedValue(error);
 
-			await expect(whitelistRepository.remove(userId, groupId))
-				.rejects.toThrow('Delete operation failed');
+			await expect(whitelistRepository.remove(userId, groupId)).rejects.toThrow(
+				'Delete operation failed'
+			);
 
 			expect(mockPrisma.whitelist.deleteMany).toHaveBeenCalledWith({
 				where: { userId, groupId },

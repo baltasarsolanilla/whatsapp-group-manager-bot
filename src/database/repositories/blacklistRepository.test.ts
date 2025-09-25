@@ -1,8 +1,49 @@
-import { blacklistRepository } from '@database/repositories/blacklistRepository';
-import mockPrisma from '@database/__mocks__/prisma';
+// Mock the prisma module before imports
+jest.mock('@database/prisma', () => ({
+	blacklist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	group: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+		update: jest.fn(),
+	},
+	user: {
+		upsert: jest.fn(),
+		findUnique: jest.fn(),
+	},
+	whitelist: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		findUnique: jest.fn(),
+		deleteMany: jest.fn(),
+	},
+	removalQueue: {
+		upsert: jest.fn(),
+		delete: jest.fn(),
+		findMany: jest.fn(),
+	},
+	groupMembership: {
+		upsert: jest.fn(),
+		findMany: jest.fn(),
+		delete: jest.fn(),
+	},
+	message: {
+		upsert: jest.fn(),
+	},
+	removalHistory: {
+		create: jest.fn(),
+	},
+	webhookEvent: {
+		create: jest.fn(),
+	},
+}));
 
-// Mock the prisma module
-jest.mock('@database/prisma', () => mockPrisma);
+import { blacklistRepository } from '@database/repositories/blacklistRepository';
+
+const mockPrisma = require('@database/prisma');
 
 describe('blacklistRepository', () => {
 	beforeEach(() => {
@@ -51,8 +92,9 @@ describe('blacklistRepository', () => {
 
 			mockPrisma.blacklist.upsert.mockRejectedValue(error);
 
-			await expect(blacklistRepository.upsert(userId, groupId))
-				.rejects.toThrow('Database connection failed');
+			await expect(blacklistRepository.upsert(userId, groupId)).rejects.toThrow(
+				'Database connection failed'
+			);
 
 			expect(mockPrisma.blacklist.upsert).toHaveBeenCalledWith({
 				where: { userId_groupId: { userId, groupId } },
@@ -111,7 +153,9 @@ describe('blacklistRepository', () => {
 			const error = new Error('Database query failed');
 			mockPrisma.blacklist.findMany.mockRejectedValue(error);
 
-			await expect(blacklistRepository.list()).rejects.toThrow('Database query failed');
+			await expect(blacklistRepository.list()).rejects.toThrow(
+				'Database query failed'
+			);
 		});
 	});
 
@@ -168,8 +212,9 @@ describe('blacklistRepository', () => {
 
 			mockPrisma.blacklist.deleteMany.mockRejectedValue(error);
 
-			await expect(blacklistRepository.remove(userId, groupId))
-				.rejects.toThrow('Delete operation failed');
+			await expect(blacklistRepository.remove(userId, groupId)).rejects.toThrow(
+				'Delete operation failed'
+			);
 
 			expect(mockPrisma.blacklist.deleteMany).toHaveBeenCalledWith({
 				where: { userId, groupId },
