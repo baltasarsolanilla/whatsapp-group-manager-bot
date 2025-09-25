@@ -18,7 +18,6 @@ export const whitelistController = {
 	list: catchAsync(async (req: Request, res: Response) => {
 		const groupId = req.query.groupId as string | undefined;
 		const members = await whitelistService.list(groupId);
-		res.json(members);
 		resSuccess(res, members);
 	}),
 };
