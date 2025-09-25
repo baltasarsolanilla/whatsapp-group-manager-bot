@@ -1,5 +1,4 @@
-import { removalQueueService } from '@logic/services';
-import { removalWorkflowService } from '@logic/services/removalWorkflowService';
+import { removalQueueService, removalWorkflowService } from '@logic/services';
 import { AppError } from '@utils/AppError';
 import { catchAsync } from '@utils/catchAsync';
 import { resSuccess } from '@utils/resSuccess';

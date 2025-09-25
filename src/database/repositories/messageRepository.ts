@@ -1,12 +1,11 @@
 import prisma from '@database/prisma';
 import { Group, User } from '@prisma/client';
-import { MessageType } from 'types/evolution';
 
 export type AddMessageType = {
 	user: User;
 	group: Group;
 	whatsappId: string;
-	messageType: MessageType | string;
+	messageType: string;
 	messageTimestamp: number;
 };
 

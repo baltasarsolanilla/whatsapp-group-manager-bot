@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
 
 /* eslint-disable no-console */
@@ -20,9 +19,9 @@ export function handleAxiosError(err: unknown): void {
 
 export function errorHandler(
 	err: any,
-	req: Request,
+	_req: Request,
 	res: Response,
-	next: NextFunction
+	_next: NextFunction
 ) {
 	res.status(500).json({
 		error: err instanceof Error ? err.message : 'Internal server error',

@@ -1,14 +1,9 @@
 // Starter TypeScript types for Evolution API v2
 import {
 	EVOLUTION_EVENTS,
-	EvolutionIntegration,
 	GroupAction,
-	MessageType,
 } from '@constants/evolutionConstants';
 
-export type EvolutionIntegrationType =
-	(typeof EvolutionIntegration)[keyof typeof EvolutionIntegration];
-export type MessageType = (typeof MessageType)[keyof typeof MessageType];
 export type GroupActionType = (typeof GroupAction)[keyof typeof GroupAction];
 
 // -------------------------------
@@ -55,7 +50,7 @@ export type MessageUpsert = {
 		participantLid?: string;
 	};
 	pushName: string;
-	messageType: MessageType;
+	messageType: string;
 	messageTimestamp: number;
 };
 
