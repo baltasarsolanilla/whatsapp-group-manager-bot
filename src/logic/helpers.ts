@@ -9,20 +9,12 @@ export const isGroupMessage = (payload: MessageUpsert) => {
 	return payload.key.remoteJid.endsWith(WHATSAPP_GROUP_ID_SUFFIX);
 };
 
-export const isPrivateMessage = (data: MessageUpsert) => {
-	return data.key.remoteJid.endsWith(WHATSAPP_USER_PN_SUFFIX);
-};
-
 export const isUserWhatsappPn = (pn: string) => {
 	return pn.endsWith(WHATSAPP_USER_PN_SUFFIX);
 };
 
 export const isUserWhatsappId = (id: string) => {
 	return id.endsWith(WHATSAPP_USER_ID_SUFFIX);
-};
-
-export const isGroupWhatsappId = (id: string) => {
-	return id.endsWith(WHATSAPP_GROUP_ID_SUFFIX);
 };
 
 // Format plain phone number to create a whatsappPn

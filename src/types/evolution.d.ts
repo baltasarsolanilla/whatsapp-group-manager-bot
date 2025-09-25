@@ -1,8 +1,5 @@
 // Starter TypeScript types for Evolution API v2
-import {
-	EVOLUTION_EVENTS,
-	GroupAction,
-} from '@constants/evolutionConstants';
+import { EVOLUTION_EVENTS, GroupAction } from '@constants/evolutionConstants';
 
 export type GroupActionType = (typeof GroupAction)[keyof typeof GroupAction];
 
