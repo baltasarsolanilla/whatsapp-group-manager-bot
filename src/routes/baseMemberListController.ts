@@ -30,11 +30,6 @@ export function createMemberListController(
 		list: catchAsync(async (req: Request, res: Response) => {
 			const groupId = req.query.groupId as string | undefined;
 			const members = await service.list(groupId);
-			// Note: WhitelistController has an extra res.json(members) call, but resSuccess already handles response
-			// We'll match the existing whitelist behavior by calling both for consistency
-			if (entityName === 'whitelist') {
-				res.json(members);
-			}
 			resSuccess(res, members);
 		}),
 	};
