@@ -1,7 +1,6 @@
 import prisma from '@database/prisma';
 import { Blacklist, Group, User, Whitelist } from '@prisma/client';
 
-// Temporary types until Prisma client is properly generated
 type MemberListEntity = Whitelist | Blacklist;
 
 // Generic interface for member list operations
