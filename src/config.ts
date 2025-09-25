@@ -1,6 +1,15 @@
 import dotenv from 'dotenv';
+import fs from 'fs';
 
-dotenv.config();
+const envFile =
+	process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
+
+if (fs.existsSync(envFile)) {
+	dotenv.config({ path: envFile });
+	console.log(`✅ Env file ${envFile} loaded`);
+} else {
+	console.warn(`⚠️ Env file ${envFile} not found`);
+}
 
 export default {
 	port: process.env.PORT,
