@@ -17,6 +17,30 @@ const baseBlacklistService = createMemberListService(
 export const blacklistService = {
 	...baseBlacklistService,
 
+	/**
+	 * Check if a user is blacklisted in a specific group
+	 * @param whatsappId The user's WhatsApp ID (e.g., "69918158549171@lid")
+	 * @param groupWaId The group's WhatsApp ID (e.g., "120363403645737238@g.us")
+	 * @returns Promise<boolean> true if user is blacklisted, false otherwise
+	 */
+	async isBlacklisted(whatsappId: string, groupWaId: string): Promise<boolean> {
+		try {
+			const user = await userRepository.getByWaId(whatsappId);
+			const group = await groupRepository.getByWaId(groupWaId);
+
+			if (!user || !group) {
+				return false; // If user or group doesn't exist, they can't be blacklisted
+			}
+
+			// Check if there's a blacklist entry for this user in this group
+			const blacklistEntries = await blacklistRepository.list(group.id);
+			return blacklistEntries.some(({ userId }) => user.id === userId);
+		} catch (error) {
+			console.warn(`Error checking blacklist status for ${whatsappId}:`, error);
+			return false; // Default to not blacklisted on error
+		}
+	},
+
 	async addToBlacklistWithRemoval(
 		phoneNumber: string,
 		groupWaId: string,

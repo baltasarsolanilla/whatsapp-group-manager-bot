@@ -1,10 +1,15 @@
 import { EVOLUTION_EVENTS, GroupAction } from '@constants/evolutionConstants';
-import { messageService, groupService } from '@logic/services';
+import {
+	messageService,
+	groupService,
+	blacklistService,
+} from '@logic/services';
 import {
 	userRepository,
 	groupMembershipRepository,
 } from '@database/repositories';
 import { AppError } from '@utils/AppError';
+import { evolutionAPI } from '@services/evolutionAPI';
 import type { WebhookEvent } from 'types/evolution';
 import { isGroupMessage } from './helpers';
 
@@ -64,18 +69,53 @@ export const handleGroupParticipantsUpdate = async (
 
 			try {
 				if (data.action === GroupAction.ADD) {
-					// Ensure user exists and add to group membership
-					const user = await userRepository.upsert({
-						whatsappId: participantId,
-						whatsappPn: participantId, // Using participantId as both id and phone number
-					});
+					// Check if user is blacklisted before processing
+					const isBlacklisted = await blacklistService.isBlacklisted(
+						participantId,
+						data.id
+					);
 
-					await groupMembershipRepository.upsert({
-						user,
-						group,
-					});
+					if (isBlacklisted) {
+						console.log(
+							`🚫 User ${participantId} is blacklisted for group ${data.id}. Removing user...`
+						);
 
-					console.log(`✅ Added user ${participantId} to group ${data.id}`);
+						try {
+							// Remove user from WhatsApp group using Evolution API
+							await evolutionAPI.groupService.removeMembers(
+								[participantId],
+								data.id
+							);
+							console.log(
+								`✅ Successfully removed blacklisted user ${participantId} from group ${data.id}`
+							);
+						} catch (removalError) {
+							console.error(
+								`❌ Failed to remove blacklisted user ${participantId} from group ${data.id}:`,
+								removalError
+							);
+							// Continue processing other participants even if removal fails
+						}
+
+						// DO NOT add to membership tracking for blacklisted users
+						console.log(
+							`⏭️  Skipping membership tracking for blacklisted user ${participantId}`
+						);
+					} else {
+						// User is not blacklisted, proceed with normal flow
+						// Ensure user exists and add to group membership
+						const user = await userRepository.upsert({
+							whatsappId: participantId,
+							whatsappPn: participantId, // Using participantId as both id and phone number
+						});
+
+						await groupMembershipRepository.upsert({
+							user,
+							group,
+						});
+
+						console.log(`✅ Added user ${participantId} to group ${data.id}`);
+					}
 				} else if (data.action === GroupAction.REMOVE) {
 					// Find user by whatsappId
 					const user = await userRepository.getByWaId(participantId);
