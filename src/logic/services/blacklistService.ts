@@ -63,7 +63,9 @@ export const blacklistService = {
 						userId: user.id,
 						groupId: group.id,
 					});
-					console.log(`Cleaned up membership record for user ${user.id} in group ${group.id}`);
+					console.log(
+						`Cleaned up membership record for user ${user.id} in group ${group.id}`
+					);
 				} catch (membershipError) {
 					// Log the warning but don't fail the overall operation
 					// The user was still successfully removed from WhatsApp

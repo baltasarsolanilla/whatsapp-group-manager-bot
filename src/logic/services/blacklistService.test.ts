@@ -21,7 +21,9 @@ describe('BlacklistService GroupMembership Cleanup', () => {
 		};
 
 		// Verify the expected flow exists
-		expect(mockScenario.expectedFlow).toContain('3. Clean up GroupMembership record from database');
+		expect(mockScenario.expectedFlow).toContain(
+			'3. Clean up GroupMembership record from database'
+		);
 		expect(mockScenario.user.id).toBeTruthy();
 		expect(mockScenario.group.id).toBeTruthy();
 
@@ -54,7 +56,8 @@ describe('BlacklistService GroupMembership Cleanup', () => {
 		];
 
 		scenarios.forEach((scenario) => {
-			const actualShouldCleanup = !scenario.skipRemoval && scenario.removalSuccess;
+			const actualShouldCleanup =
+				!scenario.skipRemoval && scenario.removalSuccess;
 			expect(actualShouldCleanup).toBe(scenario.shouldCleanup);
 		});
 
