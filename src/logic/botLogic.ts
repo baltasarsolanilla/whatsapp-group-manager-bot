@@ -1,6 +1,7 @@
-import { EVOLUTION_EVENTS } from '@constants/evolutionConstants';
+import { EVOLUTION_EVENTS, GroupAction } from '@constants/evolutionConstants';
 import { messageService, groupService } from '@logic/services';
 import { userRepository, groupMembershipRepository } from '@database/repositories';
+import { AppError } from '@utils/AppError';
 import type { WebhookEvent } from 'types/evolution';
 import { isGroupMessage } from './helpers';
 
@@ -24,28 +25,24 @@ export const handleGroupParticipantsUpdate = async (
 
 	// Validate required fields
 	if (!data || !data.id || !data.action || !data.participants) {
-		console.error('❌ Invalid webhook data: missing required fields', data);
-		return;
+		throw AppError.required('Invalid webhook data: missing required fields');
 	}
 
 	// Only process "add" and "remove" actions
-	if (data.action !== 'add' && data.action !== 'remove') {
-		console.log(`⏭️  Skipping group participants update with action: ${data.action}`);
-		return;
+	if (data.action !== GroupAction.ADD && data.action !== GroupAction.REMOVE) {
+		throw new AppError(`Unsupported group participants action: ${data.action}`, 400);
 	}
 
 	// Skip if no participants to process
 	if (!Array.isArray(data.participants) || data.participants.length === 0) {
-		console.log('⚠️  No participants to process');
-		return;
+		throw AppError.required('No participants to process');
 	}
 
 	try {
 		// Ensure group exists or fetch from Evolution API
 		const group = await groupService.ensure(data.id);
 		if (!group) {
-			console.warn(`❌ Group not found and could not be fetched: ${data.id}`);
-			return;
+			throw AppError.notFound(`Group not found: ${data.id}`);
 		}
 
 		console.log(`📊 Processing ${data.participants.length} participant(s) for ${data.action} operation`);
@@ -58,7 +55,7 @@ export const handleGroupParticipantsUpdate = async (
 			}
 
 			try {
-				if (data.action === 'add') {
+				if (data.action === GroupAction.ADD) {
 					// Ensure user exists and add to group membership
 					const user = await userRepository.upsert({
 						whatsappId: participantId,
@@ -71,7 +68,7 @@ export const handleGroupParticipantsUpdate = async (
 					});
 
 					console.log(`✅ Added user ${participantId} to group ${data.id}`);
-				} else if (data.action === 'remove') {
+				} else if (data.action === GroupAction.REMOVE) {
 					// Find user by whatsappId
 					const user = await userRepository.getByWaId(participantId);
 					if (user) {

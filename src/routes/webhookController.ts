@@ -3,6 +3,7 @@ import { handlers } from '@logic/handlers';
 import { webhookEventService } from '@logic/services';
 import { catchAsync } from '@utils/catchAsync';
 import { resSuccess } from '@utils/resSuccess';
+import { AppError } from '@utils/AppError';
 import { Request, Response } from 'express';
 import type { WebhookEvent } from 'types/evolution';
 
@@ -18,12 +19,12 @@ export const webhookController = catchAsync(
 		// Basic validation of webhook payload
 		if (!update || typeof update !== 'object') {
 			console.warn('❌ Invalid webhook payload received:', update);
-			return res.status(400).json({ error: 'Invalid webhook payload' });
+			throw new AppError('Invalid webhook payload', 400);
 		}
 
 		if (!update.event) {
 			console.warn('❌ Missing event field in webhook payload:', update);
-			return res.status(422).json({ error: 'Missing event field' });
+			throw new AppError('Missing event field', 422);
 		}
 
 		// Store webhook event for audit/debugging
