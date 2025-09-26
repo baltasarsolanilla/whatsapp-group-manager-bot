@@ -22,9 +22,21 @@ export const handleGroupParticipantsUpdate = async (
 	
 	console.log('🚀 ~ handleGroupParticipantsUpdate ~ update:', update);
 
+	// Validate required fields
+	if (!data || !data.id || !data.action || !data.participants) {
+		console.error('❌ Invalid webhook data: missing required fields', data);
+		return;
+	}
+
 	// Only process "add" and "remove" actions
 	if (data.action !== 'add' && data.action !== 'remove') {
-		console.log(`Skipping group participants update with action: ${data.action}`);
+		console.log(`⏭️  Skipping group participants update with action: ${data.action}`);
+		return;
+	}
+
+	// Skip if no participants to process
+	if (!Array.isArray(data.participants) || data.participants.length === 0) {
+		console.log('⚠️  No participants to process');
 		return;
 	}
 
@@ -32,12 +44,19 @@ export const handleGroupParticipantsUpdate = async (
 		// Ensure group exists or fetch from Evolution API
 		const group = await groupService.ensure(data.id);
 		if (!group) {
-			console.warn(`Group not found and could not be fetched: ${data.id}`);
+			console.warn(`❌ Group not found and could not be fetched: ${data.id}`);
 			return;
 		}
 
+		console.log(`📊 Processing ${data.participants.length} participant(s) for ${data.action} operation`);
+
 		// Process each participant
 		for (const participantId of data.participants) {
+			if (!participantId || typeof participantId !== 'string') {
+				console.warn(`⚠️  Invalid participant ID: ${participantId}`);
+				continue;
+			}
+
 			try {
 				if (data.action === 'add') {
 					// Ensure user exists and add to group membership
@@ -63,15 +82,17 @@ export const handleGroupParticipantsUpdate = async (
 
 						console.log(`✅ Removed user ${participantId} from group ${data.id}`);
 					} else {
-						console.warn(`User not found for removal: ${participantId}`);
+						console.warn(`⚠️  User not found for removal: ${participantId}`);
 					}
 				}
 			} catch (participantError) {
-				console.error(`Error processing participant ${participantId}:`, participantError);
+				console.error(`❌ Error processing participant ${participantId}:`, participantError);
 				// Continue processing other participants
 			}
 		}
+
+		console.log(`🎉 Completed processing group participants update for group ${data.id}`);
 	} catch (error) {
-		console.error('Error handling group participants update:', error);
+		console.error('❌ Error handling group participants update:', error);
 	}
 };
