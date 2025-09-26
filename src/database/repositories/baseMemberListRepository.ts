@@ -37,6 +37,21 @@ export function createMemberListRepository<T extends MemberListEntity>(
 		async list(groupId?: string): Promise<T[]> {
 			return model.findMany({
 				where: groupId ? { groupId } : undefined,
+				select: {
+					user: {
+						select: {
+							whatsappId: true,
+							name: true,
+							whatsappPn: true,
+						},
+					},
+					group: {
+						select: {
+							name: true,
+							whatsappId: true,
+						},
+					},
+				},
 			}) as Promise<T[]>;
 		},
 
