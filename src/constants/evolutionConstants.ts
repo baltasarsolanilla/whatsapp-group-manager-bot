@@ -4,6 +4,7 @@ export const EVOLUTION_EVENTS = {
 	MESSAGES_DELETE: 'messages.delete',
 	CONNECTION_UPDATE: 'connection.update',
 	PRESENCE_UPDATE: 'presence.update',
+	GROUP_PARTICIPANTS_UPDATE: 'group-participants.update',
 	// ... all other events
 } as const;
 
