@@ -5,3 +5,5 @@ node_modules
 /generated/prisma
 /dist
 /samples
+# Manual test files
+manual-test-*.js
