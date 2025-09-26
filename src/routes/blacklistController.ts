@@ -27,6 +27,12 @@ export const blacklistController = {
 
 		// Use the enhanced service method if skipRemoval is provided, otherwise use base method
 		if ('skipRemoval' in req.body) {
+			await blacklistService.add(phoneNumber, groupId);
+			resSuccess(res, {
+				message: 'Added to blacklist',
+				reason: reason ?? null,
+			});
+		} else {
 			const result = await blacklistService.addToBlacklistWithRemoval(
 				phoneNumber,
 				groupId,
@@ -40,10 +46,6 @@ export const blacklistController = {
 				skipRemoval: result.skipRemoval,
 				reason: reason ?? null,
 			});
-		} else {
-			// Use the original add method for backward compatibility
-			await blacklistService.add(phoneNumber, groupId);
-			resSuccess(res, { message: 'Added to blacklist', reason: reason ?? null });
 		}
 	}),
 };

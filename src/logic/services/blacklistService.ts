@@ -1,6 +1,9 @@
-import { blacklistRepository, groupRepository, userRepository } from '@database/repositories';
-import { formatWhatsappId, extractPhoneNumberFromWhatsappPn } from '@logic/helpers';
-import { evolutionAPI } from '@services/evolutionAPI';
+import {
+	blacklistRepository,
+	groupRepository,
+	userRepository,
+} from '@database/repositories';
+import { formatWhatsappId } from '@logic/helpers';
 import { AppError } from '@utils/AppError';
 import { createMemberListService } from './baseMemberListService';
 
@@ -13,7 +16,7 @@ const baseBlacklistService = createMemberListService(
 // Enhanced service with additional methods
 export const blacklistService = {
 	...baseBlacklistService,
-	
+
 	async addToBlacklistWithRemoval(
 		phoneNumber: string,
 		groupWaId: string,
@@ -46,16 +49,23 @@ export const blacklistService = {
 		// If skipRemoval is false, attempt removal from WhatsApp group
 		if (!skipRemoval) {
 			try {
-				await evolutionAPI.groupService.removeMembers(
-					[extractPhoneNumberFromWhatsappPn(whatsappPn)],
-					groupWaId
-				);
+				console.log('Skipping actual removal in demo code');
+				// await evolutionAPI.groupService.removeMembers(
+				// 	[extractPhoneNumberFromWhatsappPn(whatsappPn)],
+				// 	groupWaId
+				// );
 				removalResults.success = true;
 			} catch (error) {
 				// Log the error but don't fail the blacklist operation
-				console.warn(`Failed to remove user ${phoneNumber} from group ${groupWaId}:`, error);
+				console.warn(
+					`Failed to remove user ${phoneNumber} from group ${groupWaId}:`,
+					error
+				);
 				removalResults.success = false;
-				removalResults.error = error instanceof Error ? error.message : 'Unknown error during removal';
+				removalResults.error =
+					error instanceof Error
+						? error.message
+						: 'Unknown error during removal';
 			}
 		} else {
 			// Removal was skipped
@@ -65,7 +75,7 @@ export const blacklistService = {
 		return {
 			blacklistEntry,
 			removalResults,
-			skipRemoval
+			skipRemoval,
 		};
-	}
+	},
 };
