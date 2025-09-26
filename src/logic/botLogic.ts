@@ -1,5 +1,9 @@
 import { EVOLUTION_EVENTS, GroupAction } from '@constants/evolutionConstants';
-import { messageService, groupService, blacklistService } from '@logic/services';
+import {
+	messageService,
+	groupService,
+	blacklistService,
+} from '@logic/services';
 import {
 	userRepository,
 	groupMembershipRepository,

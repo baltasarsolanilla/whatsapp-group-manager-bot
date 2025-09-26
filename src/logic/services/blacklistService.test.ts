@@ -8,7 +8,7 @@ describe('BlacklistService', () => {
 	it('should validate expected method signature', () => {
 		// Verify the isBlacklisted method accepts the correct parameters
 		const methodString = blacklistService.isBlacklisted.toString();
-		
+
 		// Should accept whatsappId and groupWaId parameters
 		expect(methodString).toContain('whatsappId');
 		expect(methodString).toContain('groupWaId');

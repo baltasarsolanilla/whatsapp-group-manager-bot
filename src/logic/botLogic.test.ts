@@ -54,7 +54,7 @@ describe('BotLogic - Blacklist Enforcement', () => {
 
 		// Verify key function imports are available
 		expect(typeof handleGroupParticipantsUpdate).toBe('function');
-		
+
 		console.log('✅ Blacklist enforcement workflow structure validated');
 	});
 });

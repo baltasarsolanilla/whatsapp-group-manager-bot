@@ -34,10 +34,7 @@ export const blacklistService = {
 
 			// Check if there's a blacklist entry for this user in this group
 			const blacklistEntries = await blacklistRepository.list(group.id);
-			return blacklistEntries.some(
-				(entry: { user?: { whatsappId?: string } }) => 
-					entry.user?.whatsappId === whatsappId
-			);
+			return blacklistEntries.some(({ userId }) => user.id === userId);
 		} catch (error) {
 			console.warn(`Error checking blacklist status for ${whatsappId}:`, error);
 			return false; // Default to not blacklisted on error
