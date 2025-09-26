@@ -24,6 +24,30 @@ export type RemoveMembersRequest = {
 	participants: string[];
 };
 
+// -------------------------------
+// Blacklist API
+// -------------------------------
+export type AddToBlacklistRequest = {
+	phoneNumber: string;
+	groupId: string;
+	reason?: string;
+	skipRemoval?: boolean;
+};
+
+export type RemovalResult = {
+	success: boolean;
+	error?: string;
+	groupWaId: string;
+};
+
+export type AddToBlacklistResponse = {
+	message: string;
+	blacklistEntry?: unknown;
+	removalResults?: RemovalResult;
+	skipRemoval?: boolean;
+	reason?: string | null;
+};
+
 export type messageStatus = 'PENDING' | 'SENT' | 'FAILED';
 
 export type SendTextResponse = {
