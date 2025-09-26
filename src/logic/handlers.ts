@@ -1,5 +1,8 @@
 import { EVOLUTION_EVENTS } from '@constants/evolutionConstants';
-import { handleMessageUpsert, handleGroupParticipantsUpdate } from '@logic/botLogic';
+import {
+	handleMessageUpsert,
+	handleGroupParticipantsUpdate,
+} from '@logic/botLogic';
 import type { WebhookEvent } from 'types/evolution';
 
 type HandlerMap = {

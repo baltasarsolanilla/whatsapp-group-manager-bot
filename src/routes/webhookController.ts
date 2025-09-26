@@ -43,13 +43,16 @@ export const webhookController = catchAsync(
 				await (handler as any)(update);
 				console.log(`✅ Successfully processed webhook event: ${update.event}`);
 			} catch (handlerError) {
-				console.error(`❌ Error processing webhook event ${update.event}:`, handlerError);
+				console.error(
+					`❌ Error processing webhook event ${update.event}:`,
+					handlerError
+				);
 				// Don't return error to webhook sender, log for debugging
 			}
 		} else {
 			console.warn('⚠️  Unknown event received:', update.event);
 		}
-		
+
 		resSuccess(res, { received: true });
 	}
 );

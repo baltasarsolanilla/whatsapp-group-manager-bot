@@ -1,6 +1,9 @@
 import { EVOLUTION_EVENTS, GroupAction } from '@constants/evolutionConstants';
 import { messageService, groupService } from '@logic/services';
-import { userRepository, groupMembershipRepository } from '@database/repositories';
+import {
+	userRepository,
+	groupMembershipRepository,
+} from '@database/repositories';
 import { AppError } from '@utils/AppError';
 import type { WebhookEvent } from 'types/evolution';
 import { isGroupMessage } from './helpers';
@@ -20,17 +23,20 @@ export const handleGroupParticipantsUpdate = async (
 	update: WebhookEvent<typeof EVOLUTION_EVENTS.GROUP_PARTICIPANTS_UPDATE>
 ) => {
 	const { data } = update;
-	
+
 	console.log('🚀 ~ handleGroupParticipantsUpdate ~ update:', update);
 
 	// Validate required fields
-	if (!data || !data.id || !data.action || !data.participants) {
+	if (!data?.id || !data.action || !data.participants) {
 		throw AppError.required('Invalid webhook data: missing required fields');
 	}
 
 	// Only process "add" and "remove" actions
 	if (data.action !== GroupAction.ADD && data.action !== GroupAction.REMOVE) {
-		throw new AppError(`Unsupported group participants action: ${data.action}`, 400);
+		throw new AppError(
+			`Unsupported group participants action: ${data.action}`,
+			400
+		);
 	}
 
 	// Skip if no participants to process
@@ -45,7 +51,9 @@ export const handleGroupParticipantsUpdate = async (
 			throw AppError.notFound(`Group not found: ${data.id}`);
 		}
 
-		console.log(`📊 Processing ${data.participants.length} participant(s) for ${data.action} operation`);
+		console.log(
+			`📊 Processing ${data.participants.length} participant(s) for ${data.action} operation`
+		);
 
 		// Process each participant
 		for (const participantId of data.participants) {
@@ -77,18 +85,25 @@ export const handleGroupParticipantsUpdate = async (
 							groupId: group.id,
 						});
 
-						console.log(`✅ Removed user ${participantId} from group ${data.id}`);
+						console.log(
+							`✅ Removed user ${participantId} from group ${data.id}`
+						);
 					} else {
 						console.warn(`⚠️  User not found for removal: ${participantId}`);
 					}
 				}
 			} catch (participantError) {
-				console.error(`❌ Error processing participant ${participantId}:`, participantError);
+				console.error(
+					`❌ Error processing participant ${participantId}:`,
+					participantError
+				);
 				// Continue processing other participants
 			}
 		}
 
-		console.log(`🎉 Completed processing group participants update for group ${data.id}`);
+		console.log(
+			`🎉 Completed processing group participants update for group ${data.id}`
+		);
 	} catch (error) {
 		console.error('❌ Error handling group participants update:', error);
 	}
