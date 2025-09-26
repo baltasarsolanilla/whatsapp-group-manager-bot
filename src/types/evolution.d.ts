@@ -59,6 +59,13 @@ export type MessageUpsert = {
 	messageTimestamp: number;
 };
 
+export type GroupParticipantsUpdate = {
+	id: string; // Group WhatsApp ID (e.g., "120363403645737238@g.us")
+	author: string; // Author who performed the action (e.g., "212059715313729@lid")
+	participants: string[]; // Array of participant WhatsApp IDs (e.g., ["69918158549171@lid"])
+	action: GroupActionType; // "add" or "remove"
+};
+
 export type EvolutionEvent =
 	(typeof EVOLUTION_EVENTS)[keyof typeof EVOLUTION_EVENTS];
 
@@ -68,6 +75,7 @@ export type EvolutionData = {
 
 export type WebhookEventMap = {
 	[EVOLUTION_EVENTS.MESSAGES_UPSERT]: MessageUpsert;
+	[EVOLUTION_EVENTS.GROUP_PARTICIPANTS_UPDATE]: GroupParticipantsUpdate;
 	// add more events here
 };
 

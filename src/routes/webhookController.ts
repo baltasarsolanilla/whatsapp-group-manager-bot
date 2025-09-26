@@ -8,7 +8,7 @@ import type { WebhookEvent } from 'types/evolution';
 
 // webhook entrypoint (Evolution API events)
 export const webhookController = catchAsync(
-	async <T extends keyof typeof handlers>(
+	async (
 		// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 		req: Request<{}, {}, WebhookEvent>,
 		res: Response
@@ -16,10 +16,11 @@ export const webhookController = catchAsync(
 		const update = req.body;
 		webhookEventService.storeEvent(update);
 
-		const handler = handlers[update.event as T];
+		const handler = handlers[update.event];
 
 		if (handler) {
-			handler(update as WebhookEvent<T>);
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			(handler as any)(update);
 		} else {
 			console.warn('Unknown event received', update);
 		}
