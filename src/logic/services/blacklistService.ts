@@ -1,5 +1,6 @@
 import {
 	blacklistRepository,
+	groupMembershipRepository,
 	groupRepository,
 	userRepository,
 } from '@database/repositories';
@@ -79,6 +80,24 @@ export const blacklistService = {
 				// 	groupWaId
 				// );
 				removalResults.success = true;
+
+				// Clean up group membership record after successful removal
+				try {
+					await groupMembershipRepository.removeByUserAndGroup({
+						userId: user.id,
+						groupId: group.id,
+					});
+					console.log(
+						`Cleaned up membership record for user ${user.id} in group ${group.id}`
+					);
+				} catch (membershipError) {
+					// Log the warning but don't fail the overall operation
+					// The user was still successfully removed from WhatsApp
+					console.warn(
+						`Failed to clean up membership record for user ${phoneNumber} in group ${groupWaId}:`,
+						membershipError
+					);
+				}
 			} catch (error) {
 				// Log the error but don't fail the blacklist operation
 				console.warn(
@@ -92,7 +111,7 @@ export const blacklistService = {
 						: 'Unknown error during removal';
 			}
 		} else {
-			// Removal was skipped
+			// Removal was skipped - don't clean up membership record
 			removalResults.success = true; // Consider skipped as successful
 		}
 

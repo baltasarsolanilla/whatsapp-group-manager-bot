@@ -1,15 +1,16 @@
 import { EVOLUTION_EVENTS, GroupAction } from '@constants/evolutionConstants';
 import {
-	messageService,
-	groupService,
-	blacklistService,
-} from '@logic/services';
-import {
-	userRepository,
 	groupMembershipRepository,
+	userRepository,
 } from '@database/repositories';
-import { AppError } from '@utils/AppError';
+import {
+	blacklistService,
+	groupService,
+	messageService,
+} from '@logic/services';
+import { Group } from '@prisma/client';
 import { evolutionAPI } from '@services/evolutionAPI';
+import { AppError } from '@utils/AppError';
 import type { WebhookEvent } from 'types/evolution';
 import { isGroupMessage } from './helpers';
 
@@ -28,7 +29,6 @@ export const handleGroupParticipantsUpdate = async (
 	update: WebhookEvent<typeof EVOLUTION_EVENTS.GROUP_PARTICIPANTS_UPDATE>
 ) => {
 	const { data } = update;
-
 	console.log('🚀 ~ handleGroupParticipantsUpdate ~ update:', update);
 
 	// Validate required fields
@@ -44,13 +44,11 @@ export const handleGroupParticipantsUpdate = async (
 		);
 	}
 
-	// Skip if no participants to process
 	if (!Array.isArray(data.participants) || data.participants.length === 0) {
 		throw AppError.required('No participants to process');
 	}
 
 	try {
-		// Ensure group exists or fetch from Evolution API
 		const group = await groupService.ensure(data.id);
 		if (!group) {
 			throw AppError.notFound(`Group not found: ${data.id}`);
@@ -60,7 +58,6 @@ export const handleGroupParticipantsUpdate = async (
 			`📊 Processing ${data.participants.length} participant(s) for ${data.action} operation`
 		);
 
-		// Process each participant
 		for (const participantId of data.participants) {
 			if (!participantId || typeof participantId !== 'string') {
 				console.warn(`⚠️  Invalid participant ID: ${participantId}`);
@@ -69,75 +66,15 @@ export const handleGroupParticipantsUpdate = async (
 
 			try {
 				if (data.action === GroupAction.ADD) {
-					// Check if user is blacklisted before processing
-					const isBlacklisted = await blacklistService.isBlacklisted(
-						participantId,
-						data.id
-					);
-
-					if (isBlacklisted) {
-						console.log(
-							`🚫 User ${participantId} is blacklisted for group ${data.id}. Removing user...`
-						);
-
-						try {
-							// Remove user from WhatsApp group using Evolution API
-							await evolutionAPI.groupService.removeMembers(
-								[participantId],
-								data.id
-							);
-							console.log(
-								`✅ Successfully removed blacklisted user ${participantId} from group ${data.id}`
-							);
-						} catch (removalError) {
-							console.error(
-								`❌ Failed to remove blacklisted user ${participantId} from group ${data.id}:`,
-								removalError
-							);
-							// Continue processing other participants even if removal fails
-						}
-
-						// DO NOT add to membership tracking for blacklisted users
-						console.log(
-							`⏭️  Skipping membership tracking for blacklisted user ${participantId}`
-						);
-					} else {
-						// User is not blacklisted, proceed with normal flow
-						// Ensure user exists and add to group membership
-						const user = await userRepository.upsert({
-							whatsappId: participantId,
-							whatsappPn: participantId, // Using participantId as both id and phone number
-						});
-
-						await groupMembershipRepository.upsert({
-							user,
-							group,
-						});
-
-						console.log(`✅ Added user ${participantId} to group ${data.id}`);
-					}
+					await handleAddParticipant(participantId, data.id, group);
 				} else if (data.action === GroupAction.REMOVE) {
-					// Find user by whatsappId
-					const user = await userRepository.getByWaId(participantId);
-					if (user) {
-						await groupMembershipRepository.removeByUserAndGroup({
-							userId: user.id,
-							groupId: group.id,
-						});
-
-						console.log(
-							`✅ Removed user ${participantId} from group ${data.id}`
-						);
-					} else {
-						console.warn(`⚠️  User not found for removal: ${participantId}`);
-					}
+					await handleRemoveParticipant(participantId, data.id, group);
 				}
 			} catch (participantError) {
 				console.error(
 					`❌ Error processing participant ${participantId}:`,
 					participantError
 				);
-				// Continue processing other participants
 			}
 		}
 
@@ -148,3 +85,66 @@ export const handleGroupParticipantsUpdate = async (
 		console.error('❌ Error handling group participants update:', error);
 	}
 };
+
+async function handleAddParticipant(
+	participantId: string,
+	groupId: string,
+	group: Group
+) {
+	const isBlacklisted = await blacklistService.isBlacklisted(
+		participantId,
+		groupId
+	);
+
+	if (isBlacklisted) {
+		console.log(
+			`🚫 User ${participantId} is blacklisted for group ${groupId}. Removing user...`
+		);
+
+		try {
+			await evolutionAPI.groupService.removeMembers([participantId], groupId);
+			console.log(
+				`✅ Successfully removed blacklisted user ${participantId} from group ${groupId}`
+			);
+		} catch (removalError) {
+			console.error(
+				`❌ Failed to remove blacklisted user ${participantId} from group ${groupId}:`,
+				removalError
+			);
+		}
+
+		console.log(
+			`⏭️  Skipping membership tracking for blacklisted user ${participantId}`
+		);
+		return;
+	}
+
+	const user = await userRepository.upsert({
+		whatsappId: participantId,
+		whatsappPn: participantId,
+	});
+
+	await groupMembershipRepository.upsert({
+		user,
+		group,
+	});
+
+	console.log(`✅ Added user ${participantId} to group ${groupId}`);
+}
+
+async function handleRemoveParticipant(
+	participantId: string,
+	groupId: string,
+	group: Group
+) {
+	const user = await userRepository.getByWaId(participantId);
+	if (user) {
+		await groupMembershipRepository.removeByUserAndGroup({
+			userId: user.id,
+			groupId: group.id,
+		});
+		console.log(`✅ Removed user ${participantId} from group ${groupId}`);
+	} else {
+		console.warn(`⚠️  User not found for removal: ${participantId}`);
+	}
+}
