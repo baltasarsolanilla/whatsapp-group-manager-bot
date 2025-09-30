@@ -8,6 +8,7 @@ import { extractPhoneNumberFromWhatsappPn, sleep } from '@logic/helpers';
 import { Group, RemovalOutcome, User } from '@prisma/client';
 import { AppError } from '@utils/AppError';
 import { removalQueueService } from './removalQueueService';
+import { FeatureFlag, FeatureFlagService } from '../../featureFlags';
 
 type RemovalQueueRow = {
 	id: string;
@@ -24,6 +25,14 @@ type RunWorkflowConfigType = {
 
 export const removalWorkflowService = {
 	async runWorkflow(config: RunWorkflowConfigType) {
+		// Check QUEUE_REMOVAL feature flag before running workflow
+		if (!FeatureFlagService.isEnabled(FeatureFlag.QUEUE_REMOVAL)) {
+			console.log(
+				'🔒 QUEUE_REMOVAL feature flag is disabled. Skipping removal workflow.'
+			);
+			return [];
+		}
+
 		const { batchSize, delayMs, groupWaId, dryRun } = config;
 
 		// Sync Phase
@@ -61,6 +70,14 @@ export const removalWorkflowService = {
 		delayMs: number;
 		dryRun: boolean;
 	}) {
+		// Check QUEUE_REMOVAL feature flag before running removal batches
+		if (!FeatureFlagService.isEnabled(FeatureFlag.QUEUE_REMOVAL)) {
+			console.log(
+				'🔒 QUEUE_REMOVAL feature flag is disabled. Skipping removal batches.'
+			);
+			return [];
+		}
+
 		const groupId = groupWaId
 			? (await groupRepository.getByWaId(groupWaId))?.id
 			: undefined;
