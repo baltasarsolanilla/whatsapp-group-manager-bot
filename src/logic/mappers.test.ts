@@ -58,7 +58,9 @@ describe('mappers.ts', () => {
 				};
 
 				expect(() => msgUserMapper.id(payload)).toThrow(AppError);
-				expect(() => msgUserMapper.id(payload)).toThrow('Invalid WhatsApp participant');
+				expect(() => msgUserMapper.id(payload)).toThrow(
+					'Invalid WhatsApp participant'
+				);
 			});
 
 			it('should prefer participant over participantLid when both are valid', () => {
@@ -243,7 +245,10 @@ describe('mappers.ts', () => {
 			});
 
 			it('should handle different message types', () => {
-				const imagePayload = { ...basePayload, messageType: 'imageMessage' as const };
+				const imagePayload = {
+					...basePayload,
+					messageType: 'imageMessage' as const,
+				};
 				expect(messageMapper.type(imagePayload)).toBe('imageMessage');
 			});
 		});
@@ -270,13 +275,17 @@ describe('mappers.ts', () => {
 
 		describe('event', () => {
 			it('should extract event type', () => {
-				expect(webhookEventMapper.event(baseWebhookEvent)).toBe('group-participants.update');
+				expect(webhookEventMapper.event(baseWebhookEvent)).toBe(
+					'group-participants.update'
+				);
 			});
 		});
 
 		describe('instance', () => {
 			it('should extract instance', () => {
-				expect(webhookEventMapper.instance(baseWebhookEvent)).toBe('my-instance');
+				expect(webhookEventMapper.instance(baseWebhookEvent)).toBe(
+					'my-instance'
+				);
 			});
 		});
 
@@ -294,7 +303,9 @@ describe('mappers.ts', () => {
 
 		describe('date', () => {
 			it('should extract date_time', () => {
-				expect(webhookEventMapper.date(baseWebhookEvent)).toBe('2025-09-20T21:08:17.846Z');
+				expect(webhookEventMapper.date(baseWebhookEvent)).toBe(
+					'2025-09-20T21:08:17.846Z'
+				);
 			});
 		});
 	});
@@ -364,7 +375,9 @@ describe('mappers.ts', () => {
 						admin: null,
 					},
 				];
-				expect(groupMapper.participants(baseGroupData)).toEqual(expectedParticipants);
+				expect(groupMapper.participants(baseGroupData)).toEqual(
+					expectedParticipants
+				);
 			});
 
 			it('should handle empty participants array', () => {

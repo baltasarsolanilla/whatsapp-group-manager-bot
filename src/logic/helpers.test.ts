@@ -8,9 +8,7 @@ import {
 	extractPhoneNumberFromWhatsappPn,
 	sleep,
 } from './helpers';
-import {
-	WHATSAPP_USER_PN_SUFFIX,
-} from '@constants/messagesConstants';
+import { WHATSAPP_USER_PN_SUFFIX } from '@constants/messagesConstants';
 import type { MessageUpsert } from 'types/evolution';
 
 describe('helpers.ts', () => {
@@ -158,12 +156,16 @@ describe('helpers.ts', () => {
 
 	describe('formatWhatsappId', () => {
 		it('should format phone number with leading + correctly', () => {
-			expect(formatWhatsappId('+61476554841')).toBe('61476554841@s.whatsapp.net');
+			expect(formatWhatsappId('+61476554841')).toBe(
+				'61476554841@s.whatsapp.net'
+			);
 			expect(formatWhatsappId('+1234567890')).toBe('1234567890@s.whatsapp.net');
 		});
 
 		it('should format phone number without leading + correctly', () => {
-			expect(formatWhatsappId('61476554841')).toBe('61476554841@s.whatsapp.net');
+			expect(formatWhatsappId('61476554841')).toBe(
+				'61476554841@s.whatsapp.net'
+			);
 			expect(formatWhatsappId('1234567890')).toBe('1234567890@s.whatsapp.net');
 		});
 
@@ -178,14 +180,18 @@ describe('helpers.ts', () => {
 
 	describe('extractPhoneNumberFromWhatsappPn', () => {
 		it('should extract phone number correctly', () => {
-			expect(extractPhoneNumberFromWhatsappPn('61476554841@s.whatsapp.net')).toBe('+61476554841');
-			expect(extractPhoneNumberFromWhatsappPn('1234567890@s.whatsapp.net')).toBe('+1234567890');
+			expect(
+				extractPhoneNumberFromWhatsappPn('61476554841@s.whatsapp.net')
+			).toBe('+61476554841');
+			expect(
+				extractPhoneNumberFromWhatsappPn('1234567890@s.whatsapp.net')
+			).toBe('+1234567890');
 		});
 
 		it('should handle edge cases', () => {
 			// Empty number part
 			expect(extractPhoneNumberFromWhatsappPn('@s.whatsapp.net')).toBe('+');
-			
+
 			// Just the suffix
 			const suffixLength = WHATSAPP_USER_PN_SUFFIX.length;
 			const testInput = 'test'.repeat(suffixLength / 4) + '@s.whatsapp.net';
@@ -198,9 +204,9 @@ describe('helpers.ts', () => {
 		it('should resolve after specified milliseconds', async () => {
 			const start = Date.now();
 			const delay = 50; // 50ms for fast test
-			
+
 			await sleep(delay);
-			
+
 			const elapsed = Date.now() - start;
 			// Allow some tolerance for timing (±10ms)
 			expect(elapsed).toBeGreaterThanOrEqual(delay - 10);
