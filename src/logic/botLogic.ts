@@ -13,6 +13,7 @@ import { evolutionAPI } from '@services/evolutionAPI';
 import { AppError } from '@utils/AppError';
 import type { WebhookEvent } from 'types/evolution';
 import { isGroupMessage } from './helpers';
+import { FeatureFlag, FeatureFlagService } from '../featureFlags';
 
 export const handleMessageUpsert = async (
 	update: WebhookEvent<typeof EVOLUTION_EVENTS.MESSAGES_UPSERT>
@@ -101,15 +102,22 @@ async function handleAddParticipant(
 			`🚫 User ${participantId} is blacklisted for group ${groupId}. Removing user...`
 		);
 
-		try {
-			await evolutionAPI.groupService.removeMembers([participantId], groupId);
+		// Check BLACKLIST_AUTO_REMOVAL feature flag before removing
+		if (FeatureFlagService.isEnabled(FeatureFlag.BLACKLIST_AUTO_REMOVAL)) {
+			try {
+				await evolutionAPI.groupService.removeMembers([participantId], groupId);
+				console.log(
+					`✅ Successfully removed blacklisted user ${participantId} from group ${groupId}`
+				);
+			} catch (removalError) {
+				console.error(
+					`❌ Failed to remove blacklisted user ${participantId} from group ${groupId}:`,
+					removalError
+				);
+			}
+		} else {
 			console.log(
-				`✅ Successfully removed blacklisted user ${participantId} from group ${groupId}`
-			);
-		} catch (removalError) {
-			console.error(
-				`❌ Failed to remove blacklisted user ${participantId} from group ${groupId}:`,
-				removalError
+				`🔒 BLACKLIST_AUTO_REMOVAL feature flag is disabled. Skipping removal of user ${participantId}`
 			);
 		}
 

@@ -7,6 +7,7 @@ import {
 import { formatWhatsappId } from '@logic/helpers';
 import { AppError } from '@utils/AppError';
 import { createMemberListService } from './baseMemberListService';
+import { FeatureFlag, FeatureFlagService } from '../../featureFlags';
 
 // Enhanced blacklist service with auto-removal functionality
 const baseBlacklistService = createMemberListService(
@@ -73,42 +74,50 @@ export const blacklistService = {
 
 		// If skipRemoval is false, attempt removal from WhatsApp group
 		if (!skipRemoval) {
-			try {
-				console.log('Skipping actual removal in demo code');
-				// await evolutionAPI.groupService.removeMembers(
-				// 	[extractPhoneNumberFromWhatsappPn(whatsappPn)],
-				// 	groupWaId
-				// );
-				removalResults.success = true;
-
-				// Clean up group membership record after successful removal
+			// Check BLACKLIST_ENFORCEMENT feature flag before proceeding with removal
+			if (FeatureFlagService.isEnabled(FeatureFlag.BLACKLIST_ENFORCEMENT)) {
 				try {
-					await groupMembershipRepository.removeByUserAndGroup({
-						userId: user.id,
-						groupId: group.id,
-					});
-					console.log(
-						`Cleaned up membership record for user ${user.id} in group ${group.id}`
-					);
-				} catch (membershipError) {
-					// Log the warning but don't fail the overall operation
-					// The user was still successfully removed from WhatsApp
+					console.log('Skipping actual removal in demo code');
+					// await evolutionAPI.groupService.removeMembers(
+					// 	[extractPhoneNumberFromWhatsappPn(whatsappPn)],
+					// 	groupWaId
+					// );
+					removalResults.success = true;
+
+					// Clean up group membership record after successful removal
+					try {
+						await groupMembershipRepository.removeByUserAndGroup({
+							userId: user.id,
+							groupId: group.id,
+						});
+						console.log(
+							`Cleaned up membership record for user ${user.id} in group ${group.id}`
+						);
+					} catch (membershipError) {
+						// Log the warning but don't fail the overall operation
+						// The user was still successfully removed from WhatsApp
+						console.warn(
+							`Failed to clean up membership record for user ${phoneNumber} in group ${groupWaId}:`,
+							membershipError
+						);
+					}
+				} catch (error) {
+					// Log the error but don't fail the blacklist operation
 					console.warn(
-						`Failed to clean up membership record for user ${phoneNumber} in group ${groupWaId}:`,
-						membershipError
+						`Failed to remove user ${phoneNumber} from group ${groupWaId}:`,
+						error
 					);
+					removalResults.success = false;
+					removalResults.error =
+						error instanceof Error
+							? error.message
+							: 'Unknown error during removal';
 				}
-			} catch (error) {
-				// Log the error but don't fail the blacklist operation
-				console.warn(
-					`Failed to remove user ${phoneNumber} from group ${groupWaId}:`,
-					error
+			} else {
+				console.log(
+					`🔒 BLACKLIST_ENFORCEMENT feature flag is disabled. Skipping removal of user ${phoneNumber} from group ${groupWaId}`
 				);
-				removalResults.success = false;
-				removalResults.error =
-					error instanceof Error
-						? error.message
-						: 'Unknown error during removal';
+				removalResults.success = true; // Consider skipped as successful
 			}
 		} else {
 			// Removal was skipped - don't clean up membership record
