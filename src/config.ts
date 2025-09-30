@@ -12,4 +12,9 @@ export default {
 	waVickyNum: process.env.WA_VICKY_NUM,
 	waVickyId: process.env.WA_VICKY_ID,
 	waGroupTest: process.env.WA_GROUP_TEST,
+
+	// Feature flags
+	FEATURE_BLACKLIST_AUTO_REMOVAL: process.env.FEATURE_AUTO_REMOVAL,
+	FEATURE_BLACKLIST_ENFORCEMENT: process.env.FEATURE_BLACKLIST_ENFORCEMENT,
+	FEATURE_QUEUE_REMOVAL: process.env.FEATURE_QUEUE_REMOVAL,
 };
