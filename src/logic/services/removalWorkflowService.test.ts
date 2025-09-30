@@ -18,7 +18,9 @@ jest.mock('@database/repositories');
 jest.mock('@logic/helpers');
 jest.mock('./removalQueueService');
 
-const mockFeatureFlagService = FeatureFlagService as jest.Mocked<typeof FeatureFlagService>;
+const mockFeatureFlagService = FeatureFlagService as jest.Mocked<
+	typeof FeatureFlagService
+>;
 
 describe('RemovalWorkflowService - Feature Flag Integration', () => {
 	beforeEach(() => {
@@ -36,7 +38,9 @@ describe('RemovalWorkflowService - Feature Flag Integration', () => {
 				dryRun: true,
 			});
 
-			expect(mockFeatureFlagService.isEnabled).toHaveBeenCalledWith(FeatureFlag.QUEUE_REMOVAL);
+			expect(mockFeatureFlagService.isEnabled).toHaveBeenCalledWith(
+				FeatureFlag.QUEUE_REMOVAL
+			);
 			expect(result).toEqual([]);
 		});
 
@@ -44,9 +48,15 @@ describe('RemovalWorkflowService - Feature Flag Integration', () => {
 			mockFeatureFlagService.isEnabled.mockReturnValue(true);
 
 			// Mock the dependencies to prevent actual execution
-			const mockSyncRemovalQueue = jest.spyOn(removalWorkflowService, 'syncRemovalQueue');
-			const mockRunRemovalInBatches = jest.spyOn(removalWorkflowService, 'runRemovalInBatches');
-			
+			const mockSyncRemovalQueue = jest.spyOn(
+				removalWorkflowService,
+				'syncRemovalQueue'
+			);
+			const mockRunRemovalInBatches = jest.spyOn(
+				removalWorkflowService,
+				'runRemovalInBatches'
+			);
+
 			mockSyncRemovalQueue.mockResolvedValue([]);
 			mockRunRemovalInBatches.mockResolvedValue([]);
 
@@ -57,7 +67,9 @@ describe('RemovalWorkflowService - Feature Flag Integration', () => {
 				dryRun: true,
 			});
 
-			expect(mockFeatureFlagService.isEnabled).toHaveBeenCalledWith(FeatureFlag.QUEUE_REMOVAL);
+			expect(mockFeatureFlagService.isEnabled).toHaveBeenCalledWith(
+				FeatureFlag.QUEUE_REMOVAL
+			);
 			expect(mockSyncRemovalQueue).toHaveBeenCalledWith('test-group');
 			expect(mockRunRemovalInBatches).toHaveBeenCalledWith({
 				groupWaId: 'test-group',
@@ -79,7 +91,9 @@ describe('RemovalWorkflowService - Feature Flag Integration', () => {
 				dryRun: true,
 			});
 
-			expect(mockFeatureFlagService.isEnabled).toHaveBeenCalledWith(FeatureFlag.QUEUE_REMOVAL);
+			expect(mockFeatureFlagService.isEnabled).toHaveBeenCalledWith(
+				FeatureFlag.QUEUE_REMOVAL
+			);
 			expect(result).toEqual([]);
 		});
 	});
