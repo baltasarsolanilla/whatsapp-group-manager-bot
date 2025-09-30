@@ -1,5 +1,5 @@
-import { removalWorkflowService } from './removalWorkflowService';
 import { FeatureFlag, FeatureFlagService } from '../../featureFlags';
+import { removalWorkflowService } from './removalWorkflowService';
 
 // Mock the FeatureFlagService
 jest.mock('../../featureFlags', () => ({
@@ -25,6 +25,10 @@ const mockFeatureFlagService = FeatureFlagService as jest.Mocked<
 describe('RemovalWorkflowService - Feature Flag Integration', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
+	});
+
+	afterEach(() => {
+		jest.restoreAllMocks();
 	});
 
 	describe('runWorkflow', () => {
