@@ -5,15 +5,14 @@ import {
 	removalQueueRepository,
 } from '@database/repositories';
 import { extractPhoneNumberFromWhatsappPn, sleep } from '@logic/helpers';
-import { RemovalOutcome } from '@prisma/client';
+import { Group, RemovalOutcome, User } from '@prisma/client';
 import { AppError } from '@utils/AppError';
 import { removalQueueService } from './removalQueueService';
 
 type RemovalQueueRow = {
-	id: string; // removalQueue table row id
-	userId: string;
-	groupId: string;
-	// other info if needed
+	id: string;
+	user: User;
+	group: Group;
 };
 
 type RunWorkflowConfigType = {
@@ -73,20 +72,15 @@ export const removalWorkflowService = {
 		const removedPhoneNumbers: string[] = [];
 
 		while (true) {
-			const batch: RemovalQueueRow[] =
+			const queueItems: RemovalQueueRow[] =
 				await removalQueueRepository.getNextBatch({
 					groupId,
 					take: batchSize,
 				});
 
-			if (batch.length === 0) {
+			if (queueItems.length === 0) {
 				break;
 			}
-
-			const queueItems = await removalQueueRepository.getNextBatch({
-				groupId,
-				take: batchSize,
-			});
 
 			let outcome: RemovalOutcome = RemovalOutcome.FAILURE;
 			let reason: string;
@@ -94,10 +88,10 @@ export const removalWorkflowService = {
 
 			try {
 				queuePhoneNumbers = queueItems
-					.filter(Boolean)
 					.map((item) =>
 						extractPhoneNumberFromWhatsappPn(item.user.whatsappPn as string)
-					);
+					)
+					.filter(Boolean); // Remove any undefined values
 
 				if (dryRun) {
 					console.log(

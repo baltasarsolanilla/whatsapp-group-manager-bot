@@ -7,7 +7,7 @@ export enum FeatureFlag {
 }
 
 export const FeatureFlagService = {
-	async isEnabled(flag: FeatureFlag): Promise<boolean> {
+	isEnabled(flag: FeatureFlag): boolean {
 		// 1. Check environment override (highest priority)
 		const envFlag = config[`FEATURE_${flag}`];
 		if (envFlag !== undefined) {
