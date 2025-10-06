@@ -1,6 +1,7 @@
 import { groupRepository, userRepository } from '@database/repositories';
-import { formatWhatsappId } from '@logic/helpers';
+import { formatWhatsappId, isUserWhatsappId } from '@logic/helpers';
 import { AppError } from '@utils/AppError';
+import type { User } from '@prisma/client';
 
 // Generic interface for member list repository operations
 interface IMemberListRepository {
@@ -11,9 +12,47 @@ interface IMemberListRepository {
 
 // Generic interface for member list service operations
 interface IMemberListService {
-	add(phoneNumber: string, groupWaId: string): Promise<unknown>;
-	remove(phoneNumber: string, groupWaId: string): Promise<unknown>;
+	add(params: {
+		phoneNumber?: string;
+		whatsappId?: string;
+		groupWaId: string;
+	}): Promise<unknown>;
+	remove(params: {
+		phoneNumber?: string;
+		whatsappId?: string;
+		groupWaId: string;
+	}): Promise<unknown>;
 	list(groupWaId?: string): Promise<unknown[]>;
+}
+
+// Helper function to resolve user from either phoneNumber or whatsappId
+async function resolveUser(
+	phoneNumber?: string,
+	whatsappId?: string
+): Promise<User | null> {
+	if (phoneNumber && whatsappId) {
+		throw AppError.badRequest(
+			'Provide either phoneNumber or whatsappId, not both'
+		);
+	}
+
+	if (!phoneNumber && !whatsappId) {
+		throw AppError.required('Either phoneNumber or whatsappId is required');
+	}
+
+	if (whatsappId) {
+		// Validate that whatsappId has the correct format
+		if (!isUserWhatsappId(whatsappId)) {
+			throw AppError.badRequest(
+				'Invalid whatsappId format. Expected format: xxxxx@lid'
+			);
+		}
+		return await userRepository.getByWaId(whatsappId);
+	}
+
+	// phoneNumber path
+	const whatsappPn = formatWhatsappId(phoneNumber!);
+	return await userRepository.getByPn(whatsappPn);
 }
 
 // Generic service factory
@@ -22,9 +61,8 @@ export function createMemberListService(
 	entityName: string
 ): IMemberListService {
 	return {
-		async add(phoneNumber: string, groupWaId: string) {
-			const whatsappPn = formatWhatsappId(phoneNumber);
-			const user = await userRepository.getByPn(whatsappPn);
+		async add({ phoneNumber, whatsappId, groupWaId }) {
+			const user = await resolveUser(phoneNumber, whatsappId);
 			const group = await groupRepository.getByWaId(groupWaId);
 
 			if (!group || !user) {
@@ -37,9 +75,8 @@ export function createMemberListService(
 			return await repository.upsert(user.id, group.id);
 		},
 
-		async remove(phoneNumber: string, groupWaId: string) {
-			const whatsappPn = formatWhatsappId(phoneNumber);
-			const user = await userRepository.getByPn(whatsappPn);
+		async remove({ phoneNumber, whatsappId, groupWaId }) {
+			const user = await resolveUser(phoneNumber, whatsappId);
 			const group = await groupRepository.getByWaId(groupWaId);
 
 			if (!group || !user) {

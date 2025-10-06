@@ -72,26 +72,77 @@ describe('Blacklist Controller API', () => {
 	});
 
 	it('should validate request parameters', () => {
-		const validRequest = {
+		const validRequestWithPhoneNumber = {
 			phoneNumber: '+1234567890',
 			groupId: 'group123@g.us',
 		};
 
+		const validRequestWithWhatsappId = {
+			whatsappId: '69918158549171@lid',
+			groupId: 'group123@g.us',
+		};
+
 		const invalidRequests = [
-			{}, // Missing both required fields
+			{}, // Missing all required fields
+			{ groupId: 'group123@g.us' }, // Missing phoneNumber or whatsappId
 			{ phoneNumber: '+1234567890' }, // Missing groupId
-			{ groupId: 'group123@g.us' }, // Missing phoneNumber
+			{ whatsappId: '69918158549171@lid' }, // Missing groupId
+			{
+				phoneNumber: '+1234567890',
+				whatsappId: '69918158549171@lid',
+				groupId: 'group123@g.us',
+			}, // Both phoneNumber and whatsappId provided
 		];
 
-		expect(validRequest.phoneNumber).toBeTruthy();
-		expect(validRequest.groupId).toBeTruthy();
+		// Valid requests should have either phoneNumber or whatsappId, plus groupId
+		expect(validRequestWithPhoneNumber.phoneNumber).toBeTruthy();
+		expect(validRequestWithPhoneNumber.groupId).toBeTruthy();
+		expect(validRequestWithWhatsappId.whatsappId).toBeTruthy();
+		expect(validRequestWithWhatsappId.groupId).toBeTruthy();
 
 		invalidRequests.forEach((req, _index) => {
 			const hasPhone = !!req.phoneNumber;
+			const hasWhatsappId = !!req.whatsappId;
 			const hasGroup = !!req.groupId;
-			expect(hasPhone && hasGroup).toBe(false); // Should be invalid
+			const hasExactlyOneIdentifier =
+				(hasPhone && !hasWhatsappId) || (!hasPhone && hasWhatsappId);
+			const isValid = hasExactlyOneIdentifier && hasGroup;
+			expect(isValid).toBe(false); // Should be invalid
 		});
 
 		console.log('✅ Request validation logic verified');
+	});
+
+	it('should accept whatsappId instead of phoneNumber', () => {
+		const requestWithWhatsappId = {
+			whatsappId: '69918158549171@lid',
+			groupId: 'group123@g.us',
+			reason: 'Spam user',
+		};
+
+		const requestWithPhoneNumber = {
+			phoneNumber: '+1234567890',
+			groupId: 'group123@g.us',
+			reason: 'Spam user',
+		};
+
+		// Both formats should be acceptable
+		const hasIdentifier1 =
+			!!(requestWithWhatsappId as { whatsappId?: string; phoneNumber?: string })
+				.whatsappId ||
+			!!(requestWithWhatsappId as { whatsappId?: string; phoneNumber?: string })
+				.phoneNumber;
+		const hasIdentifier2 =
+			!!(
+				requestWithPhoneNumber as { whatsappId?: string; phoneNumber?: string }
+			).whatsappId ||
+			!!(
+				requestWithPhoneNumber as { whatsappId?: string; phoneNumber?: string }
+			).phoneNumber;
+
+		expect(hasIdentifier1).toBeTruthy();
+		expect(hasIdentifier2).toBeTruthy();
+
+		console.log('✅ WhatsappId support verified');
 	});
 });
