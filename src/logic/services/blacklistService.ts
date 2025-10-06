@@ -4,9 +4,8 @@ import {
 	groupRepository,
 	userRepository,
 } from '@database/repositories';
-import { formatWhatsappId } from '@logic/helpers';
 import { AppError } from '@utils/AppError';
-import { createMemberListService } from './baseMemberListService';
+import { createMemberListService, resolveUser } from './baseMemberListService';
 import { FeatureFlag, FeatureFlagService } from '../../featureFlags';
 
 // Enhanced blacklist service with auto-removal functionality
@@ -44,12 +43,12 @@ export const blacklistService = {
 	},
 
 	async addToBlacklistWithRemoval(
-		phoneNumber: string,
+		phoneNumber: string | undefined,
+		whatsappId: string | undefined,
 		groupWaId: string,
 		skipRemoval: boolean = false
 	) {
-		const whatsappPn = formatWhatsappId(phoneNumber);
-		const user = await userRepository.getByPn(whatsappPn);
+		const user = await resolveUser(phoneNumber, whatsappId);
 		const group = await groupRepository.getByWaId(groupWaId);
 
 		if (!group || !user) {
@@ -96,15 +95,17 @@ export const blacklistService = {
 					} catch (membershipError) {
 						// Log the warning but don't fail the overall operation
 						// The user was still successfully removed from WhatsApp
+						const identifier = phoneNumber ?? whatsappId;
 						console.warn(
-							`Failed to clean up membership record for user ${phoneNumber} in group ${groupWaId}:`,
+							`Failed to clean up membership record for user ${identifier} in group ${groupWaId}:`,
 							membershipError
 						);
 					}
 				} catch (error) {
 					// Log the error but don't fail the blacklist operation
+					const identifier = phoneNumber ?? whatsappId;
 					console.warn(
-						`Failed to remove user ${phoneNumber} from group ${groupWaId}:`,
+						`Failed to remove user ${identifier} from group ${groupWaId}:`,
 						error
 					);
 					removalResults.success = false;
@@ -114,8 +115,9 @@ export const blacklistService = {
 							: 'Unknown error during removal';
 				}
 			} else {
+				const identifier = phoneNumber ?? whatsappId;
 				console.log(
-					`🔒 BLACKLIST_ENFORCEMENT feature flag is disabled. Skipping removal of user ${phoneNumber} from group ${groupWaId}`
+					`🔒 BLACKLIST_ENFORCEMENT feature flag is disabled. Skipping removal of user ${identifier} from group ${groupWaId}`
 				);
 				removalResults.success = true; // Consider skipped as successful
 			}

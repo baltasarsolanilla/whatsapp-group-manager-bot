@@ -22,6 +22,10 @@ export class AppError extends Error {
 		return new AppError(message, 400);
 	}
 
+	static badRequest(message: string) {
+		return new AppError(message, 400);
+	}
+
 	static notFound(message: string) {
 		return new AppError(message, 404);
 	}
