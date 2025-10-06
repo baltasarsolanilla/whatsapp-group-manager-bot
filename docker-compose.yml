@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   # ----------------------
   # WhatsApp Bot
@@ -9,7 +7,7 @@ services:
     container_name: whatsapp_bot
     ports:
       - "${PORT}:${PORT}"
-      - "5555:5555"  # Port for prisma studio
+      - "127.0.0.1:5555:5555" # Prisma Studio     
     env_file:
       - .env
     restart: unless-stopped
@@ -37,7 +35,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USERNAME}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"             
     volumes:
       - bot_postgres_data:/var/lib/postgresql/data
     networks:
@@ -54,7 +52,7 @@ services:
       - evolution-redis
       - evolution-postgres
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     volumes:
       - evolution_instances:/evolution/instances
     env_file:
@@ -101,7 +99,7 @@ services:
       - -c
       - listen_addresses=*
     ports:
-      - "5434:5432"
+      - "127.0.0.1:5434:5432"
     volumes:
       - evolution_postgres_data:/var/lib/postgresql/data
     networks:
