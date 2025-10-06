@@ -4,41 +4,9 @@ import {
 	groupRepository,
 	userRepository,
 } from '@database/repositories';
-import { formatWhatsappId, isUserWhatsappId } from '@logic/helpers';
 import { AppError } from '@utils/AppError';
-import { createMemberListService } from './baseMemberListService';
+import { createMemberListService, resolveUser } from './baseMemberListService';
 import { FeatureFlag, FeatureFlagService } from '../../featureFlags';
-import type { User } from '@prisma/client';
-
-// Helper function to resolve user from either phoneNumber or whatsappId
-async function resolveUserForBlacklist(
-	phoneNumber?: string,
-	whatsappId?: string
-): Promise<User | null> {
-	if (phoneNumber && whatsappId) {
-		throw AppError.badRequest(
-			'Provide either phoneNumber or whatsappId, not both'
-		);
-	}
-
-	if (!phoneNumber && !whatsappId) {
-		throw AppError.required('Either phoneNumber or whatsappId is required');
-	}
-
-	if (whatsappId) {
-		// Validate that whatsappId has the correct format
-		if (!isUserWhatsappId(whatsappId)) {
-			throw AppError.badRequest(
-				'Invalid whatsappId format. Expected format: xxxxx@lid'
-			);
-		}
-		return await userRepository.getByWaId(whatsappId);
-	}
-
-	// phoneNumber path
-	const whatsappPn = formatWhatsappId(phoneNumber!);
-	return await userRepository.getByPn(whatsappPn);
-}
 
 // Enhanced blacklist service with auto-removal functionality
 const baseBlacklistService = createMemberListService(
@@ -80,7 +48,7 @@ export const blacklistService = {
 		groupWaId: string,
 		skipRemoval: boolean = false
 	) {
-		const user = await resolveUserForBlacklist(phoneNumber, whatsappId);
+		const user = await resolveUser(phoneNumber, whatsappId);
 		const group = await groupRepository.getByWaId(groupWaId);
 
 		if (!group || !user) {

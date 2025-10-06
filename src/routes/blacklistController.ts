@@ -18,7 +18,13 @@ export const blacklistController = {
 
 	// Override the add method to support auto-removal
 	add: catchAsync(async (req: Request, res: Response) => {
-		const { phoneNumber, whatsappId, groupId, reason, skipRemoval = false } = req.body;
+		const {
+			phoneNumber,
+			whatsappId,
+			groupId,
+			reason,
+			skipRemoval = false,
+		} = req.body;
 
 		// Validate that either phoneNumber or whatsappId is provided
 		if (!phoneNumber && !whatsappId) {
@@ -37,7 +43,11 @@ export const blacklistController = {
 
 		// Use the enhanced service method if skipRemoval is provided, otherwise use base method
 		if ('skipRemoval' in req.body) {
-			await blacklistService.add({ phoneNumber, whatsappId, groupWaId: groupId });
+			await blacklistService.add({
+				phoneNumber,
+				whatsappId,
+				groupWaId: groupId,
+			});
 			resSuccess(res, {
 				message: 'Added to blacklist',
 				reason: reason ?? null,

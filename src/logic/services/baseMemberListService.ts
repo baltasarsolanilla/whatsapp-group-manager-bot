@@ -26,7 +26,7 @@ interface IMemberListService {
 }
 
 // Helper function to resolve user from either phoneNumber or whatsappId
-async function resolveUser(
+export async function resolveUser(
 	phoneNumber?: string,
 	whatsappId?: string
 ): Promise<User | null> {
