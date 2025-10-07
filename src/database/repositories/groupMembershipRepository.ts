@@ -50,6 +50,24 @@ export const groupMembershipRepository = {
 		userId: string;
 		groupId: string;
 	}) {
+		// Check if membership exists before attempting to delete
+		const membership = await prisma.groupMembership.findUnique({
+			where: {
+				userId_groupId: {
+					userId,
+					groupId,
+				},
+			},
+		});
+
+		// If membership doesn't exist, return null instead of throwing error
+		if (!membership) {
+			console.log(
+				`ℹ️  Membership not found for user ${userId} in group ${groupId}, skipping deletion`
+			);
+			return null;
+		}
+
 		return prisma.groupMembership.delete({
 			where: {
 				userId_groupId: {
