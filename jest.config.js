@@ -1,6 +1,7 @@
 export const preset = 'ts-jest';
 export const testEnvironment = 'node';
 export const testMatch = ['**/?(*.)+(spec|test).[jt]s?(x)'];
+export const testPathIgnorePatterns = ['/node_modules/', '/dist/'];
 export const moduleFileExtensions = ['ts', 'js', 'json'];
 export const moduleNameMapper = {
 	'^@logic/(.*)$': '<rootDir>/src/logic/$1',
