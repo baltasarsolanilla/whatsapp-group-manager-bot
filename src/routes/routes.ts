@@ -1,6 +1,7 @@
 import { PATHS } from '@constants/routesConstants';
 import express from 'express';
 import {
+	adminMembershipController,
 	blacklistController,
 	groupController,
 	removalQueueController,
@@ -46,5 +47,15 @@ router.post(
 // ======================== ADMIN GROUPS ========================
 router.post(`/${PATHS.ADMIN.GROUPS.INGEST}`, groupController.ingest);
 router.patch(`/${PATHS.ADMIN.GROUPS.UPDATE}`, groupController.update);
+
+// ======================== ADMIN MEMBERS ========================
+router.patch(
+	`/${PATHS.ADMIN.MEMBERS.UPDATE_ROLE}`,
+	adminMembershipController.updateRole
+);
+router.get(
+	`/${PATHS.ADMIN.MEMBERS.BASE}`,
+	adminMembershipController.getMembership
+);
 
 export default router;

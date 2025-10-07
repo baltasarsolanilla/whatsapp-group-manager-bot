@@ -20,5 +20,9 @@ export const PATHS = {
 			UPDATE: 'admin/groups/:id',
 			INGEST: 'admin/groups/ingest',
 		},
+		MEMBERS: {
+			BASE: 'admin/members',
+			UPDATE_ROLE: 'admin/members/role',
+		},
 	},
 };
