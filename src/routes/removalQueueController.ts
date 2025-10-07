@@ -59,4 +59,22 @@ export const removalQueueController = {
 
 		resSuccess(res, phsRemoved);
 	}),
+	addUsers: catchAsync(async (req: Request, res: Response) => {
+		const { groupId, participants } = req.body ?? {};
+
+		if (!groupId) {
+			throw AppError.required('groupId is required');
+		}
+
+		if (!participants || !Array.isArray(participants)) {
+			throw AppError.required('participants must be an array');
+		}
+
+		const addedEntries =
+			await removalQueueService.addInactiveMembersToRemovalQueue(
+				groupId,
+				participants
+			);
+		resSuccess(res, addedEntries);
+	}),
 };

@@ -27,6 +27,10 @@ router.delete(`/${PATHS.ADMIN.LISTS.BLACKLIST}`, blacklistController.remove);
 // ======================== ADMIN REMOVE QUEUE ========================
 router.get(`/${PATHS.ADMIN.REMOVAL_QUEUE.BASE}`, removalQueueController.list);
 router.post(
+	`/${PATHS.ADMIN.REMOVAL_QUEUE.BASE}`,
+	removalQueueController.addUsers
+);
+router.post(
 	`/${PATHS.ADMIN.REMOVAL_QUEUE.RUN}`,
 	removalQueueController.runQueue
 );
