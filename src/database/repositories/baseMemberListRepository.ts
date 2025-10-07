@@ -51,6 +51,8 @@ export function createMemberListRepository<T extends MemberListEntity>(
 							whatsappId: true,
 						},
 					},
+					userId: true,
+					groupId: true,
 				},
 			}) as Promise<T[]>;
 		},

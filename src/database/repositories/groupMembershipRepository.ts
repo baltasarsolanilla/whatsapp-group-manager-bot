@@ -50,7 +50,7 @@ export const groupMembershipRepository = {
 		userId: string;
 		groupId: string;
 	}) {
-		return await prisma.groupMembership.delete({
+		return prisma.groupMembership.delete({
 			where: {
 				userId_groupId: {
 					userId,

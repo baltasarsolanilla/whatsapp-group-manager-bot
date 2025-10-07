@@ -4,9 +4,10 @@ import {
 	groupRepository,
 	userRepository,
 } from '@database/repositories';
+import { evolutionAPI } from '@services/evolutionAPI';
 import { AppError } from '@utils/AppError';
-import { createMemberListService, resolveUser } from './baseMemberListService';
 import { FeatureFlag, FeatureFlagService } from '../../featureFlags';
+import { createMemberListService, resolveUser } from './baseMemberListService';
 
 // Enhanced blacklist service with auto-removal functionality
 const baseBlacklistService = createMemberListService(
@@ -51,6 +52,10 @@ export const blacklistService = {
 		const user = await resolveUser(phoneNumber, whatsappId);
 		const group = await groupRepository.getByWaId(groupWaId);
 
+		if (!user.whatsappId) {
+			throw AppError.badRequest('User does not have a WhatsApp ID');
+		}
+
 		if (!group) {
 			const warnMsg = `blacklistService.addToBlacklistWithRemoval() - Group not found`;
 			console.warn(warnMsg);
@@ -76,11 +81,10 @@ export const blacklistService = {
 			// Check BLACKLIST_ENFORCEMENT feature flag before proceeding with removal
 			if (FeatureFlagService.isEnabled(FeatureFlag.BLACKLIST_ENFORCEMENT)) {
 				try {
-					console.log('Skipping actual removal in demo code');
-					// await evolutionAPI.groupService.removeMembers(
-					// 	[extractPhoneNumberFromWhatsappPn(whatsappPn)],
-					// 	groupWaId
-					// );
+					await evolutionAPI.groupService.removeMembers(
+						[user.whatsappId],
+						groupWaId
+					);
 					removalResults.success = true;
 
 					// Clean up group membership record after successful removal
