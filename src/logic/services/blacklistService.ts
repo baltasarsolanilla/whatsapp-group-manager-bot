@@ -51,10 +51,10 @@ export const blacklistService = {
 		const user = await resolveUser(phoneNumber, whatsappId);
 		const group = await groupRepository.getByWaId(groupWaId);
 
-		if (!group || !user) {
-			const warnMsg = `blacklistService.addToBlacklistWithRemoval() - ${!group ? 'Group' : 'User'} not found`;
+		if (!group) {
+			const warnMsg = `blacklistService.addToBlacklistWithRemoval() - Group not found`;
 			console.warn(warnMsg);
-			throw AppError.notFound('Group or user not found');
+			throw AppError.notFound('Group not found');
 		}
 
 		// Start database transaction-like operation

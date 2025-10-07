@@ -37,4 +37,24 @@ export const userRepository = {
 	async getByPn(whatsappPn: string): Promise<User | null> {
 		return prisma.user.findUnique({ where: { whatsappPn } });
 	},
+
+	/** Create a new user with only whatsappId */
+	async createByWaId(whatsappId: string, name?: string): Promise<User> {
+		return prisma.user.create({
+			data: {
+				whatsappId,
+				...(name !== undefined ? { name } : {}),
+			},
+		});
+	},
+
+	/** Create a new user with only phoneNumber (whatsappPn) */
+	async createByPn(whatsappPn: string, name?: string): Promise<User> {
+		return prisma.user.create({
+			data: {
+				whatsappPn,
+				...(name !== undefined ? { name } : {}),
+			},
+		});
+	},
 };

@@ -26,10 +26,11 @@ interface IMemberListService {
 }
 
 // Helper function to resolve user from either phoneNumber or whatsappId
+// If user doesn't exist, it will be created
 export async function resolveUser(
 	phoneNumber?: string,
 	whatsappId?: string
-): Promise<User | null> {
+): Promise<User> {
 	if (phoneNumber && whatsappId) {
 		throw AppError.badRequest(
 			'Provide either phoneNumber or whatsappId, not both'
@@ -47,12 +48,24 @@ export async function resolveUser(
 				'Invalid whatsappId format. Expected format: xxxxx@lid'
 			);
 		}
-		return await userRepository.getByWaId(whatsappId);
+		
+		// Try to find existing user by whatsappId, create if not found
+		const user =
+			(await userRepository.getByWaId(whatsappId)) ??
+			(await userRepository.createByWaId(whatsappId));
+		
+		return user;
 	}
 
 	// phoneNumber path
 	const whatsappPn = formatWhatsappId(phoneNumber!);
-	return await userRepository.getByPn(whatsappPn);
+	
+	// Try to find existing user by phoneNumber, create if not found
+	const user =
+		(await userRepository.getByPn(whatsappPn)) ??
+		(await userRepository.createByPn(whatsappPn));
+	
+	return user;
 }
 
 // Generic service factory
@@ -65,11 +78,11 @@ export function createMemberListService(
 			const user = await resolveUser(phoneNumber, whatsappId);
 			const group = await groupRepository.getByWaId(groupWaId);
 
-			if (!group || !user) {
-				const warnMsg = `${entityName}Service.add() - ${!group ? 'Group' : 'User'} not found`;
+			if (!group) {
+				const warnMsg = `${entityName}Service.add() - Group not found`;
 				// eslint-disable-next-line no-console
 				console.warn(warnMsg);
-				throw AppError.notFound('Group or user not found');
+				throw AppError.notFound('Group not found');
 			}
 
 			return await repository.upsert(user.id, group.id);
@@ -79,11 +92,11 @@ export function createMemberListService(
 			const user = await resolveUser(phoneNumber, whatsappId);
 			const group = await groupRepository.getByWaId(groupWaId);
 
-			if (!group || !user) {
-				const warnMsg = `${entityName}Service.remove() - ${!group ? 'Group' : 'User'} not found`;
+			if (!group) {
+				const warnMsg = `${entityName}Service.remove() - Group not found`;
 				// eslint-disable-next-line no-console
 				console.warn(warnMsg);
-				throw AppError.notFound('Group or user not found');
+				throw AppError.notFound('Group not found');
 			}
 
 			return await repository.remove(user.id, group.id);
