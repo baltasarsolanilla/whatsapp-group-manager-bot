@@ -15,6 +15,7 @@ services:
       - ./src:/app/src
       - ./dist:/app/dist
       - /app/node_modules
+      - ./prisma:/app/prisma
     command: npm run dev
     depends_on:
       - bot-postgres
