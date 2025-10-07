@@ -48,23 +48,23 @@ export async function resolveUser(
 				'Invalid whatsappId format. Expected format: xxxxx@lid'
 			);
 		}
-		
+
 		// Try to find existing user by whatsappId, create if not found
 		const user =
 			(await userRepository.getByWaId(whatsappId)) ??
 			(await userRepository.createByWaId(whatsappId));
-		
+
 		return user;
 	}
 
 	// phoneNumber path
 	const whatsappPn = formatWhatsappId(phoneNumber!);
-	
+
 	// Try to find existing user by phoneNumber, create if not found
 	const user =
 		(await userRepository.getByPn(whatsappPn)) ??
 		(await userRepository.createByPn(whatsappPn));
-	
+
 	return user;
 }
 
