@@ -84,6 +84,7 @@ export type MessageUpsert = {
 		participant: string;
 		participantPn?: string;
 		participantLid?: string;
+		participantAlt?: string;
 	};
 	pushName: string;
 	messageType: MessageType;

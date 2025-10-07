@@ -1,5 +1,6 @@
 import prisma from '@database/prisma';
 import type { User } from '@prisma/client';
+import { isUserWhatsappPn } from '@logic/helpers';
 
 /** Create a new user if it doesn't exist, update name & phone number if required */
 type UpsertUserType = {
@@ -14,18 +15,24 @@ export const userRepository = {
 		whatsappPn,
 		name,
 	}: UpsertUserType): Promise<User> {
+		// Validate whatsappPn format if provided
+		const validWhatsappPn =
+			whatsappPn && isUserWhatsappPn(whatsappPn) ? whatsappPn : undefined;
+
 		return prisma.user.upsert({
 			where: {
 				whatsappId,
 			},
 			update: {
 				...(name ? { name } : {}),
-				...(whatsappPn ? { whatsappPn } : {}), // whatsappPn might be null here
+				...(validWhatsappPn ? { whatsappPn: validWhatsappPn } : {}),
 			},
 			create: {
 				whatsappId,
 				...(name !== undefined ? { name } : {}),
-				...(whatsappPn !== undefined ? { whatsappPn } : {}),
+				...(validWhatsappPn !== undefined
+					? { whatsappPn: validWhatsappPn }
+					: {}),
 			},
 		});
 	},

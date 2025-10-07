@@ -115,6 +115,22 @@ describe('mappers.ts', () => {
 				expect(msgUserMapper.pn(payload)).toBe('1234567890@s.whatsapp.net');
 			});
 
+			it('should extract WhatsApp phone number from participantAlt field', () => {
+				const payload: MessageUpsert = {
+					key: {
+						remoteJid: '120363403645737238@g.us',
+						fromMe: false,
+						id: 'test-id',
+						participant: '27702639739079@lid',
+						participantAlt: '61487122491@s.whatsapp.net',
+					},
+					pushName: 'Vicky',
+					messageType: 'reactionMessage',
+					messageTimestamp: Date.now(),
+				};
+
+				expect(msgUserMapper.pn(payload)).toBe('61487122491@s.whatsapp.net');
+			});
 			it('should return null when no valid WhatsApp phone number found', () => {
 				const payload: MessageUpsert = {
 					key: {

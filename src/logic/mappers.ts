@@ -6,15 +6,17 @@ import { isUserWhatsappId, isUserWhatsappPn } from './helpers';
 // MSG USER
 // ============================================================================
 
-// WhatsappPn might be in "participant" or "participantPn"
+// WhatsappPn might be in "participant", "participantPn", or "participantAlt"
 const getUserWaPn = ({
 	participant,
 	participantPn,
+	participantAlt,
 }: {
 	participant?: string;
 	participantPn?: string;
+	participantAlt?: string;
 }) => {
-	for (const value of [participant, participantPn]) {
+	for (const value of [participant, participantPn, participantAlt]) {
 		if (value && isUserWhatsappPn(value)) {
 			return value;
 		}
