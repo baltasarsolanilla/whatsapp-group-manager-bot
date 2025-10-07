@@ -5,7 +5,8 @@ describe('GroupMembershipRepository', () => {
 		it('should have a guard check for non-existent memberships', () => {
 			// This test verifies that the removeByUserAndGroup method
 			// has a guard check to handle cases where the membership doesn't exist
-			const methodString = groupMembershipRepository.removeByUserAndGroup.toString();
+			const methodString =
+				groupMembershipRepository.removeByUserAndGroup.toString();
 
 			// The method should check if membership exists before deleting
 			expect(methodString).toContain('findUnique');
