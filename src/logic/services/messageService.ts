@@ -9,6 +9,7 @@ import { messageMapper, msgGroupMapper, msgUserMapper } from './../mappers';
 import { groupService } from './groupService';
 import { blacklistService } from './blacklistService';
 import { evolutionAPI } from '@services/evolutionAPI';
+import { FeatureFlag, FeatureFlagService } from '../../featureFlags';
 
 export const messageService = {
 	async ensureGroupMessageUpsert(payload: MessageUpsert) {
@@ -52,18 +53,25 @@ export const messageService = {
 				`🚫 User ${msgUserMapper.id(payload)} is blacklisted. Deleting message ${messageMapper.id(payload)}...`
 			);
 
-			try {
-				await evolutionAPI.messageService.deleteMessageForEveryone(
-					messageMapper.id(payload),
-					msgGroupMapper.id(payload)
-				);
+			// Check BLACKLIST_AUTO_REMOVAL feature flag before deleting message
+			if (FeatureFlagService.isEnabled(FeatureFlag.BLACKLIST_AUTO_REMOVAL)) {
+				try {
+					await evolutionAPI.messageService.deleteMessageForEveryone(
+						messageMapper.id(payload),
+						msgGroupMapper.id(payload)
+					);
+					console.log(
+						`✅ Successfully deleted message ${messageMapper.id(payload)} from blacklisted user`
+					);
+				} catch (error) {
+					console.error(
+						`❌ Failed to delete message ${messageMapper.id(payload)} from blacklisted user:`,
+						error
+					);
+				}
+			} else {
 				console.log(
-					`✅ Successfully deleted message ${messageMapper.id(payload)} from blacklisted user`
-				);
-			} catch (error) {
-				console.error(
-					`❌ Failed to delete message ${messageMapper.id(payload)} from blacklisted user:`,
-					error
+					`🔒 BLACKLIST_AUTO_REMOVAL feature flag is disabled. Skipping message deletion for user ${msgUserMapper.id(payload)}`
 				);
 			}
 		}
