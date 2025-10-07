@@ -1,6 +1,6 @@
 import { handleAxiosError } from '@utils/errorHandler';
 import axios from 'axios';
-import type { SendTextRequest } from 'types/evolution';
+import type { DeleteMessageRequest, SendTextRequest } from 'types/evolution';
 import { API_CONFIG_TYPE } from './evolutionAPI';
 
 export const createMessageService = ({
@@ -21,6 +21,28 @@ export const createMessageService = ({
 						apikey: API_KEY,
 					},
 				});
+			} catch (err: unknown) {
+				handleAxiosError(err);
+			}
+		},
+		deleteMessageForEveryone: async (messageId: string, groupId: string) => {
+			const payload: DeleteMessageRequest = {
+				id: messageId,
+				remoteJid: groupId,
+				fromMe: true,
+				participant: '',
+			};
+
+			try {
+				await axios.delete(
+					`${BASE_URL}/chat/deleteMessageForEveryone/${INSTANCE}`,
+					{
+						headers: {
+							apikey: API_KEY,
+						},
+						data: payload,
+					}
+				);
 			} catch (err: unknown) {
 				handleAxiosError(err);
 			}
