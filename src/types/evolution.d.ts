@@ -89,6 +89,18 @@ export type MessageUpsert = {
 	pushName: string;
 	messageType: MessageType;
 	messageTimestamp: number;
+	message?: {
+		reactionMessage?: {
+			key: {
+				id: string;
+				fromMe: boolean;
+				remoteJid: string;
+				participant: string;
+			};
+			text: string;
+			senderTimestampMs: number;
+		};
+	};
 };
 
 export type GroupParticipantsUpdate = {

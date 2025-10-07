@@ -1,4 +1,5 @@
 import { EVOLUTION_EVENTS, GroupAction } from '@constants/evolutionConstants';
+import { BLACKLIST_EMOJI } from '@constants/messagesConstants';
 import {
 	groupMembershipRepository,
 	userRepository,
@@ -11,8 +12,8 @@ import {
 import { Group } from '@prisma/client';
 import { evolutionAPI } from '@services/evolutionAPI';
 import { AppError } from '@utils/AppError';
-import type { WebhookEvent } from 'types/evolution';
-import { isGroupMessage } from './helpers';
+import type { WebhookEvent, MessageUpsert } from 'types/evolution';
+import { isGroupMessage, isUserAdmin } from './helpers';
 import { FeatureFlag, FeatureFlagService } from '../featureFlags';
 
 export const handleMessageUpsert = async (
@@ -22,7 +23,16 @@ export const handleMessageUpsert = async (
 
 	if (isGroupMessage(data)) {
 		console.log('🚀 ~ handleMessageUpsert ~ update:', update);
-		await messageService.ensureGroupMessageUpsert(data);
+
+		// Check if this is a reaction message
+		if (
+			data.messageType === 'reactionMessage' &&
+			data.message?.reactionMessage
+		) {
+			await handleReactionMessage(data);
+		} else {
+			await messageService.ensureGroupMessageUpsert(data);
+		}
 	}
 };
 
@@ -86,6 +96,82 @@ export const handleGroupParticipantsUpdate = async (
 		console.error('❌ Error handling group participants update:', error);
 	}
 };
+
+/**
+ * Handle reaction messages, specifically for blacklisting users via 🚫 emoji
+ */
+async function handleReactionMessage(data: MessageUpsert) {
+	const reactionMessage = data.message?.reactionMessage;
+	if (!reactionMessage) {
+		return;
+	}
+
+	const { text, key: reactionKey } = reactionMessage;
+	const groupWaId = data.key.remoteJid;
+	const reactorWaId = data.key.participant; // Admin who reacted
+	const targetUserWaId = reactionKey.participant; // User to blacklist
+
+	console.log(
+		`📱 Reaction detected: ${text} by ${reactorWaId} on message from ${targetUserWaId} in group ${groupWaId}`
+	);
+
+	// Only process blacklist emoji
+	if (text !== BLACKLIST_EMOJI) {
+		console.log(
+			`⏭️  Ignoring reaction - not blacklist emoji. Received: ${text}`
+		);
+		return;
+	}
+
+	console.log(`🚫 Blacklist emoji detected from ${reactorWaId}`);
+
+	try {
+		// Fetch group data to verify admin status
+		const groupData = await evolutionAPI.groupService.fetchGroup(groupWaId);
+		if (!groupData) {
+			console.warn(
+				`⚠️  Could not fetch group data for ${groupWaId}, skipping blacklist action`
+			);
+			return;
+		}
+
+		// Verify reactor is an admin
+		if (!isUserAdmin(reactorWaId, groupData)) {
+			console.log(
+				`⚠️  User ${reactorWaId} is not an admin, ignoring blacklist reaction`
+			);
+			return;
+		}
+
+		console.log(
+			`✅ Admin verified: ${reactorWaId} is authorized to blacklist users`
+		);
+
+		// Ensure group exists in database
+		await groupService.ensure(groupWaId);
+
+		// Add target user to blacklist
+		console.log(
+			`🚫 Adding user ${targetUserWaId} to blacklist in group ${groupWaId}`
+		);
+
+		await blacklistService.addToBlacklistWithRemoval(
+			undefined, // phoneNumber not needed
+			targetUserWaId, // whatsappId
+			groupWaId,
+			false // skipRemoval - will remove user from group
+		);
+
+		console.log(
+			`✅ Successfully blacklisted user ${targetUserWaId} in group ${groupWaId}`
+		);
+	} catch (error) {
+		console.error(
+			`❌ Error processing blacklist reaction for user ${targetUserWaId}:`,
+			error
+		);
+	}
+}
 
 async function handleAddParticipant(
 	participantId: string,
