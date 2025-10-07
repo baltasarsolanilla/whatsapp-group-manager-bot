@@ -48,8 +48,8 @@ export const groupService = {
 			.map((p) => p.id);
 
 		// Get users that are admins
-		const userAdmins = users.filter((user) =>
-			adminWaIds.includes(user.whatsappId)
+		const userAdmins = users.filter(
+			(user) => user.whatsappId && adminWaIds.includes(user.whatsappId)
 		);
 
 		// Add all admin users to whitelist for this group
