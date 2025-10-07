@@ -4,7 +4,7 @@ import {
 	removalHistoryRepository,
 	removalQueueRepository,
 } from '@database/repositories';
-import { extractPhoneNumberFromWhatsappPn, sleep } from '@logic/helpers';
+import { sleep } from '@logic/helpers';
 import { Group, RemovalOutcome, User } from '@prisma/client';
 import { AppError } from '@utils/AppError';
 import { removalQueueService } from './removalQueueService';
@@ -39,14 +39,14 @@ export const removalWorkflowService = {
 		await this.syncRemovalQueue(groupWaId);
 
 		// Removal Phase
-		const phoneNumbersRemoved = await this.runRemovalInBatches({
+		const whatsappIdsRemoved = await this.runRemovalInBatches({
 			groupWaId,
 			batchSize,
 			delayMs,
 			dryRun,
 		});
 
-		return phoneNumbersRemoved;
+		return whatsappIdsRemoved;
 	},
 
 	/**
@@ -86,7 +86,7 @@ export const removalWorkflowService = {
 			throw AppError.notFound(`Group not found: ${groupWaId}`);
 		}
 
-		const removedPhoneNumbers: string[] = [];
+		const removedWhatsappIds: string[] = [];
 
 		while (true) {
 			const queueItems: RemovalQueueRow[] =
@@ -101,32 +101,30 @@ export const removalWorkflowService = {
 
 			let outcome: RemovalOutcome = RemovalOutcome.FAILURE;
 			let reason: string;
-			let queuePhoneNumbers: string[] = [];
+			let queueWhatsappIds: string[] = [];
 
 			try {
-				queuePhoneNumbers = queueItems
-					.map((item) =>
-						extractPhoneNumberFromWhatsappPn(item.user.whatsappPn as string)
-					)
+				queueWhatsappIds = queueItems
+					.map((item) => item.user.whatsappId as string)
 					.filter(Boolean); // Remove any undefined values
 
 				if (dryRun) {
 					console.log(
 						'Evolution API ~ DRY RUN ~ remove members from group',
-						queuePhoneNumbers
+						queueWhatsappIds
 					);
 				} else {
 					console.log(
 						'Evolution API ~ LEGIT RUN ~ remove members from group',
-						queuePhoneNumbers
+						queueWhatsappIds
 					);
 					// ! Keeping it comment out for security reasons
-					// await evolutionAPI.groupService.removeMembers(queuePhoneNumbers, groupWaId);
+					// await evolutionAPI.groupService.removeMembers(queueWhatsappIds, groupWaId);
 				}
 
 				outcome = RemovalOutcome.SUCCESS;
 				reason = 'Inactive user removal';
-				removedPhoneNumbers.push(...queuePhoneNumbers);
+				removedWhatsappIds.push(...queueWhatsappIds);
 			} catch {
 				outcome = RemovalOutcome.FAILURE;
 				reason = 'Unknown error';
@@ -158,6 +156,6 @@ export const removalWorkflowService = {
 			await sleep(delayMs);
 		}
 
-		return removedPhoneNumbers;
+		return removedWhatsappIds;
 	},
 };
