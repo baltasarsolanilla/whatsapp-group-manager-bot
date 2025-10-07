@@ -24,6 +24,13 @@ export type RemoveMembersRequest = {
 	participants: string[];
 };
 
+export type DeleteMessageRequest = {
+	id: string;
+	remoteJid: string;
+	fromMe: boolean;
+	participant: string;
+};
+
 // -------------------------------
 // Blacklist API
 // -------------------------------
