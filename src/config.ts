@@ -12,6 +12,7 @@ export default {
 	waVickyNum: process.env.WA_VICKY_NUM,
 	waVickyId: process.env.WA_VICKY_ID,
 	waGroupTest: process.env.WA_GROUP_TEST,
+	botWhatsappId: process.env.BOT_WA_ID,
 
 	// Feature flags
 	FEATURE_BLACKLIST_AUTO_REMOVAL: process.env.FEATURE_BLACKLIST_AUTO_REMOVAL,
