@@ -119,18 +119,18 @@ async function handleReactionMessage(data: MessageUpsert) {
 
 	try {
 		// Verify bot user is also an admin
-		if (!config.waBaltiId) {
-			console.warn('⚠️  Bot WhatsApp ID (waBaltiId) not configured');
+		if (!config.botWhatsappId) {
+			console.warn('⚠️  Bot WhatsApp ID (botWhatsappId) not configured');
 			return;
 		}
 
 		const isBotAdmin = await groupMembershipService.isUserAdmin(
-			config.waBaltiId,
+			config.botWhatsappId,
 			groupWaId
 		);
 		if (!isBotAdmin) {
 			console.log(
-				`⚠️  Bot user ${config.waBaltiId} is not an admin in this group, skipping blacklist action`
+				`⚠️  Bot user ${config.botWhatsappId} is not an admin in this group, skipping blacklist action`
 			);
 			return;
 		}

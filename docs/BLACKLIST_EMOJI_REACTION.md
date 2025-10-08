@@ -20,11 +20,11 @@ This feature enables group administrators to instantly blacklist users by reacti
 ```
 Webhook Event → handleMessageUpsert() → handleReactionMessage()
                                               ↓
+                                   Verify bot is admin (database)
+                                              ↓
                                    Validate emoji is 🚫
                                               ↓
-                                   Fetch group data from Evolution API
-                                              ↓
-                                   Verify reactor is admin
+                                   Verify reactor is admin (database)
                                               ↓
                                    Extract target user from reactionMessage.key.participant
                                               ↓
@@ -104,31 +104,39 @@ message?: {
 export const BLACKLIST_EMOJI = '🚫';
 ```
 
-### 3. Helper Functions (`src/logic/helpers.ts`)
+### 3. Configuration (`src/config.ts`)
 
 ```typescript
-export const isUserAdmin = (
-	whatsappId: string,
-	groupData: GroupData
-): boolean => {
-	const participant = groupData.participants.find((p) => p.id === whatsappId);
-	if (!participant) return false;
-	return participant.admin === 'admin' || participant.admin === 'superadmin';
-};
+botWhatsappId: process.env.BOT_WA_ID;
 ```
 
-### 4. Main Handler (`src/logic/botLogic.ts`)
+The bot's WhatsApp ID is required to verify it has admin permissions before performing blacklist actions.
+
+### 4. Admin Verification (`src/logic/services/groupMembershipService.ts`)
+
+```typescript
+async isUserAdmin(
+  userWhatsappId: string,
+  groupWhatsappId: string
+): Promise<boolean> {
+  // Checks MembershipRole.ADMIN from database
+}
+```
+
+### 5. Main Handler (`src/logic/botLogic.ts`)
 
 The `handleReactionMessage()` function:
 
-1. Validates the emoji is 🚫
-2. Fetches group data from Evolution API
-3. Verifies the reactor is an admin
+1. Verifies bot user is admin (using database membership roles)
+2. Validates the emoji is 🚫
+3. Verifies the reactor is admin (using database membership roles)
 4. Blacklists the target user
 
 ## Security Features
 
-- ✅ **Admin-Only**: Only users with 'admin' or 'superadmin' role can trigger blacklist
+- ✅ **Bot Admin Check**: Bot must be admin in the group to perform blacklist actions
+- ✅ **Admin-Only**: Only users with ADMIN role can trigger blacklist
+- ✅ **Database-Based**: Admin verification uses database membership roles
 - ✅ **Group-Scoped**: Only works in group chats
 - ✅ **Emoji-Specific**: Only the 🚫 emoji triggers the action
 - ✅ **Idempotent**: Uses upsert to prevent duplicate entries
@@ -138,13 +146,12 @@ The `handleReactionMessage()` function:
 
 **File:** `src/logic/botLogic.reactionBlacklist.test.ts`
 
-- ✅ Admin verification with `isUserAdmin()`
 - ✅ Reaction message webhook structure validation
 - ✅ Workflow steps validation
 - ✅ Type system support
 - ✅ Constant verification
 
-All 104 tests pass (5 new tests added).
+All tests pass (132 total tests).
 
 ## Logging Examples
 
@@ -161,15 +168,16 @@ Success:
 Errors:
 
 ```
+⚠️  Bot WhatsApp ID (botWhatsappId) not configured
+⚠️  Bot user is not an admin in this group, skipping blacklist action
 ⚠️  User is not an admin, ignoring blacklist reaction
-⚠️  Could not fetch group data, skipping blacklist action
 ⏭️  Ignoring reaction - not blacklist emoji
 ❌ Error processing blacklist reaction: <error>
 ```
 
 ## Dependencies
 
-- Evolution API (group data & admin info)
+- Group Membership Service (admin verification via database)
 - Blacklist Service (blacklist management)
 - Group Service (database operations)
 - Webhook infrastructure

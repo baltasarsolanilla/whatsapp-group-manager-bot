@@ -3,7 +3,7 @@ import {
 	WHATSAPP_USER_ID_SUFFIX,
 	WHATSAPP_USER_PN_SUFFIX,
 } from '@constants/messagesConstants';
-import type { MessageUpsert, GroupData } from 'types/evolution';
+import type { MessageUpsert } from 'types/evolution';
 
 export const isGroupMessage = (payload: MessageUpsert) => {
 	return payload.key.remoteJid.endsWith(WHATSAPP_GROUP_ID_SUFFIX);
@@ -46,20 +46,3 @@ export const extractPhoneNumberFromWhatsappPn = (whatsappPn: string) => {
 
 export const sleep = (ms: number) =>
 	new Promise((resolve) => setTimeout(resolve, ms));
-
-/**
- * Check if a user is an admin in a group
- * @param whatsappId The user's WhatsApp ID to check (e.g., "69918158549171@lid")
- * @param groupData The group data containing participant information
- * @returns boolean true if user is admin or superadmin, false otherwise
- */
-export const isUserAdmin = (
-	whatsappId: string,
-	groupData: GroupData
-): boolean => {
-	const participant = groupData.participants.find((p) => p.id === whatsappId);
-	if (!participant) {
-		return false;
-	}
-	return participant.admin === 'admin' || participant.admin === 'superadmin';
-};
