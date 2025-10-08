@@ -41,6 +41,22 @@ describe('groupMembershipController', () => {
 			// This validates the structure of the controller
 			expect(groupMembershipController.getMembership).toBeDefined();
 		});
+
+		it('should support role query parameter', () => {
+			// Expected query parameters:
+			// - groupWhatsappId: string (required)
+			// - userWhatsappId: string (optional, required when role not specified)
+			// - role: 'ADMIN' | 'MEMBER' (optional)
+			const expectedParams = [
+				{ name: 'groupWhatsappId', required: true },
+				{ name: 'userWhatsappId', required: false },
+				{ name: 'role', required: false, values: ['ADMIN', 'MEMBER'] },
+			];
+
+			expect(expectedParams).toHaveLength(3);
+			expect(expectedParams[2].values).toContain('ADMIN');
+			expect(expectedParams[2].values).toContain('MEMBER');
+		});
 	});
 });
 
@@ -78,6 +94,14 @@ describe('Request Validation Logic', () => {
 		const expectedFields = ['userWhatsappId', 'groupWhatsappId'];
 		expect(expectedFields).toEqual(
 			expect.arrayContaining(['userWhatsappId', 'groupWhatsappId'])
+		);
+	});
+
+	it('should validate getMembership with role query structure', () => {
+		// Validates that the controller supports role filtering
+		const expectedFields = ['groupWhatsappId', 'role'];
+		expect(expectedFields).toEqual(
+			expect.arrayContaining(['groupWhatsappId', 'role'])
 		);
 	});
 

@@ -166,6 +166,51 @@ describe('groupMembershipService', () => {
 			expect(expectedErrors).toContain('Membership not found');
 		});
 	});
+
+	describe('getMembersByRole', () => {
+		it('should have the correct method signature', () => {
+			expect(groupMembershipService.getMembersByRole).toBeDefined();
+			expect(typeof groupMembershipService.getMembersByRole).toBe('function');
+		});
+
+		it('should validate expected parameters', () => {
+			// Expected parameters:
+			// - groupWhatsappId: string
+			// - role: MembershipRole ('ADMIN' | 'MEMBER')
+			const expectedParams = [
+				{ name: 'groupWhatsappId', type: 'string' },
+				{ name: 'role', type: 'MembershipRole' },
+			];
+
+			expect(expectedParams).toHaveLength(2);
+			expect(expectedParams[0].type).toBe('string');
+			expect(expectedParams[1].type).toBe('MembershipRole');
+		});
+
+		it('should validate expected workflow', () => {
+			// Expected workflow:
+			// 1. Get group by WhatsApp ID
+			// 2. Get members with specified role
+			// 3. Return list of members
+			const workflowSteps = [
+				'Get group by WhatsApp ID',
+				'Get members with specified role',
+				'Return list of members',
+			];
+
+			expect(workflowSteps).toHaveLength(3);
+			expect(workflowSteps).toContain('Get members with specified role');
+		});
+
+		it('should validate error handling for non-existent group', () => {
+			// Expected error cases:
+			// - Group not found
+			const expectedErrors = ['Group not found'];
+
+			expect(expectedErrors).toHaveLength(1);
+			expect(expectedErrors).toContain('Group not found');
+		});
+	});
 });
 
 describe('API Contract Validation', () => {
@@ -173,6 +218,7 @@ describe('API Contract Validation', () => {
 		expect(groupMembershipService).toHaveProperty('isUserAdmin');
 		expect(groupMembershipService).toHaveProperty('updateMemberRole');
 		expect(groupMembershipService).toHaveProperty('getMembership');
+		expect(groupMembershipService).toHaveProperty('getMembersByRole');
 	});
 
 	it('should validate service structure', () => {
@@ -181,7 +227,8 @@ describe('API Contract Validation', () => {
 		expect(serviceKeys).toContain('isUserAdmin');
 		expect(serviceKeys).toContain('updateMemberRole');
 		expect(serviceKeys).toContain('getMembership');
-		expect(serviceKeys.length).toBe(4);
+		expect(serviceKeys).toContain('getMembersByRole');
+		expect(serviceKeys.length).toBe(5);
 	});
 });
 

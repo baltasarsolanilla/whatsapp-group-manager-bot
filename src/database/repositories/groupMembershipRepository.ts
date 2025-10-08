@@ -48,6 +48,30 @@ export const groupMembershipRepository = {
 		});
 	},
 
+	async listByGroupIdAndRole(
+		groupId: string,
+		role: MembershipRole,
+		excludeWhitelist: boolean = false
+	) {
+		return prisma.groupMembership.findMany({
+			where: {
+				groupId,
+				role,
+				...(excludeWhitelist
+					? {
+							user: {
+								whitelistEntries: { none: { groupId } },
+							},
+						}
+					: {}),
+			},
+			include: {
+				user: true,
+				group: true,
+			},
+		});
+	},
+
 	async removeByUserAndGroup({
 		userId,
 		groupId,

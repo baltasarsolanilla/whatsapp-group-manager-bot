@@ -78,10 +78,11 @@ Retrieves membership details including the role.
 
 **Query Parameters:**
 
-- `userWhatsappId`: WhatsApp user ID (required)
+- `userWhatsappId`: WhatsApp user ID (optional when role is specified)
 - `groupWhatsappId`: WhatsApp group ID (required)
+- `role`: Filter by role - "ADMIN" or "MEMBER" (optional)
 
-**Example:**
+**Example 1: Get a specific user's membership**
 
 ```
 GET /admin/members?userWhatsappId=123456789@s.whatsapp.net&groupWhatsappId=987654321@g.us
@@ -109,6 +110,63 @@ GET /admin/members?userWhatsappId=123456789@s.whatsapp.net&groupWhatsappId=98765
 		"name": "Test Group"
 	}
 }
+```
+
+**Example 2: Get all admin members in a group**
+
+```
+GET /admin/members?groupWhatsappId=987654321@g.us&role=ADMIN
+```
+
+**Response:**
+
+```json
+[
+	{
+		"id": "...",
+		"userId": "...",
+		"groupId": "...",
+		"role": "ADMIN",
+		"joinDate": "...",
+		"lastActiveAt": "...",
+		"createdAt": "...",
+		"user": {
+			"id": "...",
+			"whatsappId": "123456789@s.whatsapp.net",
+			"name": "John Doe"
+		},
+		"group": {
+			"id": "...",
+			"whatsappId": "987654321@g.us",
+			"name": "Test Group"
+		}
+	},
+	{
+		"id": "...",
+		"userId": "...",
+		"groupId": "...",
+		"role": "ADMIN",
+		"joinDate": "...",
+		"lastActiveAt": "...",
+		"createdAt": "...",
+		"user": {
+			"id": "...",
+			"whatsappId": "987654321@s.whatsapp.net",
+			"name": "Jane Smith"
+		},
+		"group": {
+			"id": "...",
+			"whatsappId": "987654321@g.us",
+			"name": "Test Group"
+		}
+	}
+]
+```
+
+**Example 3: Get all regular members in a group**
+
+```
+GET /admin/members?groupWhatsappId=987654321@g.us&role=MEMBER
 ```
 
 ## Utility Functions
@@ -188,6 +246,15 @@ const membership = await groupMembershipService.getMembership({
 });
 ```
 
+#### getMembersByRole()
+
+```typescript
+const admins = await groupMembershipService.getMembersByRole({
+	groupWhatsappId: '987654321@g.us',
+	role: 'ADMIN',
+});
+```
+
 ## Repository Layer
 
 ### groupMembershipRepository
@@ -213,6 +280,15 @@ const membership = await groupMembershipRepository.getByUserAndGroup({
 	userId: 'internal-user-id',
 	groupId: 'internal-group-id',
 });
+```
+
+#### listByGroupIdAndRole()
+
+```typescript
+const admins = await groupMembershipRepository.listByGroupIdAndRole(
+	'internal-group-id',
+	'ADMIN'
+);
 ```
 
 ## Migration
@@ -271,7 +347,19 @@ curl -X PATCH http://localhost:3000/admin/members/role \
 curl -X GET "http://localhost:3000/admin/members?userWhatsappId=123456789@s.whatsapp.net&groupWhatsappId=987654321@g.us"
 ```
 
-### Example 4: Using isUserAdmin in Code
+### Example 4: Get All Admin Members
+
+```bash
+curl -X GET "http://localhost:3000/admin/members?groupWhatsappId=987654321@g.us&role=ADMIN"
+```
+
+### Example 5: Get All Regular Members
+
+```bash
+curl -X GET "http://localhost:3000/admin/members?groupWhatsappId=987654321@g.us&role=MEMBER"
+```
+
+### Example 6: Using isUserAdmin in Code
 
 ```typescript
 import { groupMembershipService } from '@logic/services/groupMembershipService';
