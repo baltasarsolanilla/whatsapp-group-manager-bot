@@ -1,5 +1,10 @@
 import prisma from '@database/prisma';
-import type { Group, GroupMembership, User } from '@prisma/client';
+import type {
+	Group,
+	GroupMembership,
+	MembershipRole,
+	User,
+} from '@prisma/client';
 
 export const groupMembershipRepository = {
 	async upsert({
@@ -74,6 +79,49 @@ export const groupMembershipRepository = {
 					userId,
 					groupId,
 				},
+			},
+		});
+	},
+
+	async updateRole({
+		userId,
+		groupId,
+		role,
+	}: {
+		userId: string;
+		groupId: string;
+		role: MembershipRole;
+	}): Promise<GroupMembership> {
+		return prisma.groupMembership.update({
+			where: {
+				userId_groupId: {
+					userId,
+					groupId,
+				},
+			},
+			data: {
+				role,
+			},
+		});
+	},
+
+	async getByUserAndGroup({
+		userId,
+		groupId,
+	}: {
+		userId: string;
+		groupId: string;
+	}): Promise<GroupMembership | null> {
+		return prisma.groupMembership.findUnique({
+			where: {
+				userId_groupId: {
+					userId,
+					groupId,
+				},
+			},
+			include: {
+				user: true,
+				group: true,
 			},
 		});
 	},

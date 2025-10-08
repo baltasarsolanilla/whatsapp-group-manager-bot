@@ -3,6 +3,7 @@ import express from 'express';
 import {
 	blacklistController,
 	groupController,
+	groupMembershipController,
 	removalQueueController,
 	webhookController,
 	whitelistController,
@@ -46,5 +47,15 @@ router.post(
 // ======================== ADMIN GROUPS ========================
 router.post(`/${PATHS.ADMIN.GROUPS.INGEST}`, groupController.ingest);
 router.patch(`/${PATHS.ADMIN.GROUPS.UPDATE}`, groupController.update);
+
+// ======================== ADMIN MEMBERS ========================
+router.patch(
+	`/${PATHS.ADMIN.MEMBERS.UPDATE_ROLE}`,
+	groupMembershipController.updateRole
+);
+router.get(
+	`/${PATHS.ADMIN.MEMBERS.BASE}`,
+	groupMembershipController.getMembership
+);
 
 export default router;
