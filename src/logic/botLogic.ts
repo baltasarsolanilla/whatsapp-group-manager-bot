@@ -9,12 +9,13 @@ import {
 	blacklistService,
 	groupService,
 	messageService,
+	groupMembershipService,
 } from '@logic/services';
 import { Group } from '@prisma/client';
 import { evolutionAPI } from '@services/evolutionAPI';
 import { AppError } from '@utils/AppError';
 import type { WebhookEvent, MessageUpsert } from 'types/evolution';
-import { isGroupMessage, isUserAdmin } from './helpers';
+import { isGroupMessage } from './helpers';
 import { FeatureFlag, FeatureFlagService } from '../featureFlags';
 
 export const handleMessageUpsert = async (
@@ -117,22 +118,17 @@ async function handleReactionMessage(data: MessageUpsert) {
 	);
 
 	try {
-		// Fetch group data to verify admin status
-		const groupData = await evolutionAPI.groupService.fetchGroup(groupWaId);
-		if (!groupData) {
-			console.warn(
-				`⚠️  Could not fetch group data for ${groupWaId}, skipping blacklist action`
-			);
-			return;
-		}
-
 		// Verify bot user is also an admin
 		if (!config.waBaltiId) {
 			console.warn('⚠️  Bot WhatsApp ID (waBaltiId) not configured');
 			return;
 		}
 
-		if (!isUserAdmin(config.waBaltiId, groupData)) {
+		const isBotAdmin = await groupMembershipService.isUserAdmin(
+			config.waBaltiId,
+			groupWaId
+		);
+		if (!isBotAdmin) {
 			console.log(
 				`⚠️  Bot user ${config.waBaltiId} is not an admin in this group, skipping blacklist action`
 			);
@@ -150,7 +146,11 @@ async function handleReactionMessage(data: MessageUpsert) {
 		console.log(`🚫 Blacklist emoji detected from ${reactorWaId}`);
 
 		// Verify reactor is an admin
-		if (!isUserAdmin(reactorWaId, groupData)) {
+		const isReactorAdmin = await groupMembershipService.isUserAdmin(
+			reactorWaId,
+			groupWaId
+		);
+		if (!isReactorAdmin) {
 			console.log(
 				`⚠️  User ${reactorWaId} is not an admin, ignoring blacklist reaction`
 			);
