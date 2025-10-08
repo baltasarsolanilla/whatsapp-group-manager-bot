@@ -1,9 +1,9 @@
 import { PATHS } from '@constants/routesConstants';
 import express from 'express';
 import {
-	adminMembershipController,
 	blacklistController,
 	groupController,
+	groupMembershipController,
 	removalQueueController,
 	webhookController,
 	whitelistController,
@@ -51,11 +51,11 @@ router.patch(`/${PATHS.ADMIN.GROUPS.UPDATE}`, groupController.update);
 // ======================== ADMIN MEMBERS ========================
 router.patch(
 	`/${PATHS.ADMIN.MEMBERS.UPDATE_ROLE}`,
-	adminMembershipController.updateRole
+	groupMembershipController.updateRole
 );
 router.get(
 	`/${PATHS.ADMIN.MEMBERS.BASE}`,
-	adminMembershipController.getMembership
+	groupMembershipController.getMembership
 );
 
 export default router;

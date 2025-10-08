@@ -115,14 +115,14 @@ GET /admin/members?userWhatsappId=123456789@s.whatsapp.net&groupWhatsappId=98765
 
 ### isUserAdmin()
 
-**Location:** `src/logic/adminHelpers.ts`
+**Location:** `src/logic/services/groupMembershipService.ts`
 
 Checks if a user is an admin in a specified group.
 
 **Function Signature:**
 
 ```typescript
-function isUserAdmin(
+groupMembershipService.isUserAdmin(
 	userWhatsappId: string,
 	groupWhatsappId: string
 ): Promise<boolean>;
@@ -131,9 +131,12 @@ function isUserAdmin(
 **Example Usage:**
 
 ```typescript
-import { isUserAdmin } from '@logic/adminHelpers';
+import { groupMembershipService } from '@logic/services/groupMembershipService';
 
-const isAdmin = await isUserAdmin('123456789@s.whatsapp.net', '987654321@g.us');
+const isAdmin = await groupMembershipService.isUserAdmin(
+	'123456789@s.whatsapp.net',
+	'987654321@g.us'
+);
 
 if (isAdmin) {
 	// Allow privileged action
@@ -149,18 +152,27 @@ if (isAdmin) {
 
 ## Service Layer
 
-### adminMembershipService
+### groupMembershipService
 
-**Location:** `src/logic/services/adminMembershipService.ts`
+**Location:** `src/logic/services/groupMembershipService.ts`
 
-Provides business logic for admin membership management.
+Provides business logic for group membership management.
 
 **Methods:**
+
+#### isUserAdmin()
+
+```typescript
+await groupMembershipService.isUserAdmin(
+	'123456789@s.whatsapp.net',
+	'987654321@g.us'
+);
+```
 
 #### updateMemberRole()
 
 ```typescript
-await adminMembershipService.updateMemberRole({
+await groupMembershipService.updateMemberRole({
 	userWhatsappId: '123456789@s.whatsapp.net',
 	groupWhatsappId: '987654321@g.us',
 	role: 'ADMIN',
@@ -170,7 +182,7 @@ await adminMembershipService.updateMemberRole({
 #### getMembership()
 
 ```typescript
-const membership = await adminMembershipService.getMembership({
+const membership = await groupMembershipService.getMembership({
 	userWhatsappId: '123456789@s.whatsapp.net',
 	groupWhatsappId: '987654321@g.us',
 });
@@ -222,9 +234,8 @@ This ensures all existing memberships are automatically assigned the MEMBER role
 
 Comprehensive tests are included for all components:
 
-- `src/logic/adminHelpers.test.ts` - Tests for the isUserAdmin utility function
-- `src/logic/services/adminMembershipService.test.ts` - Tests for the service layer
-- `src/routes/adminMembershipController.test.ts` - Tests for the controller layer
+- `src/logic/services/groupMembershipService.test.ts` - Tests for the service layer including isUserAdmin
+- `src/routes/groupMembershipController.test.ts` - Tests for the controller layer
 
 All tests follow the existing structural validation pattern used in the codebase.
 
@@ -263,10 +274,10 @@ curl -X GET "http://localhost:3000/admin/members?userWhatsappId=123456789@s.what
 ### Example 4: Using isUserAdmin in Code
 
 ```typescript
-import { isUserAdmin } from '@logic/adminHelpers';
+import { groupMembershipService } from '@logic/services/groupMembershipService';
 
 async function handlePrivilegedAction(userWaId: string, groupWaId: string) {
-	const isAdmin = await isUserAdmin(userWaId, groupWaId);
+	const isAdmin = await groupMembershipService.isUserAdmin(userWaId, groupWaId);
 
 	if (!isAdmin) {
 		throw new Error('Only admins can perform this action');

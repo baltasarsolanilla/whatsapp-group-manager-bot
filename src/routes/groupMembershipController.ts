@@ -1,10 +1,10 @@
-import { adminMembershipService } from '@logic/services/adminMembershipService';
+import { groupMembershipService } from '@logic/services/groupMembershipService';
 import { AppError } from '@utils/AppError';
 import { catchAsync } from '@utils/catchAsync';
 import { resSuccess } from '@utils/resSuccess';
 import { Request, Response } from 'express';
 
-export const adminMembershipController = {
+export const groupMembershipController = {
 	updateRole: catchAsync(async (req: Request, res: Response) => {
 		const { userWhatsappId, groupWhatsappId, role } = req.body;
 
@@ -26,7 +26,7 @@ export const adminMembershipController = {
 			throw AppError.badRequest('role must be either ADMIN or MEMBER');
 		}
 
-		const membership = await adminMembershipService.updateMemberRole({
+		const membership = await groupMembershipService.updateMemberRole({
 			userWhatsappId,
 			groupWhatsappId,
 			role,
@@ -51,7 +51,7 @@ export const adminMembershipController = {
 			throw AppError.required('groupWhatsappId is required');
 		}
 
-		const membership = await adminMembershipService.getMembership({
+		const membership = await groupMembershipService.getMembership({
 			userWhatsappId,
 			groupWhatsappId,
 		});

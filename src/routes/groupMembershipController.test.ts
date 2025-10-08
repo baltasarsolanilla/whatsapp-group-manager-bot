@@ -1,19 +1,19 @@
-import { adminMembershipController } from './adminMembershipController';
+import { groupMembershipController } from './groupMembershipController';
 
 /**
- * Tests for admin membership controller
+ * Tests for group membership controller
  * These are structural validation tests to ensure the API contract is maintained
  */
-describe('adminMembershipController', () => {
+describe('groupMembershipController', () => {
 	describe('updateRole', () => {
 		it('should have the correct method signature', () => {
-			expect(adminMembershipController.updateRole).toBeDefined();
-			expect(typeof adminMembershipController.updateRole).toBe('function');
+			expect(groupMembershipController.updateRole).toBeDefined();
+			expect(typeof groupMembershipController.updateRole).toBe('function');
 		});
 
 		it('should be wrapped with catchAsync', () => {
 			// The controller should return a function (wrapped by catchAsync)
-			const handler = adminMembershipController.updateRole;
+			const handler = groupMembershipController.updateRole;
 			expect(typeof handler).toBe('function');
 			// catchAsync returns a function with 3 parameters (req, res, next)
 			expect(handler.length).toBe(3);
@@ -21,37 +21,37 @@ describe('adminMembershipController', () => {
 
 		it('should validate required fields in request body', () => {
 			// This validates the structure of the controller
-			expect(adminMembershipController.updateRole).toBeDefined();
+			expect(groupMembershipController.updateRole).toBeDefined();
 		});
 	});
 
 	describe('getMembership', () => {
 		it('should have the correct method signature', () => {
-			expect(adminMembershipController.getMembership).toBeDefined();
-			expect(typeof adminMembershipController.getMembership).toBe('function');
+			expect(groupMembershipController.getMembership).toBeDefined();
+			expect(typeof groupMembershipController.getMembership).toBe('function');
 		});
 
 		it('should be wrapped with catchAsync', () => {
-			const handler = adminMembershipController.getMembership;
+			const handler = groupMembershipController.getMembership;
 			expect(typeof handler).toBe('function');
 			expect(handler.length).toBe(3);
 		});
 
 		it('should handle query parameters', () => {
 			// This validates the structure of the controller
-			expect(adminMembershipController.getMembership).toBeDefined();
+			expect(groupMembershipController.getMembership).toBeDefined();
 		});
 	});
 });
 
 describe('API Contract Validation', () => {
 	it('should expose required controller methods', () => {
-		expect(adminMembershipController).toHaveProperty('updateRole');
-		expect(adminMembershipController).toHaveProperty('getMembership');
+		expect(groupMembershipController).toHaveProperty('updateRole');
+		expect(groupMembershipController).toHaveProperty('getMembership');
 	});
 
 	it('should validate controller structure', () => {
-		const controllerKeys = Object.keys(adminMembershipController);
+		const controllerKeys = Object.keys(groupMembershipController);
 		expect(controllerKeys).toContain('updateRole');
 		expect(controllerKeys).toContain('getMembership');
 		expect(controllerKeys.length).toBe(2);
@@ -59,8 +59,8 @@ describe('API Contract Validation', () => {
 
 	it('should use catchAsync wrapper for async error handling', () => {
 		// Both methods should be wrapped with catchAsync
-		expect(typeof adminMembershipController.updateRole).toBe('function');
-		expect(typeof adminMembershipController.getMembership).toBe('function');
+		expect(typeof groupMembershipController.updateRole).toBe('function');
+		expect(typeof groupMembershipController.getMembership).toBe('function');
 	});
 });
 
@@ -91,5 +91,5 @@ describe('Request Validation Logic', () => {
 
 // Log completion
 afterAll(() => {
-	console.log('✅ Admin membership controller tests validated');
+	console.log('✅ Group membership controller tests validated');
 });

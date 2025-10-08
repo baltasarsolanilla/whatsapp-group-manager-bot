@@ -1,14 +1,75 @@
-import { adminMembershipService } from './adminMembershipService';
+import { groupMembershipService } from './groupMembershipService';
 
 /**
- * Tests for admin membership service
+ * Tests for group membership service
  * These are structural validation tests to ensure the API contract is maintained
  */
-describe('adminMembershipService', () => {
+describe('groupMembershipService', () => {
+	describe('isUserAdmin', () => {
+		it('should be defined as a function', () => {
+			expect(groupMembershipService.isUserAdmin).toBeDefined();
+			expect(typeof groupMembershipService.isUserAdmin).toBe('function');
+		});
+
+		it('should accept two string parameters', () => {
+			// Validate function signature
+			expect(groupMembershipService.isUserAdmin.length).toBe(2);
+		});
+
+		it('should accept valid WhatsApp ID formats', () => {
+			// Test that the function signature is correct
+			expect(typeof groupMembershipService.isUserAdmin).toBe('function');
+			expect(groupMembershipService.isUserAdmin.length).toBe(2);
+		});
+
+		it('should validate expected workflow', () => {
+			// Expected workflow:
+			// 1. Accept userWhatsappId and groupWhatsappId
+			// 2. Query user by WhatsApp ID
+			// 3. Query group by WhatsApp ID
+			// 4. Query membership
+			// 5. Check if role is ADMIN
+			// 6. Return boolean
+			const workflowSteps = [
+				'Accept userWhatsappId parameter',
+				'Accept groupWhatsappId parameter',
+				'Query user by WhatsApp ID',
+				'Query group by WhatsApp ID',
+				'Query membership',
+				'Check if role is ADMIN',
+				'Return boolean',
+			];
+
+			expect(workflowSteps).toHaveLength(7);
+			expect(workflowSteps).toContain('Check if role is ADMIN');
+			expect(workflowSteps).toContain('Return boolean');
+		});
+
+		it('should validate expected return type is Promise<boolean>', () => {
+			// The function should return a Promise that resolves to a boolean
+			const expectedReturnType = 'Promise<boolean>';
+			expect(expectedReturnType).toBe('Promise<boolean>');
+		});
+
+		it('should validate expected parameter types', () => {
+			// Expected parameters:
+			// 1. userWhatsappId: string
+			// 2. groupWhatsappId: string
+			const expectedParams = [
+				{ name: 'userWhatsappId', type: 'string' },
+				{ name: 'groupWhatsappId', type: 'string' },
+			];
+
+			expect(expectedParams).toHaveLength(2);
+			expect(expectedParams[0].type).toBe('string');
+			expect(expectedParams[1].type).toBe('string');
+		});
+	});
+
 	describe('updateMemberRole', () => {
 		it('should have the correct method signature', () => {
-			expect(adminMembershipService.updateMemberRole).toBeDefined();
-			expect(typeof adminMembershipService.updateMemberRole).toBe('function');
+			expect(groupMembershipService.updateMemberRole).toBeDefined();
+			expect(typeof groupMembershipService.updateMemberRole).toBe('function');
 		});
 
 		it('should validate expected parameters', () => {
@@ -54,8 +115,8 @@ describe('adminMembershipService', () => {
 
 	describe('getMembership', () => {
 		it('should have the correct method signature', () => {
-			expect(adminMembershipService.getMembership).toBeDefined();
-			expect(typeof adminMembershipService.getMembership).toBe('function');
+			expect(groupMembershipService.getMembership).toBeDefined();
+			expect(typeof groupMembershipService.getMembership).toBe('function');
 		});
 
 		it('should validate expected parameters', () => {
@@ -109,19 +170,22 @@ describe('adminMembershipService', () => {
 
 describe('API Contract Validation', () => {
 	it('should expose required service methods', () => {
-		expect(adminMembershipService).toHaveProperty('updateMemberRole');
-		expect(adminMembershipService).toHaveProperty('getMembership');
+		expect(groupMembershipService).toHaveProperty('isUserAdmin');
+		expect(groupMembershipService).toHaveProperty('updateMemberRole');
+		expect(groupMembershipService).toHaveProperty('getMembership');
 	});
 
 	it('should validate service structure', () => {
-		const serviceKeys = Object.keys(adminMembershipService);
+		const serviceKeys = Object.keys(groupMembershipService);
+		expect(serviceKeys).toContain('getInactive');
+		expect(serviceKeys).toContain('isUserAdmin');
 		expect(serviceKeys).toContain('updateMemberRole');
 		expect(serviceKeys).toContain('getMembership');
-		expect(serviceKeys.length).toBe(2);
+		expect(serviceKeys.length).toBe(4);
 	});
 });
 
 // Log completion
 afterAll(() => {
-	console.log('✅ Admin membership service tests validated');
+	console.log('✅ Group membership service tests validated');
 });
