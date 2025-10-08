@@ -1,5 +1,6 @@
 import { EVOLUTION_EVENTS, GroupAction } from '@constants/evolutionConstants';
 import { BLACKLIST_EMOJI } from '@constants/messagesConstants';
+import config from '@config';
 import {
 	groupMembershipRepository,
 	userRepository,
@@ -30,9 +31,9 @@ export const handleMessageUpsert = async (
 			data.message?.reactionMessage
 		) {
 			await handleReactionMessage(data);
-		} else {
-			await messageService.ensureGroupMessageUpsert(data);
 		}
+
+		await messageService.ensureGroupMessageUpsert(data);
 	}
 };
 
@@ -115,16 +116,6 @@ async function handleReactionMessage(data: MessageUpsert) {
 		`📱 Reaction detected: ${text} by ${reactorWaId} on message from ${targetUserWaId} in group ${groupWaId}`
 	);
 
-	// Only process blacklist emoji
-	if (text !== BLACKLIST_EMOJI) {
-		console.log(
-			`⏭️  Ignoring reaction - not blacklist emoji. Received: ${text}`
-		);
-		return;
-	}
-
-	console.log(`🚫 Blacklist emoji detected from ${reactorWaId}`);
-
 	try {
 		// Fetch group data to verify admin status
 		const groupData = await evolutionAPI.groupService.fetchGroup(groupWaId);
@@ -134,6 +125,29 @@ async function handleReactionMessage(data: MessageUpsert) {
 			);
 			return;
 		}
+
+		// Verify bot user is also an admin
+		if (!config.waBaltiId) {
+			console.warn('⚠️  Bot WhatsApp ID (waBaltiId) not configured');
+			return;
+		}
+
+		if (!isUserAdmin(config.waBaltiId, groupData)) {
+			console.log(
+				`⚠️  Bot user ${config.waBaltiId} is not an admin in this group, skipping blacklist action`
+			);
+			return;
+		}
+
+		// Only process blacklist emoji
+		if (text !== BLACKLIST_EMOJI) {
+			console.log(
+				`⏭️  Ignoring reaction - not blacklist emoji. Received: ${text}`
+			);
+			return;
+		}
+
+		console.log(`🚫 Blacklist emoji detected from ${reactorWaId}`);
 
 		// Verify reactor is an admin
 		if (!isUserAdmin(reactorWaId, groupData)) {

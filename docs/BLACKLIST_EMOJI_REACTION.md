@@ -43,35 +43,36 @@ Example webhook event:
 
 ```json
 {
-  "event": "messages.upsert",
-  "instance": "my-instance",
-  "data": {
-    "key": {
-      "remoteJid": "120363403554080562@g.us",
-      "fromMe": false,
-      "id": "3A20E439291D7F9C0AC9",
-      "participant": "82334925746303@lid"
-    },
-    "pushName": "Valentina",
-    "messageType": "reactionMessage",
-    "messageTimestamp": 1759875142,
-    "message": {
-      "reactionMessage": {
-        "key": {
-          "id": "3A868C172CED89C71C6B",
-          "fromMe": false,
-          "remoteJid": "120363403645737238@g.us",
-          "participant": "275449187958817@lid"
-        },
-        "text": "🚫",
-        "senderTimestampMs": 1759875191970
-      }
-    }
-  }
+	"event": "messages.upsert",
+	"instance": "my-instance",
+	"data": {
+		"key": {
+			"remoteJid": "120363403554080562@g.us",
+			"fromMe": false,
+			"id": "3A20E439291D7F9C0AC9",
+			"participant": "82334925746303@lid"
+		},
+		"pushName": "Valentina",
+		"messageType": "reactionMessage",
+		"messageTimestamp": 1759875142,
+		"message": {
+			"reactionMessage": {
+				"key": {
+					"id": "3A868C172CED89C71C6B",
+					"fromMe": false,
+					"remoteJid": "120363403645737238@g.us",
+					"participant": "275449187958817@lid"
+				},
+				"text": "🚫",
+				"senderTimestampMs": 1759875191970
+			}
+		}
+	}
 }
 ```
 
 **Key Fields:**
+
 - `data.key.participant` - WhatsApp ID of the admin who reacted
 - `data.message.reactionMessage.key.participant` - WhatsApp ID of the user to blacklist
 - `data.message.reactionMessage.text` - The emoji used (must be '🚫')
@@ -107,18 +108,19 @@ export const BLACKLIST_EMOJI = '🚫';
 
 ```typescript
 export const isUserAdmin = (
-  whatsappId: string,
-  groupData: GroupData
+	whatsappId: string,
+	groupData: GroupData
 ): boolean => {
-  const participant = groupData.participants.find((p) => p.id === whatsappId);
-  if (!participant) return false;
-  return participant.admin === 'admin' || participant.admin === 'superadmin';
+	const participant = groupData.participants.find((p) => p.id === whatsappId);
+	if (!participant) return false;
+	return participant.admin === 'admin' || participant.admin === 'superadmin';
 };
 ```
 
 ### 4. Main Handler (`src/logic/botLogic.ts`)
 
 The `handleReactionMessage()` function:
+
 1. Validates the emoji is 🚫
 2. Fetches group data from Evolution API
 3. Verifies the reactor is an admin
@@ -147,6 +149,7 @@ All 104 tests pass (5 new tests added).
 ## Logging Examples
 
 Success:
+
 ```
 📱 Reaction detected: 🚫 by 82334925746303@lid on message from 275449187958817@lid
 🚫 Blacklist emoji detected from 82334925746303@lid
@@ -156,6 +159,7 @@ Success:
 ```
 
 Errors:
+
 ```
 ⚠️  User is not an admin, ignoring blacklist reaction
 ⚠️  Could not fetch group data, skipping blacklist action
@@ -177,4 +181,4 @@ Errors:
 ✅ ESLint passes  
 ✅ Prettier formatting passes  
 ✅ All tests passing  
-✅ No breaking changes  
+✅ No breaking changes
