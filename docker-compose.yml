@@ -41,7 +41,7 @@ services:
   # Evolution API
   # ----------------------
   evolution-api:
-    image: evoapicloud/evolution-api:latest
+    image: evoapicloud/evolution-api:v2.3.4
     container_name: evolution_api
     restart: always
     depends_on:
@@ -62,7 +62,7 @@ services:
   # Evolution Redis
   # ----------------------
   evolution-redis:
-    image: redis:latest
+    image: redis:8.2.2
     container_name: evolution_redis
     restart: always
     command: >
