@@ -11,12 +11,7 @@ services:
     env_file:
       - .env
     restart: unless-stopped
-    volumes:
-      - ./src:/app/src
-      - ./dist:/app/dist
-      - /app/node_modules
-      - ./prisma:/app/prisma
-    command: npm run dev
+    command: npm start
     depends_on:
       - bot-postgres
       - evolution-api
