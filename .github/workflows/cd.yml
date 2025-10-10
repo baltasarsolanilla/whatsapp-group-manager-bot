@@ -1,0 +1,42 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: ['CI']
+    types:
+      - completed
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up SSH key for deployment
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.LIGHTSAIL_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.LIGHTSAIL_HOST }} >> ~/.ssh/known_hosts
+
+      # Sync code to Lightsail instance
+      - name: Deploy with rsync
+        run: |
+          rsync -az --delete \
+            --exclude='.git*' \
+            --exclude='node_modules' \
+            --exclude='dist' \
+            ./ ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }}:/home/${{ secrets.LIGHTSAIL_USER }}/app
+        env:
+          RSYNC_RSH: 'ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes'
+
+      # Restart app using docker-compose
+      - name: Restart App (docker-compose)
+        run: |
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }} "
+            cd /home/${{ secrets.LIGHTSAIL_USER }}/app &&
+            docker-compose pull &&
+            docker-compose up -d --build
+          "
