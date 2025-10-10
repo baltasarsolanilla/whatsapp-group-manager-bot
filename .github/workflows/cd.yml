@@ -33,10 +33,10 @@ jobs:
           RSYNC_RSH: 'ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes'
 
       # Restart app using docker-compose
-      - name: Restart App (docker-compose)
+      - name: Restart App (docker CLI)
         run: |
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }} "
             cd /home/${{ secrets.LIGHTSAIL_USER }}/app &&
-            docker-compose pull &&
-            docker-compose up -d --build
+            docker compose pull &&
+            docker compose up -d --build
           "
