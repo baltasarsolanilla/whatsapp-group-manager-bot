@@ -49,11 +49,13 @@ npm test                # Jest tests (~5s, 68+ tests)
 npm run build           # Final build verification
 ```
 
-**Quick fix-all command:**
+**IMPORTANT: Auto-fix formatting and linting issues:**
 
 ```bash
-npm run fix-all         # Runs format + lint:fix together
+npm run fix-all         # Runs format + lint:fix together - ALWAYS run this before committing
 ```
+
+**Critical:** If `npm run format:check` fails, ALWAYS run `npm run fix-all` to automatically fix formatting issues. This applies to ALL file types including YAML, JSON, TypeScript, and Markdown files. Never commit code with formatting issues.
 
 ### Known Build Behaviors
 
@@ -62,6 +64,7 @@ npm run fix-all         # Runs format + lint:fix together
 3. **Prisma generate:** Automatically runs in Dockerfile but may need manual execution during development
 4. **Test execution:** Uses `--passWithNoTests` flag, so passing with 0 tests is valid
 5. **Build output:** Located in `dist/` directory (gitignored)
+6. **Prettier formatting:** ALWAYS run `npm run fix-all` before committing to auto-fix formatting issues. Prettier formats ALL files including TypeScript, YAML, JSON, and Markdown.
 
 ## Project Structure
 
