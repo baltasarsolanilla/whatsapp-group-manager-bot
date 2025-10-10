@@ -1,8 +1,8 @@
 version: 2
 updates:
   # Monitor Docker images in docker-compose.yml
-  - package-ecosystem: "docker"
-    directory: "/"
+  - package-ecosystem: 'docker'
+    directory: '/'
     schedule:
-      interval: "weekly"
+      interval: 'weekly'
     open-pull-requests-limit: 5
