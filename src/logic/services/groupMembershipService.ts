@@ -145,4 +145,24 @@ export const groupMembershipService = {
 
 		return membership;
 	},
+
+	/**
+	 * Get members with a specific role in a group
+	 */
+	async getMembersByRole({
+		groupWhatsappId,
+		role,
+	}: {
+		groupWhatsappId: string;
+		role: MembershipRole;
+	}) {
+		// Get group by WhatsApp ID
+		const group = await groupRepository.getByWaId(groupWhatsappId);
+		if (!group) {
+			throw AppError.notFound('Group not found');
+		}
+
+		// Get members with the specified role
+		return groupMembershipRepository.listByGroupIdAndRole(group.id, role);
+	},
 };

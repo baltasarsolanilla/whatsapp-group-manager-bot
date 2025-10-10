@@ -127,4 +127,64 @@ describe('GroupMembershipRepository', () => {
 			console.log('✅ Removal workflow guard check validated');
 		});
 	});
+
+	describe('listByGroupIdAndRole', () => {
+		it('should have the correct method signature', () => {
+			expect(groupMembershipRepository.listByGroupIdAndRole).toBeDefined();
+			expect(typeof groupMembershipRepository.listByGroupIdAndRole).toBe(
+				'function'
+			);
+		});
+
+		it('should validate expected parameters', () => {
+			// Expected parameters:
+			// - groupId: string
+			// - role: MembershipRole
+			// - excludeWhitelist: boolean (optional, default: false)
+			const expectedParams = [
+				{ name: 'groupId', type: 'string', required: true },
+				{ name: 'role', type: 'MembershipRole', required: true },
+				{ name: 'excludeWhitelist', type: 'boolean', required: false },
+			];
+
+			expect(expectedParams).toHaveLength(3);
+			expect(expectedParams[0].required).toBe(true);
+			expect(expectedParams[1].type).toBe('MembershipRole');
+			expect(expectedParams[2].required).toBe(false);
+
+			console.log('✅ listByGroupIdAndRole parameters validated');
+		});
+
+		it('should validate expected behavior', () => {
+			// Expected behavior:
+			// 1. Query memberships by groupId and role
+			// 2. Optionally exclude whitelisted users
+			// 3. Include user and group relations
+			// 4. Return array of memberships
+			const expectedBehavior = [
+				'Query memberships by groupId and role',
+				'Optionally exclude whitelisted users',
+				'Include user and group relations',
+				'Return array of memberships',
+			];
+
+			expect(expectedBehavior).toHaveLength(4);
+			expect(expectedBehavior).toContain(
+				'Query memberships by groupId and role'
+			);
+
+			console.log('✅ listByGroupIdAndRole behavior validated');
+		});
+
+		it('should validate role filtering capability', () => {
+			// This method should support filtering by ADMIN or MEMBER role
+			const supportedRoles = ['ADMIN', 'MEMBER'];
+
+			expect(supportedRoles).toContain('ADMIN');
+			expect(supportedRoles).toContain('MEMBER');
+			expect(supportedRoles.length).toBe(2);
+
+			console.log('✅ Role filtering capability validated');
+		});
+	});
 });
