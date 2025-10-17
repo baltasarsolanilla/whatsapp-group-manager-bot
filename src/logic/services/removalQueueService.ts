@@ -12,9 +12,16 @@ export const removalQueueService = {
 	/**
 	 * Adds all inactive members to the removal queue for a given group.
 	 * @param groupWaId The Group whatsapp id.
+	 * @param inactivityWindowMs The inactivity window in milliseconds.
 	 */
-	async syncInactiveMembersToRemovalQueue(groupWaId: string) {
-		const memberships = await groupMembershipService.getInactive(groupWaId);
+	async syncInactiveMembersToRemovalQueue(
+		groupWaId: string,
+		inactivityWindowMs: number
+	) {
+		const memberships = await groupMembershipService.getInactive(
+			groupWaId,
+			inactivityWindowMs
+		);
 		const newQueueMembers: RemovalQueue[] = [];
 		for (const membership of memberships) {
 			const newMember = await removalQueueRepository.upsertUser({

@@ -12,14 +12,24 @@ export const removalQueueController = {
 		resSuccess(res, members);
 	}),
 	syncQueue: catchAsync(async (req: Request, res: Response) => {
-		const { groupWaId } = req.body ?? {};
+		const { groupWaId, inactivityWindowMs } = req.body ?? {};
 
 		if (!groupWaId) {
 			throw AppError.required('groupWaId is required');
 		}
 
-		const removalQueue =
-			await removalWorkflowService.syncRemovalQueue(groupWaId);
+		if (!inactivityWindowMs || typeof inactivityWindowMs !== 'number') {
+			throw AppError.required('inactivityWindowMs must be a number');
+		}
+
+		if (inactivityWindowMs <= 0) {
+			throw AppError.badRequest('inactivityWindowMs must be a positive number');
+		}
+
+		const removalQueue = await removalWorkflowService.syncRemovalQueue(
+			groupWaId,
+			inactivityWindowMs
+		);
 		resSuccess(res, removalQueue);
 	}),
 	runQueue: catchAsync(async (req: Request, res: Response) => {
@@ -41,11 +51,20 @@ export const removalQueueController = {
 		resSuccess(res, removedMembers);
 	}),
 	runWorkflow: catchAsync(async (req: Request, res: Response) => {
-		const { groupWaId, batchSize, delayMs, dryRun } = req.body ?? {};
+		const { groupWaId, batchSize, delayMs, dryRun, inactivityWindowMs } =
+			req.body ?? {};
 
 		// TODO: streamline error message
 		if (!groupWaId || !batchSize || !delayMs || dryRun === undefined) {
 			throw AppError.required('Missing config props');
+		}
+
+		if (!inactivityWindowMs || typeof inactivityWindowMs !== 'number') {
+			throw AppError.required('inactivityWindowMs must be a number');
+		}
+
+		if (inactivityWindowMs <= 0) {
+			throw AppError.badRequest('inactivityWindowMs must be a positive number');
 		}
 
 		const config = {
@@ -53,6 +72,7 @@ export const removalQueueController = {
 			batchSize,
 			dryRun,
 			delayMs,
+			inactivityWindowMs,
 		};
 
 		const phsRemoved = await removalWorkflowService.runWorkflow(config);

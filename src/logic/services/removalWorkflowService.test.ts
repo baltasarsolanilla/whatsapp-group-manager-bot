@@ -40,6 +40,7 @@ describe('RemovalWorkflowService - Feature Flag Integration', () => {
 				delayMs: 1000,
 				groupWaId: 'test-group',
 				dryRun: true,
+				inactivityWindowMs: 2592000000,
 			});
 
 			expect(mockFeatureFlagService.isEnabled).toHaveBeenCalledWith(
@@ -69,12 +70,16 @@ describe('RemovalWorkflowService - Feature Flag Integration', () => {
 				delayMs: 1000,
 				groupWaId: 'test-group',
 				dryRun: true,
+				inactivityWindowMs: 2592000000,
 			});
 
 			expect(mockFeatureFlagService.isEnabled).toHaveBeenCalledWith(
 				FeatureFlag.QUEUE_REMOVAL
 			);
-			expect(mockSyncRemovalQueue).toHaveBeenCalledWith('test-group');
+			expect(mockSyncRemovalQueue).toHaveBeenCalledWith(
+				'test-group',
+				2592000000
+			);
 			expect(mockRunRemovalInBatches).toHaveBeenCalledWith({
 				groupWaId: 'test-group',
 				batchSize: 10,
