@@ -45,4 +45,8 @@ export const removalQueueRepository = {
 			include: { user: true, group: true },
 		});
 	},
+
+	async deleteAll() {
+		return prisma.removalQueue.deleteMany({});
+	},
 };

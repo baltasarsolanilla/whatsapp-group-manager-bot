@@ -31,6 +31,10 @@ router.post(
 	`/${PATHS.ADMIN.REMOVAL_QUEUE.BASE}`,
 	removalQueueController.addUsers
 );
+router.delete(
+	`/${PATHS.ADMIN.REMOVAL_QUEUE.BASE}`,
+	removalQueueController.clearQueue
+);
 router.post(
 	`/${PATHS.ADMIN.REMOVAL_QUEUE.RUN}`,
 	removalQueueController.runQueue

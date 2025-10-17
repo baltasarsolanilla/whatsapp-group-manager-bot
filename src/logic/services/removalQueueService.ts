@@ -78,4 +78,12 @@ export const removalQueueService = {
 		// 4. Return all entries added
 		return addedEntries;
 	},
+
+	/**
+	 * Clears all entries from the removal queue.
+	 * @returns The result with count of deleted records.
+	 */
+	async clearAllQueue() {
+		return removalQueueRepository.deleteAll();
+	},
 };

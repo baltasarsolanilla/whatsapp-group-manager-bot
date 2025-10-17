@@ -77,4 +77,11 @@ export const removalQueueController = {
 			);
 		resSuccess(res, addedEntries);
 	}),
+	clearQueue: catchAsync(async (req: Request, res: Response) => {
+		const result = await removalQueueService.clearAllQueue();
+		resSuccess(res, {
+			message: 'Removal queue cleared successfully',
+			deletedCount: result.count,
+		});
+	}),
 };
