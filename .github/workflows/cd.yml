@@ -41,3 +41,27 @@ jobs:
             docker compose pull &&
             docker compose up -d --build
           "
+
+      # Stop any existing Prisma Studio instances
+      - name: Stop Previous Prisma Studio
+        run: |
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }} "
+            docker exec whatsapp_bot pkill -f 'prisma studio' || true
+          "
+
+      # Start Prisma Studio in detached mode
+      # SECURITY NOTES:
+      # - Prisma Studio is bound to 127.0.0.1:5555 in docker-compose.yml
+      # - This prevents direct external access to the database UI
+      # - To access remotely, use SSH port forwarding:
+      #   ssh -L 5555:localhost:5555 user@lightsail-host
+      # - Consider additional security measures:
+      #   * Implement authentication (Prisma Studio has no built-in auth)
+      #   * Use a reverse proxy with authentication (nginx, Caddy)
+      #   * Restrict access via firewall rules
+      #   * Only expose when needed for debugging
+      - name: Start Prisma Studio
+        run: |
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }} "
+            docker exec -d whatsapp_bot npx prisma studio --port 5555 --hostname 0.0.0.0
+          "
