@@ -18,6 +18,16 @@ export const removalQueueRepository = {
 	},
 
 	async remove(id: string) {
+		const queueItem = await prisma.removalQueue.findUnique({
+			where: { id },
+		});
+
+		// If queueItem doesn't exist, return null instead of throwing error
+		if (!queueItem) {
+			console.log(`ℹ️  Entry not found for id ${id}, skipping deletion`);
+			return null;
+		}
+
 		return prisma.removalQueue.delete({
 			where: { id },
 		});
