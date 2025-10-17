@@ -8,13 +8,10 @@ import { AppError } from '@utils/AppError';
 
 export const groupMembershipService = {
 	async getInactive(
-		groupWaId: string
+		groupWaId: string,
+		inactivityWindowMs: number
 	): Promise<{ user: User; group: Group }[]> {
-		// const days = 30;
-		// const msPerDay = 24 * 60 * 60 * 1000;
-		// const threshold = Date.now() - days * msPerDay;
-		const test = 60 * 1 * 1000;
-		const threshold = Date.now() - test;
+		const threshold = Date.now() - inactivityWindowMs;
 
 		const group = await groupRepository.getByWaId(groupWaId);
 		if (!group) {

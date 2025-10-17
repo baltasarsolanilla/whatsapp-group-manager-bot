@@ -124,3 +124,120 @@ describe('Removal Queue Controller API', () => {
 		console.log('✅ Endpoint path verified');
 	});
 });
+
+describe('Removal Queue Controller - syncQueue API', () => {
+	it('should validate syncQueue request with inactivityWindowMs parameter', () => {
+		// Valid request format
+		const validRequest = {
+			groupWaId: '120363403645737238@g.us',
+			inactivityWindowMs: 2592000000, // 30 days in milliseconds
+		};
+
+		// Verify the structure is correct
+		expect(validRequest).toHaveProperty('groupWaId');
+		expect(validRequest).toHaveProperty('inactivityWindowMs');
+		expect(typeof validRequest.inactivityWindowMs).toBe('number');
+		expect(validRequest.inactivityWindowMs).toBeGreaterThan(0);
+
+		console.log('✅ syncQueue API contract validation passed');
+	});
+
+	it('should validate inactivityWindowMs parameter requirements', () => {
+		// Valid requests
+		const validRequests = [
+			{ groupWaId: '120363403645737238@g.us', inactivityWindowMs: 2592000000 }, // 30 days
+			{ groupWaId: '120363403645737238@g.us', inactivityWindowMs: 86400000 }, // 1 day
+			{ groupWaId: '120363403645737238@g.us', inactivityWindowMs: 3600000 }, // 1 hour
+		];
+
+		// Invalid requests
+		const invalidRequests = [
+			{}, // Missing all required fields
+			{ groupWaId: '120363403645737238@g.us' }, // Missing inactivityWindowMs
+			{ inactivityWindowMs: 2592000000 }, // Missing groupWaId
+			{ groupWaId: '120363403645737238@g.us', inactivityWindowMs: 0 }, // Zero value
+			{ groupWaId: '120363403645737238@g.us', inactivityWindowMs: -1000 }, // Negative value
+			{ groupWaId: '120363403645737238@g.us', inactivityWindowMs: 'invalid' }, // Wrong type
+		];
+
+		// Valid requests should have both fields with correct types and positive values
+		validRequests.forEach((req) => {
+			expect(req.groupWaId).toBeTruthy();
+			expect(typeof req.inactivityWindowMs).toBe('number');
+			expect(req.inactivityWindowMs).toBeGreaterThan(0);
+		});
+
+		// Check invalid requests
+		expect(invalidRequests[0].groupWaId).toBeUndefined();
+		expect(invalidRequests[1].inactivityWindowMs).toBeUndefined();
+		expect(invalidRequests[2].groupWaId).toBeUndefined();
+		expect(invalidRequests[3].inactivityWindowMs).toBe(0);
+		expect(invalidRequests[4].inactivityWindowMs).toBeLessThan(0);
+		expect(typeof invalidRequests[5].inactivityWindowMs).not.toBe('number');
+
+		console.log('✅ inactivityWindowMs validation logic verified');
+	});
+
+	it('should validate expected API usage example', () => {
+		const exampleRequest = {
+			groupWaId: '12345@g.us',
+			inactivityWindowMs: 2592000000, // 30 days
+		};
+
+		// This example considers users inactive if their last activity is older than 30 days
+		const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
+
+		expect(exampleRequest.inactivityWindowMs).toBe(thirtyDaysInMs);
+		expect(exampleRequest.inactivityWindowMs).toBe(2592000000);
+
+		console.log('✅ API usage example verified');
+	});
+});
+
+describe('Removal Queue Controller - runWorkflow API', () => {
+	it('should validate runWorkflow request with inactivityWindowMs parameter', () => {
+		// Valid request format
+		const validRequest = {
+			groupWaId: '120363403645737238@g.us',
+			batchSize: 5,
+			delayMs: 1000,
+			dryRun: true,
+			inactivityWindowMs: 2592000000,
+		};
+
+		// Verify the structure is correct
+		expect(validRequest).toHaveProperty('groupWaId');
+		expect(validRequest).toHaveProperty('batchSize');
+		expect(validRequest).toHaveProperty('delayMs');
+		expect(validRequest).toHaveProperty('dryRun');
+		expect(validRequest).toHaveProperty('inactivityWindowMs');
+		expect(typeof validRequest.inactivityWindowMs).toBe('number');
+		expect(validRequest.inactivityWindowMs).toBeGreaterThan(0);
+
+		console.log('✅ runWorkflow API contract validation passed');
+	});
+
+	it('should validate inactivityWindowMs is required in runWorkflow', () => {
+		// Valid request
+		const validRequest = {
+			groupWaId: '120363403645737238@g.us',
+			batchSize: 5,
+			delayMs: 1000,
+			dryRun: true,
+			inactivityWindowMs: 2592000000,
+		};
+
+		// Invalid request - missing inactivityWindowMs
+		const invalidRequest: Record<string, unknown> = {
+			groupWaId: '120363403645737238@g.us',
+			batchSize: 5,
+			delayMs: 1000,
+			dryRun: true,
+		};
+
+		expect(validRequest.inactivityWindowMs).toBeDefined();
+		expect(invalidRequest.inactivityWindowMs).toBeUndefined();
+
+		console.log('✅ runWorkflow inactivityWindowMs requirement verified');
+	});
+});

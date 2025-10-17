@@ -21,6 +21,7 @@ type RunWorkflowConfigType = {
 	delayMs: number;
 	groupWaId: string;
 	dryRun: boolean;
+	inactivityWindowMs: number;
 };
 
 export const removalWorkflowService = {
@@ -33,10 +34,11 @@ export const removalWorkflowService = {
 			return [];
 		}
 
-		const { batchSize, delayMs, groupWaId, dryRun } = config;
+		const { batchSize, delayMs, groupWaId, dryRun, inactivityWindowMs } =
+			config;
 
 		// Sync Phase
-		await this.syncRemovalQueue(groupWaId);
+		await this.syncRemovalQueue(groupWaId, inactivityWindowMs);
 
 		// Removal Phase
 		const whatsappIdsRemoved = await this.runRemovalInBatches({
@@ -52,8 +54,11 @@ export const removalWorkflowService = {
 	/**
 	 * Sync Phase - populate removalQueue with inactive users
 	 */
-	async syncRemovalQueue(groupWaId: string) {
-		return removalQueueService.syncInactiveMembersToRemovalQueue(groupWaId);
+	async syncRemovalQueue(groupWaId: string, inactivityWindowMs: number) {
+		return removalQueueService.syncInactiveMembersToRemovalQueue(
+			groupWaId,
+			inactivityWindowMs
+		);
 	},
 
 	/**
