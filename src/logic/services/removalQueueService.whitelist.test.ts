@@ -56,7 +56,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 					user: { id: 'user-3', whatsappId: 'user3@lid', name: 'User 3' },
 					group: { id: 'group-1', whatsappId: groupWaId, name: 'Test Group' },
 				},
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			] as any);
 
 			// Mock whitelist check - user-2 is whitelisted
@@ -74,7 +74,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 						userId,
 						groupId,
 						createdAt: new Date(),
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
 					} as any;
 				}
 			);
@@ -122,7 +122,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 					user: { id: 'user-2', whatsappId: 'user2@lid', name: 'User 2' },
 					group: { id: 'group-1', whatsappId: groupWaId, name: 'Test Group' },
 				},
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			] as any);
 
 			// Mock whitelist check - no users are whitelisted
@@ -136,7 +136,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 						userId,
 						groupId,
 						createdAt: new Date(),
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
 					} as any;
 				}
 			);
@@ -166,7 +166,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 					user: { id: 'user-2', whatsappId: 'user2@lid', name: 'User 2' },
 					group: { id: 'group-1', whatsappId: groupWaId, name: 'Test Group' },
 				},
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			] as any);
 
 			// Mock whitelist check - all users are whitelisted
@@ -194,7 +194,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 				id: 'group-1',
 				whatsappId: groupWaId,
 				name: 'Test Group',
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			} as any);
 
 			// Mock user lookup
@@ -204,7 +204,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 					id: userId,
 					whatsappId,
 					name: `User ${userId}`,
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				} as any;
 			});
 
@@ -223,7 +223,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 						userId,
 						groupId,
 						createdAt: new Date(),
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
 					} as any;
 				}
 			);
@@ -261,7 +261,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 				id: 'group-1',
 				whatsappId: groupWaId,
 				name: 'Test Group',
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			} as any);
 
 			// Mock user lookup
@@ -271,7 +271,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 					id: userId,
 					whatsappId,
 					name: `User ${userId}`,
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				} as any;
 			});
 
@@ -286,7 +286,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 						userId,
 						groupId,
 						createdAt: new Date(),
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
 					} as any;
 				}
 			);
@@ -312,7 +312,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 				id: 'group-1',
 				whatsappId: groupWaId,
 				name: 'Test Group',
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			} as any);
 
 			// Mock user lookup
@@ -322,7 +322,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 					id: userId,
 					whatsappId,
 					name: `User ${userId}`,
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				} as any;
 			});
 
@@ -367,7 +367,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 				id: 'group-1',
 				whatsappId: groupWaId,
 				name: 'Test Group',
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			} as any);
 
 			// Mock user lookup - user4 doesn't exist
@@ -380,7 +380,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 					id: userId,
 					whatsappId,
 					name: `User ${userId}`,
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				} as any;
 			});
 
@@ -425,7 +425,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 				id: 'group-1',
 				whatsappId: groupWaId,
 				name: 'Test Group',
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			} as any);
 
 			// Mock user lookup
@@ -435,7 +435,7 @@ describe('RemovalQueueService - Whitelist Exclusion', () => {
 					id: userId,
 					whatsappId,
 					name: `User ${userId}`,
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				} as any;
 			});
 
