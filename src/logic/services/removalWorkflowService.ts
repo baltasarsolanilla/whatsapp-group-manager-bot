@@ -22,6 +22,7 @@ type RunWorkflowConfigType = {
 	groupWaId: string;
 	dryRun: boolean;
 	inactivityWindowMs: number;
+	signal?: AbortSignal;
 };
 
 export const removalWorkflowService = {
@@ -34,11 +35,29 @@ export const removalWorkflowService = {
 			return [];
 		}
 
-		const { batchSize, delayMs, groupWaId, dryRun, inactivityWindowMs } =
-			config;
+		const {
+			batchSize,
+			delayMs,
+			groupWaId,
+			dryRun,
+			inactivityWindowMs,
+			signal,
+		} = config;
+
+		// Check cancellation before sync
+		if (signal?.aborted) {
+			console.log('Job cancelled before sync phase');
+			return [];
+		}
 
 		// Sync Phase
 		await this.syncRemovalQueue(groupWaId, inactivityWindowMs);
+
+		// Check cancellation before removal phase
+		if (signal?.aborted) {
+			console.log('Job cancelled after sync phase');
+			return [];
+		}
 
 		// Removal Phase
 		const whatsappIdsRemoved = await this.runRemovalInBatches({
@@ -46,6 +65,7 @@ export const removalWorkflowService = {
 			batchSize,
 			delayMs,
 			dryRun,
+			signal,
 		});
 
 		return whatsappIdsRemoved;
@@ -75,11 +95,13 @@ export const removalWorkflowService = {
 		batchSize,
 		dryRun,
 		delayMs,
+		signal,
 	}: {
 		groupWaId: string;
 		batchSize: number;
 		delayMs: number;
 		dryRun: boolean;
+		signal?: AbortSignal;
 	}) {
 		// Check QUEUE_REMOVAL feature flag before running removal batches
 		if (!FeatureFlagService.isEnabled(FeatureFlag.QUEUE_REMOVAL)) {
@@ -100,6 +122,12 @@ export const removalWorkflowService = {
 		const removedWhatsappIds: string[] = [];
 
 		while (true) {
+			// Check for cancellation at the start of each batch
+			if (signal?.aborted) {
+				console.log('Job cancelled during batch processing');
+				break;
+			}
+
 			const queueItems: RemovalQueueRow[] =
 				await removalQueueRepository.getNextBatch({
 					groupId,

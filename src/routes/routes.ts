@@ -4,6 +4,7 @@ import {
 	blacklistController,
 	groupController,
 	groupMembershipController,
+	jobController,
 	removalQueueController,
 	webhookController,
 	whitelistController,
@@ -65,5 +66,11 @@ router.get(
 	`/${PATHS.ADMIN.MEMBERS.BASE}`,
 	groupMembershipController.getMembership
 );
+
+// ======================== ADMIN JOBS ========================
+router.post(`/${PATHS.ADMIN.JOBS.START}`, jobController.start);
+router.get(`/${PATHS.ADMIN.JOBS.BASE}`, jobController.list);
+router.get(`/${PATHS.ADMIN.JOBS.STATUS}`, jobController.status);
+router.post(`/${PATHS.ADMIN.JOBS.CANCEL}`, jobController.cancel);
 
 export default router;

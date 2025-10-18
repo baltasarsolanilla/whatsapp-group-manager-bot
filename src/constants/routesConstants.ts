@@ -12,6 +12,12 @@ export const PATHS = {
 			RUN_WORKFLOW: 'admin/removalQueue/runWorkflow',
 			HARDCODE_POPULATE: 'admin/removalQueue/hardcode-populate',
 		},
+		JOBS: {
+			BASE: 'admin/jobs',
+			START: 'admin/jobs/start',
+			STATUS: 'admin/jobs/:jobId/status',
+			CANCEL: 'admin/jobs/:jobId/cancel',
+		},
 		LISTS: {
 			WHITELIST: 'admin/lists/whitelist',
 			BLACKLIST: 'admin/lists/blacklist',
