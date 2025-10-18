@@ -10,6 +10,7 @@ export const PATHS = {
 			RUN: 'admin/removalQueue/run',
 			SYNC: 'admin/removalQueue/sync',
 			RUN_WORKFLOW: 'admin/removalQueue/runWorkflow',
+			HARDCODE_POPULATE: 'admin/removalQueue/hardcode-populate',
 		},
 		LISTS: {
 			WHITELIST: 'admin/lists/whitelist',

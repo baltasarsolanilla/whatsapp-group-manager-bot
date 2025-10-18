@@ -104,4 +104,27 @@ export const removalQueueController = {
 			deletedCount: result.count,
 		});
 	}),
+	hardcodePopulate: catchAsync(async (req: Request, res: Response) => {
+		const { groupId, userIds } = req.body ?? {};
+
+		// Validate groupId
+		if (!groupId) {
+			throw AppError.required('groupId is required');
+		}
+
+		// Validate userIds
+		if (!userIds || !Array.isArray(userIds)) {
+			throw AppError.required('userIds must be an array');
+		}
+
+		if (userIds.length === 0) {
+			throw AppError.badRequest('userIds array cannot be empty');
+		}
+
+		const result = await removalQueueService.hardcodePopulateRemovalQueue(
+			groupId,
+			userIds
+		);
+		resSuccess(res, result);
+	}),
 };

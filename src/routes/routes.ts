@@ -47,6 +47,10 @@ router.post(
 	`/${PATHS.ADMIN.REMOVAL_QUEUE.RUN_WORKFLOW}`,
 	removalQueueController.runWorkflow
 );
+router.post(
+	`/${PATHS.ADMIN.REMOVAL_QUEUE.HARDCODE_POPULATE}`,
+	removalQueueController.hardcodePopulate
+);
 
 // ======================== ADMIN GROUPS ========================
 router.post(`/${PATHS.ADMIN.GROUPS.INGEST}`, groupController.ingest);
