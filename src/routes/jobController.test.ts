@@ -128,12 +128,29 @@ describe('JobController - API Contract Validation', () => {
 			expect(status).toBeDefined();
 			expect(config).toBeDefined();
 			expect(progress).toBeDefined();
+			expect(progress.processed).toBeDefined();
 			expect(result).toBeDefined();
 			expect(createdAt).toBeDefined();
 			expect(startedAt).toBeDefined();
 			expect(completedAt).toBeDefined();
 
 			console.log('✅ Status endpoint API contract validation passed');
+		});
+
+		it('should include progress message field in status response', () => {
+			const progressWithMessage = {
+				processed: 10,
+				total: 100,
+				currentBatch: 2,
+				message: 'Processed batch: success',
+			};
+
+			expect(progressWithMessage.processed).toBeDefined();
+			expect(progressWithMessage.total).toBeDefined();
+			expect(progressWithMessage.currentBatch).toBeDefined();
+			expect(progressWithMessage.message).toBeDefined();
+
+			console.log('✅ Progress message field validation passed');
 		});
 	});
 

@@ -16,6 +16,12 @@ type RemovalQueueRow = {
 	group: Group;
 };
 
+type ProgressCallback = (update: {
+	processed: number;
+	total?: number;
+	message?: string;
+}) => void;
+
 type RunWorkflowConfigType = {
 	batchSize: number;
 	delayMs: number;
@@ -23,6 +29,7 @@ type RunWorkflowConfigType = {
 	dryRun: boolean;
 	inactivityWindowMs: number;
 	signal?: AbortSignal;
+	onProgress?: ProgressCallback;
 };
 
 export const removalWorkflowService = {
@@ -42,20 +49,30 @@ export const removalWorkflowService = {
 			dryRun,
 			inactivityWindowMs,
 			signal,
+			onProgress,
 		} = config;
+
+		// Report initial progress
+		onProgress?.({ processed: 0, message: 'Starting workflow: sync phase' });
 
 		// Check cancellation before sync
 		if (signal?.aborted) {
 			console.log('Job cancelled before sync phase');
+			onProgress?.({ processed: 0, message: 'Cancelled before sync phase' });
 			return [];
 		}
 
 		// Sync Phase
 		await this.syncRemovalQueue(groupWaId, inactivityWindowMs);
+		onProgress?.({
+			processed: 0,
+			message: 'Sync phase complete, starting removal phase',
+		});
 
 		// Check cancellation before removal phase
 		if (signal?.aborted) {
 			console.log('Job cancelled after sync phase');
+			onProgress?.({ processed: 0, message: 'Cancelled after sync phase' });
 			return [];
 		}
 
@@ -66,6 +83,7 @@ export const removalWorkflowService = {
 			delayMs,
 			dryRun,
 			signal,
+			onProgress,
 		});
 
 		return whatsappIdsRemoved;
@@ -96,12 +114,14 @@ export const removalWorkflowService = {
 		dryRun,
 		delayMs,
 		signal,
+		onProgress,
 	}: {
 		groupWaId: string;
 		batchSize: number;
 		delayMs: number;
 		dryRun: boolean;
 		signal?: AbortSignal;
+		onProgress?: ProgressCallback;
 	}) {
 		// Check QUEUE_REMOVAL feature flag before running removal batches
 		if (!FeatureFlagService.isEnabled(FeatureFlag.QUEUE_REMOVAL)) {
@@ -120,11 +140,22 @@ export const removalWorkflowService = {
 		}
 
 		const removedWhatsappIds: string[] = [];
+		let processedCount = 0;
+
+		// Report initial progress with 0 processed
+		onProgress?.({
+			processed: 0,
+			message: 'Starting batch removal',
+		});
 
 		while (true) {
 			// Check for cancellation at the start of each batch
 			if (signal?.aborted) {
 				console.log('Job cancelled during batch processing');
+				onProgress?.({
+					processed: processedCount,
+					message: 'Job cancelled',
+				});
 				break;
 			}
 
@@ -247,6 +278,13 @@ export const removalWorkflowService = {
 					}
 				}
 			}
+
+			// Update progress after processing this batch
+			processedCount += queueItems.length;
+			onProgress?.({
+				processed: processedCount,
+				message: `Processed batch: ${outcome === RemovalOutcome.SUCCESS ? 'success' : 'failed'}`,
+			});
 
 			await sleep(delayMs);
 		}

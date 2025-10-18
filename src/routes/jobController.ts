@@ -210,6 +210,15 @@ async function executeJob(
 	// Update status to running
 	jobManager.updateJobStatus(jobId, JobStatus.RUNNING);
 
+	// Create progress callback
+	const onProgress = (update: {
+		processed: number;
+		total?: number;
+		message?: string;
+	}) => {
+		jobManager.updateJobProgress(jobId, update);
+	};
+
 	try {
 		let removedWhatsappIds: string[] = [];
 
@@ -219,12 +228,14 @@ async function executeJob(
 				...config,
 				inactivityWindowMs: config.inactivityWindowMs!,
 				signal: job.abortController.signal,
+				onProgress,
 			});
 		} else if (type === JobType.REMOVAL_QUEUE) {
 			// Run queue removal only
 			removedWhatsappIds = await removalWorkflowService.runRemovalInBatches({
 				...config,
 				signal: job.abortController.signal,
+				onProgress,
 			});
 		}
 
