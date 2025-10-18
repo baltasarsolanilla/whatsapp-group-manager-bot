@@ -2,7 +2,7 @@ import { removalQueueService } from '@logic/services';
 import { removalWorkflowService } from '@logic/services/removalWorkflowService';
 import { AppError } from '@utils/AppError';
 import { catchAsync } from '@utils/catchAsync';
-import { resSuccess } from '@utils/resSuccess';
+import { resSuccess, resAccepted } from '@utils/resSuccess';
 import { Request, Response } from 'express';
 
 export const removalQueueController = {
@@ -46,9 +46,16 @@ export const removalQueueController = {
 			delayMs,
 		};
 
-		const removedMembers =
-			await removalWorkflowService.runRemovalInBatches(config);
-		resSuccess(res, removedMembers);
+		// Run workflow in background to prevent HTTP timeout
+		// For large groups, this can take 1+ hour (e.g., 1000 users / 5 per batch * 10s delay = ~33 minutes)
+		removalWorkflowService.runRemovalInBatches(config).catch((error) => {
+			console.error('Background removal workflow failed:', error);
+		});
+
+		resAccepted(res, {
+			message: 'Removal workflow started in background',
+			config,
+		});
 	}),
 	runWorkflow: catchAsync(async (req: Request, res: Response) => {
 		const { groupWaId, batchSize, delayMs, dryRun, inactivityWindowMs } =
@@ -75,9 +82,18 @@ export const removalQueueController = {
 			inactivityWindowMs,
 		};
 
-		const phsRemoved = await removalWorkflowService.runWorkflow(config);
+		// Run workflow in background to prevent HTTP timeout
+		// WARNING: This operation can take 1+ hour for large groups
+		// Expected runtime: (inactive_users / batchSize) * (delayMs / 1000) seconds
+		// Example: 1000 users, batch size 5, 10s delay = ~33 minutes
+		removalWorkflowService.runWorkflow(config).catch((error) => {
+			console.error('Background removal workflow failed:', error);
+		});
 
-		resSuccess(res, phsRemoved);
+		resAccepted(res, {
+			message: 'Removal workflow started in background',
+			config,
+		});
 	}),
 	addUsers: catchAsync(async (req: Request, res: Response) => {
 		const { groupId, participants } = req.body ?? {};

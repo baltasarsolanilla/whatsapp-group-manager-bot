@@ -63,6 +63,12 @@ export const removalWorkflowService = {
 
 	/**
 	 * Removal Phase - process users in batches
+	 *
+	 * WARNING: This operation can take a very long time for large groups.
+	 * Expected runtime: (queue_size / batchSize) * (delayMs / 1000) seconds
+	 * Example: 1000 users with batchSize=5 and delayMs=10000 → ~33 minutes
+	 *
+	 * This should be run as a background job, not in an HTTP request handler.
 	 */
 	async runRemovalInBatches({
 		groupWaId,
@@ -130,19 +136,29 @@ export const removalWorkflowService = {
 				outcome = RemovalOutcome.SUCCESS;
 				reason = 'Inactive user removal';
 				removedWhatsappIds.push(...queueWhatsappIds);
-			} catch {
+			} catch (error) {
 				outcome = RemovalOutcome.FAILURE;
 				reason = 'Unknown error';
+				console.error(
+					'Error removing users from group via Evolution API:',
+					error,
+					{
+						groupWaId,
+						queueWhatsappIds,
+					}
+				);
 			}
 
 			/**
 			 * Archive the removed memberships into removalHistory, and delete from removalQueue & groupMembership
+			 * Only perform database cleanup if removal was successful
 			 */
 			if (dryRun) {
 				console.log(
 					'DRY RUN: Skipping database changes (removalQueue removal, removalHistory addition, groupMembership removal)'
 				);
-			} else {
+			} else if (outcome === RemovalOutcome.SUCCESS) {
+				// Only clean up database if removal actually succeeded
 				for (const item of queueItems) {
 					const {
 						id,
@@ -150,17 +166,57 @@ export const removalWorkflowService = {
 						group: { id: groupId },
 					} = item;
 
-					removalQueueRepository.remove(id);
-					removalHistoryRepository.add({
-						userId,
-						groupId,
-						outcome,
-						reason,
-					});
-					groupMembershipRepository.removeByUserAndGroup({
-						userId,
-						groupId,
-					});
+					try {
+						await removalQueueRepository.remove(id);
+						await removalHistoryRepository.add({
+							userId,
+							groupId,
+							outcome,
+							reason,
+						});
+						await groupMembershipRepository.removeByUserAndGroup({
+							userId,
+							groupId,
+						});
+					} catch (error) {
+						console.error(
+							'Error during database cleanup for removed user:',
+							error,
+							{
+								userId,
+								groupId,
+								queueItemId: id,
+							}
+						);
+						// Continue processing other items even if one fails
+					}
+				}
+			} else {
+				// Removal failed - log failure in history but keep queue items for retry
+				console.log(
+					'Removal failed - logging failure in history and keeping users in queue for retry'
+				);
+				for (const item of queueItems) {
+					const {
+						id,
+						user: { id: userId },
+						group: { id: groupId },
+					} = item;
+
+					try {
+						await removalHistoryRepository.add({
+							userId,
+							groupId,
+							outcome: RemovalOutcome.FAILURE,
+							reason,
+						});
+					} catch (error) {
+						console.error('Error logging removal failure to history:', error, {
+							userId,
+							groupId,
+							queueItemId: id,
+						});
+					}
 				}
 			}
 
