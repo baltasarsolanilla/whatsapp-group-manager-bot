@@ -59,4 +59,13 @@ export const removalQueueRepository = {
 	async deleteAll() {
 		return prisma.removalQueue.deleteMany({});
 	},
+
+	async createMany(
+		data: Array<{ userId: string; groupId: string }>
+	): Promise<{ count: number }> {
+		return prisma.removalQueue.createMany({
+			data,
+			skipDuplicates: true,
+		});
+	},
 };
