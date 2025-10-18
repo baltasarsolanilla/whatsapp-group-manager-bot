@@ -138,24 +138,30 @@ export const removalWorkflowService = {
 			/**
 			 * Archive the removed memberships into removalHistory, and delete from removalQueue & groupMembership
 			 */
-			for (const item of queueItems) {
-				const {
-					id,
-					user: { id: userId },
-					group: { id: groupId },
-				} = item;
+			if (dryRun) {
+				console.log(
+					'DRY RUN: Skipping database changes (removalQueue removal, removalHistory addition, groupMembership removal)'
+				);
+			} else {
+				for (const item of queueItems) {
+					const {
+						id,
+						user: { id: userId },
+						group: { id: groupId },
+					} = item;
 
-				removalQueueRepository.remove(id);
-				removalHistoryRepository.add({
-					userId,
-					groupId,
-					outcome,
-					reason,
-				});
-				groupMembershipRepository.removeByUserAndGroup({
-					userId,
-					groupId,
-				});
+					removalQueueRepository.remove(id);
+					removalHistoryRepository.add({
+						userId,
+						groupId,
+						outcome,
+						reason,
+					});
+					groupMembershipRepository.removeByUserAndGroup({
+						userId,
+						groupId,
+					});
+				}
 			}
 
 			await sleep(delayMs);
