@@ -37,7 +37,7 @@ describe('RemovalWorkflowService - Feature Flag Integration', () => {
 
 			const result = await removalWorkflowService.runWorkflow({
 				batchSize: 10,
-				delayMs: 1000,
+				delayMs: 10000,
 				groupWaId: 'test-group',
 				dryRun: true,
 				inactivityWindowMs: 2592000000,
@@ -67,7 +67,7 @@ describe('RemovalWorkflowService - Feature Flag Integration', () => {
 
 			await removalWorkflowService.runWorkflow({
 				batchSize: 10,
-				delayMs: 1000,
+				delayMs: 10000,
 				groupWaId: 'test-group',
 				dryRun: true,
 				inactivityWindowMs: 2592000000,
@@ -83,7 +83,7 @@ describe('RemovalWorkflowService - Feature Flag Integration', () => {
 			expect(mockRunRemovalInBatches).toHaveBeenCalledWith({
 				groupWaId: 'test-group',
 				batchSize: 10,
-				delayMs: 1000,
+				delayMs: 10000,
 				dryRun: true,
 			});
 		});
@@ -96,7 +96,7 @@ describe('RemovalWorkflowService - Feature Flag Integration', () => {
 			const result = await removalWorkflowService.runRemovalInBatches({
 				groupWaId: 'test-group',
 				batchSize: 10,
-				delayMs: 1000,
+				delayMs: 10000,
 				dryRun: true,
 			});
 
@@ -166,7 +166,7 @@ describe('RemovalWorkflowService - Feature Flag Integration', () => {
 			const result = await removalWorkflowService.runRemovalInBatches({
 				groupWaId: 'test-group',
 				batchSize: 10,
-				delayMs: 1000,
+				delayMs: 10000,
 				dryRun: true,
 			});
 
@@ -236,7 +236,7 @@ describe('RemovalWorkflowService - Feature Flag Integration', () => {
 			const result = await removalWorkflowService.runRemovalInBatches({
 				groupWaId: 'test-group',
 				batchSize: 10,
-				delayMs: 1000,
+				delayMs: 10000,
 				dryRun: false,
 			});
 

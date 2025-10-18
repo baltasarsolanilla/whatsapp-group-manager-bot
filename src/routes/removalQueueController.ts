@@ -39,6 +39,12 @@ export const removalQueueController = {
 			throw AppError.required('Missing config props');
 		}
 
+		if (delayMs < 10000) {
+			throw AppError.badRequest(
+				'delayMs must be at least 10 seconds (10000ms) to avoid WhatsApp rate limits'
+			);
+		}
+
 		const config = {
 			groupWaId,
 			batchSize,
@@ -57,6 +63,12 @@ export const removalQueueController = {
 		// TODO: streamline error message
 		if (!groupWaId || !batchSize || !delayMs || dryRun === undefined) {
 			throw AppError.required('Missing config props');
+		}
+
+		if (delayMs < 10000) {
+			throw AppError.badRequest(
+				'delayMs must be at least 10 seconds (10000ms) to avoid WhatsApp rate limits'
+			);
 		}
 
 		if (!inactivityWindowMs || typeof inactivityWindowMs !== 'number') {
