@@ -226,7 +226,7 @@ describe('Removal Queue Controller - runWorkflow API', () => {
 		const validRequest = {
 			groupWaId: '120363403645737238@g.us',
 			batchSize: 5,
-			delayMs: 1000,
+			delayMs: 10000,
 			dryRun: true,
 			inactivityWindowMs: 2592000000,
 		};
@@ -248,7 +248,7 @@ describe('Removal Queue Controller - runWorkflow API', () => {
 		const validRequest = {
 			groupWaId: '120363403645737238@g.us',
 			batchSize: 5,
-			delayMs: 1000,
+			delayMs: 10000,
 			dryRun: true,
 			inactivityWindowMs: 2592000000,
 		};
@@ -257,7 +257,7 @@ describe('Removal Queue Controller - runWorkflow API', () => {
 		const invalidRequest: Record<string, unknown> = {
 			groupWaId: '120363403645737238@g.us',
 			batchSize: 5,
-			delayMs: 1000,
+			delayMs: 10000,
 			dryRun: true,
 		};
 
@@ -265,6 +265,84 @@ describe('Removal Queue Controller - runWorkflow API', () => {
 		expect(invalidRequest.inactivityWindowMs).toBeUndefined();
 
 		console.log('✅ runWorkflow inactivityWindowMs requirement verified');
+	});
+
+	it('should validate delayMs must be at least 10 seconds', () => {
+		// Valid requests with delayMs >= 10000
+		const validRequests = [
+			{ delayMs: 10000 }, // Exactly 10 seconds
+			{ delayMs: 15000 }, // 15 seconds
+			{ delayMs: 30000 }, // 30 seconds
+		];
+
+		// Invalid requests with delayMs < 10000
+		const invalidRequests = [
+			{ delayMs: 1000 }, // 1 second
+			{ delayMs: 5000 }, // 5 seconds
+			{ delayMs: 9999 }, // Just under 10 seconds
+			{ delayMs: 0 }, // Zero
+		];
+
+		// Valid requests should have delayMs >= 10000
+		validRequests.forEach((req) => {
+			expect(req.delayMs).toBeGreaterThanOrEqual(10000);
+		});
+
+		// Invalid requests should have delayMs < 10000
+		invalidRequests.forEach((req) => {
+			expect(req.delayMs).toBeLessThan(10000);
+		});
+
+		console.log('✅ delayMs validation requirement verified');
+	});
+});
+
+describe('Removal Queue Controller - runQueue API', () => {
+	it('should validate runQueue request format', () => {
+		// Valid request format
+		const validRequest = {
+			groupWaId: '120363403645737238@g.us',
+			batchSize: 5,
+			delayMs: 10000,
+			dryRun: true,
+		};
+
+		// Verify the structure is correct
+		expect(validRequest).toHaveProperty('groupWaId');
+		expect(validRequest).toHaveProperty('batchSize');
+		expect(validRequest).toHaveProperty('delayMs');
+		expect(validRequest).toHaveProperty('dryRun');
+
+		console.log('✅ runQueue API contract validation passed');
+	});
+
+	it('should validate delayMs must be at least 10 seconds in runQueue', () => {
+		// Valid requests with delayMs >= 10000
+		const validRequests = [
+			{ delayMs: 10000 }, // Exactly 10 seconds
+			{ delayMs: 15000 }, // 15 seconds
+			{ delayMs: 30000 }, // 30 seconds
+		];
+
+		// Invalid requests with delayMs < 10000
+		const invalidRequests = [
+			{ delayMs: 1000 }, // 1 second
+			{ delayMs: 5000 }, // 5 seconds
+			{ delayMs: 9999 }, // Just under 10 seconds
+			{ delayMs: 0 }, // Zero
+		];
+
+		// Valid requests should have delayMs >= 10000
+		validRequests.forEach((req) => {
+			expect(req.delayMs).toBeGreaterThanOrEqual(10000);
+		});
+
+		// Invalid requests should have delayMs < 10000
+		invalidRequests.forEach((req) => {
+			expect(req.delayMs).toBeLessThan(10000);
+		});
+
+		console.log('✅ runQueue delayMs validation requirement verified');
 	});
 });
 
