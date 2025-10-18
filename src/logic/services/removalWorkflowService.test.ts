@@ -303,7 +303,9 @@ describe('RemovalWorkflowService - Feature Flag Integration', () => {
 				.mockResolvedValueOnce([]); // Second call returns empty to end loop
 
 			// Mock repository operations with resolved promises to verify await
-			mockRemovalQueueRepository.remove = jest.fn().mockResolvedValue(undefined);
+			mockRemovalQueueRepository.remove = jest
+				.fn()
+				.mockResolvedValue(undefined);
 			mockRemovalHistoryRepository.add = jest.fn().mockResolvedValue(undefined);
 			mockGroupMembershipRepository.removeByUserAndGroup = jest
 				.fn()
@@ -380,7 +382,9 @@ describe('RemovalWorkflowService - Feature Flag Integration', () => {
 				.mockResolvedValueOnce([]); // Second call returns empty to end loop
 
 			// Mock repository operations
-			mockRemovalQueueRepository.remove = jest.fn().mockResolvedValue(undefined);
+			mockRemovalQueueRepository.remove = jest
+				.fn()
+				.mockResolvedValue(undefined);
 			mockRemovalHistoryRepository.add = jest.fn().mockResolvedValue(undefined);
 			mockGroupMembershipRepository.removeByUserAndGroup = jest
 				.fn()
