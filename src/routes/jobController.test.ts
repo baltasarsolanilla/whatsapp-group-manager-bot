@@ -109,7 +109,12 @@ describe('JobController - API Contract Validation', () => {
 			const id = 'job_123';
 			const type = 'removal_workflow';
 			const status = 'running';
-			const config = { groupWaId: 'test', batchSize: 5, delayMs: 10000, dryRun: true };
+			const config = {
+				groupWaId: 'test',
+				batchSize: 5,
+				delayMs: 10000,
+				dryRun: true,
+			};
 			const progress = { processed: 10, total: 100, currentBatch: 2 };
 			const result = { removedWhatsappIds: ['id1', 'id2'] };
 			const createdAt = new Date().toISOString();
@@ -157,17 +162,21 @@ describe('JobController - API Contract Validation', () => {
 			const endpoint = '/admin/jobs';
 			const method = 'GET';
 
-			const expectedResponseShape = expect.arrayContaining([
-				expect.objectContaining({
-					id: expect.any(String),
-					type: expect.any(String),
-					status: expect.any(String),
-				}),
-			]);
+			// Validate response is array
+			const sampleResponse = [
+				{
+					id: 'job_123',
+					type: 'removal_workflow',
+					status: 'running',
+				},
+			];
 
 			expect(endpoint).toBe('/admin/jobs');
 			expect(method).toBe('GET');
-			expect(Array.isArray([])).toBe(true);
+			expect(Array.isArray(sampleResponse)).toBe(true);
+			expect(sampleResponse[0].id).toBeDefined();
+			expect(sampleResponse[0].type).toBeDefined();
+			expect(sampleResponse[0].status).toBeDefined();
 
 			console.log('✅ List endpoint API contract validation passed');
 		});

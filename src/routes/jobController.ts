@@ -115,7 +115,17 @@ export const jobController = {
 		}
 
 		// Return job status without the AbortController
-		const { abortController: _abortController, ...jobData } = job;
+		const jobData = {
+			id: job.id,
+			type: job.type,
+			status: job.status,
+			config: job.config,
+			progress: job.progress,
+			result: job.result,
+			createdAt: job.createdAt,
+			startedAt: job.startedAt,
+			completedAt: job.completedAt,
+		};
 
 		resSuccess(res, jobData);
 	}),
@@ -167,8 +177,18 @@ export const jobController = {
 
 		const jobs = jobManager.getAllJobs(status);
 
-		// Remove AbortController from response
-		const jobsData = jobs.map(({ abortController: _abortController, ...jobData }) => jobData);
+		// Remove AbortController from response by mapping to plain objects
+		const jobsData = jobs.map((job) => ({
+			id: job.id,
+			type: job.type,
+			status: job.status,
+			config: job.config,
+			progress: job.progress,
+			result: job.result,
+			createdAt: job.createdAt,
+			startedAt: job.startedAt,
+			completedAt: job.completedAt,
+		}));
 
 		resSuccess(res, jobsData);
 	}),

@@ -26,9 +26,11 @@ The cancellable job system provides a way to manage long-running removal workflo
 ## Job Types
 
 ### `removal_workflow`
+
 Runs the full workflow: sync inactive members + remove in batches
 
 **Required Config:**
+
 - `groupWaId`: WhatsApp group ID
 - `batchSize`: Number of users per batch (e.g., 5)
 - `delayMs`: Delay between batches in milliseconds (min: 10000)
@@ -36,9 +38,11 @@ Runs the full workflow: sync inactive members + remove in batches
 - `inactivityWindowMs`: Time window in milliseconds for inactivity detection
 
 ### `removal_queue`
+
 Runs only the removal phase (processes existing queue)
 
 **Required Config:**
+
 - `groupWaId`: WhatsApp group ID
 - `batchSize`: Number of users per batch
 - `delayMs`: Delay between batches in milliseconds (min: 10000)
@@ -71,11 +75,12 @@ Content-Type: application/json
 ```
 
 **Response (202 Accepted):**
+
 ```json
 {
-  "jobId": "job_1234567890_abc123",
-  "message": "Job started successfully",
-  "status": "pending"
+	"jobId": "job_1234567890_abc123",
+	"message": "Job started successfully",
+	"status": "pending"
 }
 ```
 
@@ -86,25 +91,26 @@ GET /admin/jobs/:jobId/status
 ```
 
 **Response (200 OK):**
+
 ```json
 {
-  "id": "job_1234567890_abc123",
-  "type": "removal_workflow",
-  "status": "running",
-  "config": {
-    "groupWaId": "120363403645737238@g.us",
-    "batchSize": 5,
-    "delayMs": 10000,
-    "dryRun": true,
-    "inactivityWindowMs": 2592000000
-  },
-  "progress": {
-    "processed": 50,
-    "total": 100,
-    "currentBatch": 10
-  },
-  "createdAt": "2024-01-15T10:30:00.000Z",
-  "startedAt": "2024-01-15T10:30:01.000Z"
+	"id": "job_1234567890_abc123",
+	"type": "removal_workflow",
+	"status": "running",
+	"config": {
+		"groupWaId": "120363403645737238@g.us",
+		"batchSize": 5,
+		"delayMs": 10000,
+		"dryRun": true,
+		"inactivityWindowMs": 2592000000
+	},
+	"progress": {
+		"processed": 50,
+		"total": 100,
+		"currentBatch": 10
+	},
+	"createdAt": "2024-01-15T10:30:00.000Z",
+	"startedAt": "2024-01-15T10:30:01.000Z"
 }
 ```
 
@@ -115,11 +121,12 @@ POST /admin/jobs/:jobId/cancel
 ```
 
 **Response (200 OK):**
+
 ```json
 {
-  "jobId": "job_1234567890_abc123",
-  "message": "Job cancelled successfully",
-  "status": "cancelled"
+	"jobId": "job_1234567890_abc123",
+	"message": "Job cancelled successfully",
+	"status": "cancelled"
 }
 ```
 
@@ -131,6 +138,7 @@ GET /admin/jobs?status=running
 ```
 
 **Response (200 OK):**
+
 ```json
 [
   {
@@ -209,6 +217,7 @@ curl http://localhost:3000/admin/jobs/job_1234567890_abc123/status
 ## Cancellation Behavior
 
 ### When a Job is Cancelled:
+
 1. The AbortSignal is triggered via `abortController.abort()`
 2. Job status is immediately set to `cancelled`
 3. The running workflow checks the signal at key points:
@@ -220,6 +229,7 @@ curl http://localhost:3000/admin/jobs/job_1234567890_abc123/status
 6. Partial results are saved in job.result
 
 ### Graceful Cancellation:
+
 - No mid-batch interruption (batch completes before checking signal)
 - Database operations are atomic per batch
 - No inconsistent state (users either fully removed or not at all)
@@ -228,11 +238,13 @@ curl http://localhost:3000/admin/jobs/job_1234567890_abc123/status
 ## Limitations
 
 ### Single-Process Only
+
 - Jobs are stored in-memory (Map)
 - Process restart loses all job state
 - Not suitable for distributed/multi-instance deployments
 
 ### No Persistence
+
 - Job history is lost on restart
 - Only recent finished jobs are kept (1 hour TTL)
 - For production, consider:
@@ -241,6 +253,7 @@ curl http://localhost:3000/admin/jobs/job_1234567890_abc123/status
   - Message queue (Bull, BullMQ) for robust job processing
 
 ### Rate Limits
+
 - Minimum 10 second delay between batches enforced
 - Large groups (1000+ users) can take 1+ hours
 - Consider WhatsApp rate limits when setting batch size
@@ -273,12 +286,14 @@ Potential improvements for production use:
 ## Testing
 
 ### Unit Tests
+
 ```bash
 npm test -- jobManager.test.ts
 npm test -- jobController.test.ts
 ```
 
 ### Integration Testing
+
 1. Start a dry run job
 2. Monitor its progress
 3. Cancel mid-execution
@@ -306,12 +321,14 @@ Jobs handle errors at multiple levels:
 ## Monitoring
 
 ### Console Logs
+
 - Job creation: "Job started successfully"
 - Cancellation: "Job cancelled during batch processing"
 - Completion: "Job {jobId} completed successfully"
 - Cleanup: "Cleaned up finished job: {jobId}"
 
 ### Status Checking
+
 ```bash
 # Check all running jobs
 curl http://localhost:3000/admin/jobs?status=running
@@ -331,15 +348,17 @@ curl http://localhost:3000/admin/jobs?status=failed
 ## Performance
 
 ### Memory Usage
+
 - Each job: ~1KB (config + metadata)
 - 1000 active jobs: ~1MB
 - Automatic cleanup after 1 hour
 - Recommended max: 10,000 jobs in memory
 
 ### Job Execution
+
 - Batch processing: O(n/batchSize) where n = queue size
 - Database queries: O(batchSize) per batch
 - Memory per batch: O(batchSize)
-- Total time: (queue_size / batchSize) * (delayMs / 1000) seconds
+- Total time: (queue_size / batchSize) \* (delayMs / 1000) seconds
 
 Example: 1000 users, batch size 5, 10s delay = ~33 minutes

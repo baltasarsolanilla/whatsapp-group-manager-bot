@@ -101,7 +101,9 @@ export class JobManager {
 	 */
 	updateJobStatus(id: string, status: JobStatus): void {
 		const job = this.jobs.get(id);
-		if (!job) {return;}
+		if (!job) {
+			return;
+		}
 
 		job.status = status;
 
@@ -123,7 +125,9 @@ export class JobManager {
 	 */
 	updateJobProgress(id: string, progress: Partial<Job['progress']>): void {
 		const job = this.jobs.get(id);
-		if (!job) {return;}
+		if (!job) {
+			return;
+		}
 
 		job.progress = { ...job.progress, ...progress };
 	}
@@ -133,7 +137,9 @@ export class JobManager {
 	 */
 	setJobResult(id: string, result: Job['result']): void {
 		const job = this.jobs.get(id);
-		if (!job) {return;}
+		if (!job) {
+			return;
+		}
 
 		job.result = result;
 	}
@@ -143,7 +149,9 @@ export class JobManager {
 	 */
 	cancelJob(id: string): boolean {
 		const job = this.jobs.get(id);
-		if (!job) {return false;}
+		if (!job) {
+			return false;
+		}
 
 		// Only cancel if job is pending or running
 		if (job.status !== JobStatus.PENDING && job.status !== JobStatus.RUNNING) {
@@ -181,8 +189,9 @@ export class JobManager {
 
 	/**
 	 * Clean up finished jobs older than TTL
+	 * Exposed for testing
 	 */
-	private cleanupFinishedJobs(): void {
+	cleanupFinishedJobs(): void {
 		const now = Date.now();
 		const finishedStatuses = [
 			JobStatus.COMPLETED,
