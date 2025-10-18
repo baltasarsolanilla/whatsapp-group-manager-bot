@@ -6,9 +6,10 @@ import {
 } from '@database/repositories';
 import { sleep } from '@logic/helpers';
 import { Group, RemovalOutcome, User } from '@prisma/client';
+import { evolutionAPI } from '@services/evolutionAPI';
 import { AppError } from '@utils/AppError';
-import { removalQueueService } from './removalQueueService';
 import { FeatureFlag, FeatureFlagService } from '../../featureFlags';
+import { removalQueueService } from './removalQueueService';
 
 type RemovalQueueRow = {
 	id: string;
@@ -188,8 +189,10 @@ export const removalWorkflowService = {
 						'Evolution API ~ LEGIT RUN ~ remove members from group',
 						queueWhatsappIds
 					);
-					// ! Keeping it comment out for security reasons
-					// await evolutionAPI.groupService.removeMembers(queueWhatsappIds, groupWaId);
+					await evolutionAPI.groupService.removeMembers(
+						queueWhatsappIds,
+						groupWaId
+					);
 				}
 
 				outcome = RemovalOutcome.SUCCESS;
