@@ -53,6 +53,9 @@ This project demonstrates my ability to architect and build a complete backend s
 - ✅ **Real-time Enforcement** - Automatically remove blacklisted users when they join groups
 - ✅ **Membership Tracking** - Comprehensive database of all group members
 - ✅ **Membership Clean-up** - Manually initiate a clean-up process to remove inactive members
+- ✅ **Cancellable Job System** - Start, monitor, and cancel long-running removal workflows via API
+
+For detailed information about the job system, see [docs/CANCELLABLE_JOBS.md](docs/CANCELLABLE_JOBS.md).
 
 ## 🏗️ Architecture
 

@@ -56,6 +56,7 @@ export default tseslint.config(
 			'coverage/**',
 			'*.config.js',
 			'.env*',
+			'docs/**/*.js',
 		],
 	}
 );
