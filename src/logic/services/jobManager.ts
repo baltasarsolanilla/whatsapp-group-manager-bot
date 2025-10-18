@@ -36,6 +36,7 @@ export interface Job {
 		processed: number;
 		total?: number;
 		currentBatch?: number;
+		message?: string;
 	};
 	result?: {
 		removedWhatsappIds?: string[];
