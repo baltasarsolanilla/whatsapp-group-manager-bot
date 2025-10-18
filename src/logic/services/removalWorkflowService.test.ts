@@ -17,6 +17,14 @@ jest.mock('../../featureFlags', () => ({
 jest.mock('@database/repositories');
 jest.mock('@logic/helpers');
 jest.mock('./removalQueueService');
+jest.mock('@services/evolutionAPI', () => ({
+	evolutionAPI: {
+		groupService: {
+			removeMembers: jest.fn(),
+		},
+		messageService: {},
+	},
+}));
 
 const mockFeatureFlagService = FeatureFlagService as jest.Mocked<
 	typeof FeatureFlagService
