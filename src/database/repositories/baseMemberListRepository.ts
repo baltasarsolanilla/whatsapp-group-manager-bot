@@ -11,6 +11,7 @@ interface IMemberListRepository<T extends MemberListEntity> {
 	): Promise<T | (T & { user: User; group: Group })>;
 	list(groupId?: string): Promise<T[]>;
 	remove(userId: string, groupId: string): Promise<T | null>;
+	exists(userId: string, groupId: string): Promise<boolean>;
 }
 
 // Generic base repository factory
@@ -68,6 +69,13 @@ export function createMemberListRepository<T extends MemberListEntity>(
 						result.count > 0 ? ({ userId, groupId } as T) : null
 					)
 			);
+		},
+
+		async exists(userId: string, groupId: string): Promise<boolean> {
+			const entry = await model.findUnique({
+				where: { userId_groupId: { userId, groupId } },
+			});
+			return entry !== null;
 		},
 	};
 }

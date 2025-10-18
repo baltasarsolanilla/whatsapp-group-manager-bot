@@ -2,6 +2,7 @@ import {
 	groupRepository,
 	removalQueueRepository,
 	userRepository,
+	whitelistRepository,
 } from '@database/repositories';
 import { groupMembershipService } from '@logic/services';
 import { isUserWhatsappId } from '@logic/helpers';
@@ -24,6 +25,15 @@ export const removalQueueService = {
 		);
 		const newQueueMembers: RemovalQueue[] = [];
 		for (const membership of memberships) {
+			// Skip whitelisted members
+			const isWhitelisted = await whitelistRepository.exists(
+				membership.user.id,
+				membership.group.id
+			);
+			if (isWhitelisted) {
+				continue;
+			}
+
 			const newMember = await removalQueueRepository.upsertUser({
 				userId: membership.user.id,
 				groupId: membership.group.id,
@@ -68,11 +78,20 @@ export const removalQueueService = {
 			);
 		}
 
-		// 3. Add entries to removalQueue, ignoring whatsappIds that don't exist in User DB
+		// 3. Add entries to removalQueue, ignoring whatsappIds that don't exist in User DB or are whitelisted
 		const addedEntries: RemovalQueue[] = [];
 		for (const whatsappId of participants) {
 			const user = await userRepository.getByWaId(whatsappId);
 			if (user) {
+				// Skip whitelisted members
+				const isWhitelisted = await whitelistRepository.exists(
+					user.id,
+					group.id
+				);
+				if (isWhitelisted) {
+					continue;
+				}
+
 				const entry = await removalQueueRepository.upsertUser({
 					userId: user.id,
 					groupId: group.id,
@@ -109,6 +128,8 @@ export const removalQueueService = {
 		inserted: number;
 		missing: number;
 		missingUserIds: string[];
+		skippedWhitelisted: number;
+		skippedWhitelistedIds: string[];
 	}> {
 		// 1. Resolve the group
 		const group = await groupRepository.getByWaId(groupId);
@@ -124,10 +145,28 @@ export const removalQueueService = {
 
 		const userResolutions = await Promise.all(userResolutionPromises);
 
-		// 3. Separate existing users from missing ones
-		const existingUsers = userResolutions
-			.filter((r) => r.user !== null)
-			.map((r) => ({ userId: r.user!.id, groupId: group.id }));
+		// 3. Separate existing users from missing ones, and check whitelist
+		const existingUsers: Array<{ userId: string; groupId: string }> = [];
+		const skippedWhitelistedIds: string[] = [];
+
+		for (const resolution of userResolutions) {
+			if (resolution.user !== null) {
+				// Check if user is whitelisted
+				const isWhitelisted = await whitelistRepository.exists(
+					resolution.user.id,
+					group.id
+				);
+				if (isWhitelisted) {
+					skippedWhitelistedIds.push(resolution.whatsappId);
+					continue;
+				}
+
+				existingUsers.push({
+					userId: resolution.user.id,
+					groupId: group.id,
+				});
+			}
+		}
 
 		const missingUserIds = userResolutions
 			.filter((r) => r.user === null)
@@ -146,6 +185,8 @@ export const removalQueueService = {
 			inserted: insertedCount,
 			missing: missingUserIds.length,
 			missingUserIds,
+			skippedWhitelisted: skippedWhitelistedIds.length,
+			skippedWhitelistedIds,
 		};
 	},
 };
